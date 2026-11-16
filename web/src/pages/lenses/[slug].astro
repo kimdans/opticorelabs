@@ -1,4 +1,5 @@
 ---
+import { url } from '../../lib/paths';
 import Base from '../../layouts/Base.astro';
 import { lenses, erpOptions, type Lens } from '../../data/site';
 
@@ -19,7 +20,7 @@ const nextLens = lenses[(i + 1) % lenses.length];
         <div class="chips" style="margin-top:20px">{lens.tags.map(t => <span class="chip">{t}</span>)}</div>
       </div>
       <nav class="others" aria-label="다른 서비스">
-        {lenses.map(l => <a href={`/lenses/${l.slug}`} aria-current={l.slug === lens.slug ? 'page' : undefined}>{l.code}</a>)}
+        {lenses.map(l => <a href={url(`/lenses/${l.slug}`)} aria-current={l.slug === lens.slug ? 'page' : undefined}>{l.code}</a>)}
       </nav>
     </div>
   </section>
@@ -48,8 +49,8 @@ const nextLens = lenses[(i + 1) % lenses.length];
 
   <section class="section gut">
     <div class="inner end">
-      <a class="btn" href="/diagnose">우리 회사에 맞는지 진단하기</a>
-      <a class="nextlink" href={`/lenses/${nextLens.slug}`}>다음 렌즈 <b>{nextLens.code} · {nextLens.name}</b> →</a>
+      <a class="btn" href={url('/diagnose')}>우리 회사에 맞는지 진단하기</a>
+      <a class="nextlink" href={url(`/lenses/${nextLens.slug}`)}>다음 렌즈 <b>{nextLens.code} · {nextLens.name}</b> →</a>
     </div>
   </section>
 </Base>

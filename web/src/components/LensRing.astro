@@ -1,4 +1,5 @@
 ---
+import { url } from '../lib/paths';
 import { lenses } from '../data/site';
 const ticks = Array.from({ length: 144 }, (_, i) => {
   const a = (i / 144) * Math.PI * 2, l = i % 12 === 0 ? 18 : i % 6 === 0 ? 11 : 6, r1 = 232, r2 = r1 - l;
@@ -38,7 +39,7 @@ const ticks = Array.from({ length: 144 }, (_, i) => {
             <h3>{l.name}</h3>
             <p class="what">{l.what}</p>
             <p class="when"><b>이럴 때</b>{l.when}</p>
-            <a class="btn ghost" href={`/lenses/${l.slug}`}>{l.name} 자세히</a>
+            <a class="btn ghost" href={url(`/lenses/${l.slug}`)}>{l.name} 자세히</a>
           </div>
         ))}
       </div>

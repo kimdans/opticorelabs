@@ -1,4 +1,5 @@
 ---
+import { url } from '../lib/paths';
 import '../styles/global.css';
 import { company, nav } from '../data/site';
 
@@ -6,10 +7,10 @@ interface Props { title?: string; description?: string; }
 const { title, description = company.summary } = Astro.props;
 const fullTitle = title ? `${title} · 오티코어` : `오티코어 OptiCore · ${company.tagline}`;
 const path = Astro.url.pathname;
-const canonical = new URL(path, Astro.site).href;
+const canonical = new URL(path.replace(/index\.html$/, '').replace(/\.html$/, ''), Astro.site).href;
 const org = {
   '@context': 'https://schema.org', '@type': 'Organization',
-  name: company.nameKo, alternateName: company.nameEn, url: Astro.site?.href, description: company.summary,
+  name: company.nameKo, alternateName: company.nameEn, url: new URL(url('/'), Astro.site).href, description: company.summary,
   knowsAbout: ['시스템 통합', 'ERP 구축', 'AI 전환', 'SaaS'],
 };
 ---
@@ -21,8 +22,8 @@ const org = {
   <title>{fullTitle}</title>
   <meta name="description" content={description}>
   <link rel="canonical" href={canonical}>
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM-readable summary">
+  <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml">
+  <link rel="alternate" type="text/plain" href={url('/llms.txt')} title="LLM-readable summary">
   <meta property="og:title" content={fullTitle}>
   <meta property="og:description" content={description}>
   <meta property="og:type" content="website">
@@ -36,21 +37,21 @@ const org = {
   <a class="skip" href="#main">본문으로 건너뛰기</a>
   <header class="hud gut">
     <div class="inner bar">
-      <a class="logo" href="/" aria-label="오티코어 홈">
+      <a class="logo" href={url('/')} aria-label="오티코어 홈">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="3"/><rect x="8.5" y="8.5" width="7" height="7" rx="1.2" fill="var(--core)"/></svg>
         opticore
       </a>
       <nav aria-label="주요 메뉴" class="links">
-        {nav.map(n => <a href={n.href} aria-current={path.startsWith(n.match ?? n.href) ? 'page' : undefined}>{n.label}</a>)}
+        {nav.map(n => <a href={url(n.href)} aria-current={path.startsWith(url(n.match ?? n.href)) ? 'page' : undefined}>{n.label}</a>)}
       </nav>
       <div class="right">
         <slot name="hud" />
-        <a class="btn small" href="/diagnose">진단 시작</a>
+        <a class="btn small" href={url('/diagnose')}>진단 시작</a>
         <details class="menu">
           <summary aria-label="메뉴 열기"><span></span><span></span></summary>
           <nav aria-label="모바일 메뉴">
-            {nav.map(n => <a href={n.href}>{n.label}</a>)}
-            <a href="/diagnose">진단 시작</a>
+            {nav.map(n => <a href={url(n.href)}>{n.label}</a>)}
+            <a href={url('/diagnose')}>진단 시작</a>
           </nav>
         </details>
       </div>
@@ -67,7 +68,7 @@ const org = {
         <p>{company.email}{company.placeholder && ' (예시)'}</p>
       </div>
       <div class="flinks">
-        <a href="/method">일하는 순서</a><a href="/principles">원칙</a><a href="/company">회사</a><a href="/llms.txt">llms.txt</a>
+        <a href={url('/method')}>일하는 순서</a><a href={url('/principles')}>원칙</a><a href={url('/company')}>회사</a><a href={url('/llms.txt')}>llms.txt</a>
       </div>
     </div>
   </footer>

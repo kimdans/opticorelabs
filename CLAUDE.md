@@ -42,4 +42,6 @@
 - 브랜드 규칙: `brand/BRAND.md`
 - 사이트 구조: `docs/SITEMAP.md`
 - **실제 사이트: `web/` (Astro, 시안 B 기반)** — 문구는 `web/src/data/site.ts` 한 곳에서 수정
+- 배포: GitHub Pages (`.github/workflows/pages.yml`, `main`에 올라가면 자동). 내부 링크는 `web/src/lib/paths.ts`의 `url()` 사용
+- 브랜드 필름(15초): `brand/motion/` — `build.sh`로 다시 렌더
 - 초기 프로토타입·모션 시안(참고용): `site/index.html`, `site/concepts/`

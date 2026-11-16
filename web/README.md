@@ -19,7 +19,19 @@ npm run build    # dist/ 에 정적 파일 생성
 | `src/scripts/motion.ts` | 부드러운 스크롤과 등장 모션. '동작 줄이기' 설정이면 꺼짐 |
 | `src/scripts/track.ts` | 분석 이벤트 (도구 선정 전까지 `window.dataLayer`로만 전달) |
 
+## 배포 (GitHub Pages)
+`main` 브랜치에 `web/` 변경이 올라가면 `.github/workflows/pages.yml`이 테스트 → 빌드 → 배포를 자동으로 합니다.
+
+- 주소: `https://kimdans.github.io/opticorelabs/`
+- 처음 한 번만: 저장소 **Settings → Pages → Build and deployment → Source**를 **GitHub Actions**로 바꿉니다.
+- 비공개 저장소는 GitHub Pro 이상 요금제에서만 Pages를 쓸 수 있습니다. 무료 요금제라면 저장소를 공개로 바꿔야 합니다. 어느 쪽이든 배포된 사이트는 누구나 볼 수 있습니다.
+- 사이트가 `/opticorelabs/` 아래에 올라가므로 내부 링크는 모두 `src/lib/paths.ts`의 `url()`을 거칩니다. 새 링크를 만들 때 `href="/..."`를 직접 쓰지 마세요.
+- 자체 도메인을 연결하면 워크플로가 주소를 자동으로 넘겨주므로 코드를 고칠 필요가 없습니다.
+- GitHub Pages는 정적 호스팅이라 서버 코드를 돌릴 수 없습니다. 진단 전송은 외부 주소(`PUBLIC_DIAGNOSE_ENDPOINT`)가 필요합니다.
+
+로컬에서 Pages와 같은 경로로 확인: `npm run build && npx astro preview` → `http://localhost:4321/opticorelabs/`
+루트 경로로 확인: `BASE_PATH=/ npm run build && BASE_PATH=/ npx astro preview`
+
 ## 남은 설정
-- `astro.config.mjs`의 `site` 도메인 (지금은 예시 `opticore.kr`)
 - `src/data/site.ts`의 이메일·사업자등록번호·주소 (지금은 예시 값, 화면에 "(예시)"로 표시됨)
 - 진단 전송: 환경 변수 `PUBLIC_DIAGNOSE_ENDPOINT`에 받을 주소를 넣으면 실제로 전송됩니다. 없으면 "준비 중" 안내와 함께 복사로 대체됩니다.

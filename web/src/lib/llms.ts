@@ -4,8 +4,9 @@ import { SIZES, PAINS, SYSTEMS } from './diagnose';
 
 const note = company.placeholder ? ' (예시 값)' : '';
 
-export function llmsShort(site: string): string {
-  const u = (p: string) => new URL(p, site).href;
+/** root = 사이트의 맨 앞 주소 (base 경로 포함). 예: https://kimdans.github.io/opticorelabs */
+export function llmsShort(root: string): string {
+  const u = (p: string) => root.replace(/\/$/, '') + p;
   return [
     `# ${company.nameKo} (${company.nameEn})`, '',
     `> ${company.tagline} ${company.summary}`, '',
@@ -28,9 +29,9 @@ export function llmsShort(site: string): string {
   ].join('\n');
 }
 
-export function llmsFull(site: string): string {
+export function llmsFull(root: string): string {
   return [
-    llmsShort(site).trimEnd(), '',
+    llmsShort(root).trimEnd(), '',
     '---', '',
     ...lenses.flatMap(l => [
       `## ${l.code} · ${l.name}`, l.what, '', `이럴 때: ${l.when}`, '',
