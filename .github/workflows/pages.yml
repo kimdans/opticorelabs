@@ -1,5 +1,5 @@
 # web/ 사이트를 GitHub Pages에 배포한다.
-# 처음 한 번: 저장소 Settings → Pages → Build and deployment → Source를 "GitHub Actions"로 바꿔야 한다.
+# 저장소 Settings → Pages → Source가 "GitHub Actions"여야 한다 (설정 완료).
 name: pages
 on:
   push:
@@ -23,8 +23,8 @@ jobs:
       run:
         working-directory: web
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: '22'
           cache: npm
