@@ -1,0 +1,17 @@
+# OptiCore (주식회사 오티코어)
+
+> 흐릿한 업무를 선명한 시스템으로. SI, ERP 구축, AX(AI 전환), 구독형 SaaS를 진단부터 운영까지 한 팀이 맡는 회사.
+
+## Services
+- SI: 시스템 통합, API 연동, 데이터 이관, 레거시 현대화
+- ERP: Odoo / ERPNext / 패키지 / 자체 개발을 비교한 뒤 구축
+- AX: 사내 문서·데이터에 연결된 업무 에이전트, 사람 승인 단계 포함
+- SaaS: 구축 프로젝트에서 검증된 기능의 구독형 모듈
+
+## Method
+SCAN(진단) -> FOCUS(설계) -> BUILD(구축) -> RUN(운영) -> SCAN
+각 상태는 명시된 전이 조건을 통과해야 다음으로 넘어간다.
+
+## Contact
+- diagnose: POST /api/diagnose (planned)
+- email: contact@opticore.kr (example)

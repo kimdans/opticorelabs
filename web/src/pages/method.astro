@@ -1,0 +1,37 @@
+---
+import { url } from '../lib/paths';
+import Base from '../layouts/Base.astro';
+import StateStrip from '../components/StateStrip.astro';
+const faq = [
+  ['진단(SCAN)만 따로 맡길 수 있나요?', '네. 진단 결과물(업무 흐름 지도, 데이터 인벤토리, 우선순위 과제)은 다른 회사와 구축을 진행해도 그대로 쓸 수 있게 드립니다.'],
+  ['기간은 어떻게 정해지나요?', '표의 기간은 일반적인 범위입니다. 실제 기간은 FOCUS 단계에서 범위와 함께 확정합니다.'],
+  ['중간에 범위가 바뀌면요?', 'BUILD 중의 변경 요청은 빈도와 영향으로 점수를 매겨 이번 스프린트에 넣을지, 다음으로 미룰지 함께 정합니다.'],
+];
+---
+<Base title="일하는 순서" description="SCAN, FOCUS, BUILD, RUN 네 상태와 각 상태의 산출물, 기간, 다음 상태로 가는 조건.">
+  <section class="page-hero gut">
+    <div class="inner">
+      <p class="eyebrow">일하는 순서</p>
+      <h1 class="page-title">프로젝트는 네 개의 상태만 가집니다.</h1>
+      <p class="lede">각 상태는 끝나는 조건이 정해져 있고, 조건을 통과해야 다음으로 넘어갑니다. 운영에서 쌓인 데이터는 다음 진단의 출발점이 됩니다.</p>
+    </div>
+  </section>
+  <section class="gut" style="padding-bottom:96px">
+    <div class="inner"><StateStrip detailed /></div>
+  </section>
+  <section class="section gut">
+    <div class="inner">
+      <div class="sec-head"><h2>자주 묻는 질문</h2></div>
+      <div class="faq">
+        {faq.map(([q, a]) => <details><summary>{q}</summary><p>{a}</p></details>)}
+      </div>
+      <p style="margin-top:40px"><a class="btn" href={url('/diagnose')}>어디서 시작할지 진단하기</a></p>
+    </div>
+  </section>
+</Base>
+<style>
+  .faq { border-top: 1px solid var(--line); max-width: 52em; }
+  details { border-bottom: 1px solid var(--line); padding-block: 18px; }
+  summary { cursor: pointer; font-weight: 500; font-size: 17px; }
+  details p { margin-top: 10px; color: var(--ink-2); }
+</style>

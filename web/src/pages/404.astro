@@ -1,0 +1,14 @@
+---
+import { url } from '../lib/paths';
+import Base from '../layouts/Base.astro';
+---
+<Base title="페이지를 찾을 수 없음">
+  <section class="page-hero gut" style="min-height:70svh">
+    <div class="inner">
+      <p class="eyebrow">f/∞ · 초점 없음</p>
+      <h1 class="page-title">이 주소에는 맞출 초점이 없습니다.</h1>
+      <p class="lede">주소가 바뀌었거나 아직 열리지 않은 페이지입니다.</p>
+      <p style="margin-top:28px;display:flex;gap:10px;flex-wrap:wrap"><a class="btn" href={url('/')}>홈으로</a><a class="btn ghost" href={url('/diagnose')}>진단 시작</a></p>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,290 @@
+<title>OptiCore Aperture</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: 카메라 바디 — 조리개(f/16 → f/1.4)가 열리며 메시지가 드러나고, 렌즈 링을 돌려 서비스를 고르고, 셔터로 진단을 시작한다. 의도적으로 다크 단일 테마. */
+:root {
+  --body: #0B0C0E; --body-2: #131619; --blade-a: #171A1E; --blade-b: #1D2126; --edge: #2E353B;
+  --ink: #E8ECEB; --ink-2: #8B959A; --line: #252B30; --core: #7C86FF; --core-deep: #2430E8; --on-core: #0B0C0E;
+  --f-display: "Bricolage Grotesque", "IBM Plex Sans KR", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--body); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.6; word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 50; background: var(--body); }
+.gut { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.inner { max-width: 1240px; margin: 0 auto; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+h1, h2, h3 { margin: 0; text-wrap: balance; } p { margin: 0; } a { color: inherit; }
+:focus-visible { outline: 2px solid var(--core); outline-offset: 3px; }
+
+/* HUD */
+.hud { position: fixed; top: env(safe-area-inset-top, 0px); left: 0; right: 0; z-index: 40; pointer-events: none; }
+.hud .inner { display: flex; justify-content: space-between; align-items: center; padding-block: 16px; gap: 16px; }
+.logo { pointer-events: auto; display: flex; align-items: center; gap: 10px; font-family: var(--f-display); font-weight: 600; font-size: 19px; letter-spacing: -.02em; text-decoration: none; }
+.logo svg { width: 24px; height: 24px; }
+.exif { font-family: var(--f-mono); font-size: 12px; color: var(--ink-2); display: flex; gap: 16px; font-variant-numeric: tabular-nums; }
+.exif b { color: var(--ink); font-weight: 500; }
+.exif .rec { display: inline-flex; align-items: center; gap: 6px; }
+.exif .rec::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--core); animation: blink 1.6s steps(2) infinite; }
+@keyframes blink { 50% { opacity: .2; } }
+@media (max-width: 520px) { .exif .hide-s { display: none; } }
+
+/* Iris stage */
+.stage { position: relative; height: 100svh; overflow: hidden; }
+.scene { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--core-deep) 55%, var(--body)) 0%, var(--body) 62%); }
+.scene h1 { font-weight: 700; font-size: clamp(34px, 6.4vw, 92px); line-height: 1.08; letter-spacing: -.04em; max-width: 9.5em; padding-inline: 16px; }
+.scene h1 em { font-style: normal; color: #FFFFFF; text-shadow: 0 0 40px color-mix(in srgb, var(--core) 70%, transparent); }
+.scene p { margin-top: 18px; color: color-mix(in srgb, var(--ink) 75%, transparent); }
+canvas#iris { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.caption { position: absolute; left: 0; right: 0; bottom: max(24px, env(safe-area-inset-bottom, 0px)); display: flex; justify-content: space-between; align-items: end; gap: 16px; pointer-events: none; }
+.caption .l { max-width: 24em; }
+.caption .l h2 { font-size: clamp(20px, 2.6vw, 30px); letter-spacing: -.02em; line-height: 1.25; }
+.caption .l p { margin-top: 8px; color: var(--ink-2); font-size: 14px; }
+.caption .r { font-family: var(--f-mono); font-size: 12px; color: var(--ink-2); text-align: right; }
+.fstops { display: flex; gap: 10px; font-family: var(--f-mono); font-size: 12px; color: var(--ink-2); margin-top: 6px; justify-content: flex-end; flex-wrap: wrap; }
+.fstops span.on { color: var(--core); }
+
+/* Lens ring */
+.ringsec { height: 100svh; display: grid; align-content: center; overflow: hidden; }
+.ringwrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; align-items: center; }
+@media (max-width: 860px) { .ringwrap { grid-template-columns: 1fr; gap: 20px; justify-items: center; } }
+.ring { width: min(520px, 82vw, 52svh); aspect-ratio: 1; position: relative; }
+@media (min-width: 861px) { .ring { width: min(520px, 42vw, 74svh); } }
+.ring svg { width: 100%; height: 100%; overflow: visible; }
+.detail { min-width: 0; display: grid; gap: 14px; max-width: 30em; }
+@media (max-width: 860px) { .detail { text-align: left; justify-self: stretch; } }
+.detail .code { font-family: var(--f-display); font-weight: 800; font-size: clamp(56px, 8vw, 112px); line-height: .85; letter-spacing: -.05em; font-variation-settings: "opsz" 96; color: var(--core); }
+.detail h3 { font-size: 24px; }
+.detail .what { color: var(--ink-2); }
+.detail .when { border-top: 1px solid var(--line); padding-top: 14px; font-size: 15px; }
+.detail .when b { display: block; font-family: var(--f-mono); font-weight: 400; font-size: 12px; color: var(--ink-2); letter-spacing: .06em; margin-bottom: 4px; }
+.dots { display: flex; gap: 8px; }
+.dots i { width: 22px; height: 3px; border-radius: 2px; background: var(--line); transition: background .3s; }
+.dots i.on { background: var(--core); }
+
+/* F-stop principles */
+.stops { padding-block: 120px; }
+.stops h2 { font-size: clamp(30px, 4.6vw, 58px); letter-spacing: -.03em; line-height: 1.12; margin-top: 14px; }
+.stoplist { margin-top: 44px; border-top: 1px solid var(--line); }
+.stop { display: grid; grid-template-columns: 120px minmax(0, 1fr) minmax(0, 1.2fr); gap: 24px; padding-block: 24px; border-bottom: 1px solid var(--line); align-items: baseline; transition: background .3s; }
+@media (max-width: 760px) { .stop { grid-template-columns: 76px minmax(0, 1fr); } .stop p { grid-column: 2; } }
+.stop .f { font-family: var(--f-mono); font-size: 22px; color: var(--ink-2); transition: color .3s; font-variant-numeric: tabular-nums; }
+.stop h3 { font-size: 20px; }
+.stop p { color: var(--ink-2); }
+.stop:hover .f { color: var(--core); }
+.stop:hover { background: linear-gradient(90deg, color-mix(in srgb, var(--core) 8%, transparent), transparent 70%); }
+
+/* Shutter CTA */
+.shot { padding-block: 120px 140px; display: grid; justify-items: center; text-align: center; gap: 28px; }
+.shot h2 { font-size: clamp(32px, 6vw, 84px); letter-spacing: -.04em; line-height: 1.05; }
+.shutter { all: unset; cursor: pointer; width: 132px; height: 132px; border-radius: 50%; display: grid; place-items: center; position: relative; background: radial-gradient(circle, var(--body-2) 58%, transparent 59%), conic-gradient(from 0deg, var(--edge), #3A4249, var(--edge), #3A4249, var(--edge)); box-shadow: 0 0 0 1px var(--edge), 0 20px 60px -20px #000; transition: transform .2s; }
+.shutter span { width: 64px; height: 64px; border-radius: 50%; background: var(--core); box-shadow: 0 0 40px color-mix(in srgb, var(--core) 60%, transparent); transition: transform .15s; }
+.shutter:hover span { transform: scale(1.08); }
+.shutter:active span { transform: scale(.88); }
+.shutter:focus-visible { outline: 2px solid var(--core); outline-offset: 6px; }
+.shot .msg { font-family: var(--f-mono); font-size: 13px; color: var(--ink-2); min-height: 1.6em; }
+.flash { position: fixed; inset: 0; background: #FFFFFF; opacity: 0; pointer-events: none; z-index: 70; }
+footer .inner { padding-block: 32px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--ink-2); }
+@media (prefers-reduced-motion: reduce) { .exif .rec::before { animation: none; } }
+</style>
+
+<div class="flash" id="flash"></div>
+<header class="hud gut">
+  <div class="inner">
+    <a class="logo" href="#top" aria-label="오티코어 홈"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="3"/><rect x="8.5" y="8.5" width="7" height="7" rx="1.2" fill="var(--core)"/></svg>opticore</a>
+    <div class="exif" aria-label="촬영 정보"><span class="rec">LIVE</span><span><b id="fnum">f/5.6</b></span><span class="hide-s">ISO 100</span><span class="hide-s">1/250</span></div>
+  </div>
+</header>
+
+<main>
+  <section class="stage" id="top">
+    <div class="scene">
+      <div>
+        <h1>흐릿한 업무를<br><em>선명한 시스템</em>으로.</h1>
+        <p>SI · ERP · AX · SaaS를 하나의 코어로</p>
+      </div>
+    </div>
+    <canvas id="iris" aria-hidden="true"></canvas>
+    <div class="caption gut"><div class="inner" style="width:100%;display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap">
+      <div class="l"><p class="eyebrow">주식회사 오티코어</p><h2 style="margin-top:8px">조리개를 열면, 회사의 핵심이 보입니다.</h2><p>스크롤해서 조리개를 여세요.</p></div>
+      <div class="r">APERTURE<div class="fstops" id="fstops"><span>16</span><span>11</span><span>8</span><span class="on">5.6</span><span>4</span><span>2.8</span><span>2</span><span>1.4</span></div></div>
+    </div></div>
+  </section>
+
+  <section class="ringsec gut" id="ring">
+    <div class="inner">
+      <p class="eyebrow" style="margin-bottom:24px">렌즈 링을 돌려 서비스를 고르세요</p>
+      <div class="ringwrap">
+        <div class="ring"><svg viewBox="-260 -260 520 520" aria-hidden="true" id="ringsvg">
+          <circle r="250" fill="none" stroke="var(--edge)"/>
+          <circle r="196" fill="var(--body-2)" stroke="var(--edge)"/>
+          <circle r="120" fill="none" stroke="var(--line)"/>
+          <circle r="64" fill="var(--body)" stroke="var(--edge)"/>
+          <rect x="-22" y="-22" width="44" height="44" rx="6" fill="var(--core)"/>
+          <g id="ticks"></g>
+          <g id="labels" font-family="Bricolage Grotesque, sans-serif" font-weight="800" fill="var(--ink)" text-anchor="middle" font-size="40">
+            <text y="-142">SI</text><text y="-142" transform="rotate(90)">ERP</text><text y="-142" transform="rotate(180)">AX</text><text y="-142" transform="rotate(270)">SaaS</text>
+          </g>
+          <path d="M0 -258 l-10 -16 h20 z" fill="var(--core)"/>
+        </svg></div>
+        <div class="detail" aria-live="polite">
+          <div class="dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></div>
+          <div class="code" id="dCode">SI</div>
+          <h3 id="dName">시스템 통합</h3>
+          <p class="what" id="dWhat">따로 노는 프로그램들이 같은 데이터를 보게 만듭니다. 쇼핑몰, 회계, 물류 사이의 복사·붙여넣기를 없앱니다.</p>
+          <p class="when"><b>이럴 때</b><span id="dWhen">프로그램은 다섯 개인데 서로 대화를 하지 않을 때.</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="stops gut">
+    <div class="inner">
+      <p class="eyebrow">일하는 원칙</p>
+      <h2>여섯 단계의 조리개로 일합니다.</h2>
+      <div class="stoplist">
+        <div class="stop"><span class="f">f/1.4</span><h3>숨은 상태를 꺼냅니다</h3><p>로딩 중인데 에러도 보이는 화면을 없앱니다. 상태와 전이를 표로 드러냅니다.</p></div>
+        <div class="stop"><span class="f">f/2</span><h3>먼저 찾아보고 만듭니다</h3><p>처음 보는 기능은 관련 오픈소스를 비교한 뒤에 시작합니다.</p></div>
+        <div class="stop"><span class="f">f/2.8</span><h3>버그는 점수로 다룹니다</h3><p>빈도 × 심각도가 5 미만이면 기록만 합니다. 요청 없는 미래를 위해 설계하지 않습니다.</p></div>
+        <div class="stop"><span class="f">f/4</span><h3>끝까지 갑니다</h3><p>중간에 묻지 않고, 지우기 전에만 확인합니다. 보고는 핵심부터 쉬운 말로.</p></div>
+        <div class="stop"><span class="f">f/5.6</span><h3>느린 빌드를 숫자로 봅니다</h3><p>대기·셋업·실행 시간을 나눠 가장 느린 다섯 개를 먼저 보고합니다.</p></div>
+        <div class="stop"><span class="f">f/8</span><h3>처음부터라면 무엇을 남길까</h3><p>남길 것, 버릴 것, 다시 만들 것을 나눠서 결정합니다.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="shot gut">
+    <p class="eyebrow">진단</p>
+    <h2>셔터를 누르면<br>진단이 시작됩니다.</h2>
+    <button class="shutter" id="shutter" type="button" aria-label="진단 시작"><span></span></button>
+    <p class="msg" id="msg" aria-live="polite">3문항 · 약 1분</p>
+  </section>
+</main>
+<footer class="gut"><div class="inner"><span>주식회사 오티코어 · OptiCore — 모션 시안 B</span><span>f/1.4 · focus → core</span></div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const hasGsap = typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined';
+
+  /* ---------- Iris (canvas) ---------- */
+  const cv = $('#iris'), ctx = cv.getContext('2d');
+  const C = { body: css('--body'), a: css('--blade-a'), b: css('--blade-b'), edge: css('--edge'), ink2: css('--ink-2'), core: css('--core') };
+  const N = 9;
+  const state = { open: reduce ? .64 : .04, hole: 0, rot: 0, px: 0 };
+  let W = 0, H = 0, dpr = 1;
+  function size() { dpr = Math.min(2, devicePixelRatio || 1); W = cv.clientWidth; H = cv.clientHeight; cv.width = W * dpr; cv.height = H * dpr; draw(); }
+  function draw() {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const cx = W / 2, cy = H / 2, R0 = Math.min(W, H) * .42, diag = Math.hypot(W, H) / 2 + 40;
+    const R = R0 + (diag - R0) * state.hole;
+    ctx.clearRect(0, 0, W, H);
+    // body with a hole
+    ctx.fillStyle = C.body; ctx.fillRect(0, 0, W, H);
+    ctx.save(); ctx.globalCompositeOperation = 'destination-out'; ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    // housing ticks
+    if (state.hole < .98) {
+      ctx.save(); ctx.globalAlpha = 1 - state.hole; ctx.strokeStyle = C.edge; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(cx, cy, R + 14, 0, Math.PI * 2); ctx.stroke();
+      for (let i = 0; i < 120; i++) { const a = i / 120 * Math.PI * 2 + state.rot * .25, l = i % 10 === 0 ? 12 : 5;
+        ctx.beginPath(); ctx.moveTo(cx + Math.cos(a) * (R + 22), cy + Math.sin(a) * (R + 22)); ctx.lineTo(cx + Math.cos(a) * (R + 22 + l), cy + Math.sin(a) * (R + 22 + l)); ctx.stroke(); }
+      ctx.restore();
+    }
+    // blades
+    const r = Math.max(2, R0 * state.open);
+    if (r < R) {
+      const rot = state.rot + state.px * .25;
+      const V = Array.from({ length: N + 2 }, (_, i) => { const a = rot + i * Math.PI * 2 / N; return [cx + Math.cos(a) * r, cy + Math.sin(a) * r]; });
+      const E = i => { const dx = V.at(i + 1)[0] - V.at(i)[0], dy = V.at(i + 1)[1] - V.at(i)[1], d = Math.hypot(dx, dy) || 1; return [dx / d, dy / d]; };
+      const L = R * 3;
+      ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.clip();
+      for (let i = 0; i < N; i++) {
+        const p1 = V.at(i + 1), p2 = V.at(i + 2), e1 = E(i), e2 = E(i + 1);
+        ctx.beginPath(); ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p1[0] + e1[0] * L, p1[1] + e1[1] * L); ctx.lineTo(p2[0] + e2[0] * L, p2[1] + e2[1] * L); ctx.lineTo(p2[0], p2[1]); ctx.closePath();
+        const g = ctx.createLinearGradient(p1[0], p1[1], p1[0] + e1[0] * R, p1[1] + e1[1] * R);
+        g.addColorStop(0, i % 2 ? C.b : C.a); g.addColorStop(1, C.body);
+        ctx.fillStyle = g; ctx.fill();
+        ctx.strokeStyle = C.edge; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p1[0] + e1[0] * L, p1[1] + e1[1] * L); ctx.stroke();
+      }
+      ctx.restore();
+      // rim highlight on the opening
+      ctx.save(); ctx.strokeStyle = C.core; ctx.globalAlpha = .35 * (1 - state.open / 1.2); ctx.beginPath(); ctx.moveTo(V[0][0], V[0][1]); for (let i = 1; i <= N; i++) ctx.lineTo(V.at(i)[0], V.at(i)[1]); ctx.stroke(); ctx.restore();
+    }
+  }
+  addEventListener('resize', size); size();
+
+  const stops = ['16', '11', '8', '5.6', '4', '2.8', '2', '1.4'];
+  const fspans = $$('#fstops span');
+  function readout() {
+    const i = Math.max(0, Math.min(7, Math.round((state.open - .04) / (1.02 - .04) * 7)));
+    $('#fnum').textContent = 'f/' + stops[i];
+    fspans.forEach((s, j) => s.classList.toggle('on', j === i));
+  }
+  readout();
+
+  if (!hasGsap) { state.open = .64; draw(); readout(); return; }
+  gsap.registerPlugin(ScrollTrigger);
+  if (!reduce && typeof Lenis !== 'undefined') { const lenis = new Lenis({ lerp: .09 }); lenis.on('scroll', ScrollTrigger.update); gsap.ticker.add(t => lenis.raf(t * 1000)); gsap.ticker.lagSmoothing(0); }
+
+  const REST = .64;
+  if (!reduce) {
+    gsap.to(state, { open: REST, rot: .6, duration: 2, delay: .3, ease: 'expo.out', onUpdate: () => { draw(); readout(); } });
+    addEventListener('pointermove', e => { gsap.to(state, { px: (e.clientX / innerWidth - .5), duration: .8, ease: 'power3.out', onUpdate: draw }); });
+    gsap.timeline({ scrollTrigger: { trigger: '.stage', start: 'top top', end: '+=180%', pin: true, scrub: .7, onUpdate: () => { draw(); readout(); } } })
+      .fromTo(state, { open: REST, rot: .6 }, { open: 1.02, rot: 1.9, ease: 'power2.inOut', duration: .7, immediateRender: false })
+      .to(state, { hole: 1, ease: 'power2.in', duration: .3 })
+      .to('.caption', { opacity: 0, y: 20, duration: .2 }, 0)
+      .fromTo('.scene h1', { scale: .92 }, { scale: 1, duration: 1, ease: 'none' }, 0);
+  } else { draw(); readout(); }
+
+  /* ---------- Lens ring ---------- */
+  const ticks = $('#ticks');
+  let tickHtml = '';
+  for (let i = 0; i < 144; i++) { const a = i / 144 * Math.PI * 2, l = i % 12 === 0 ? 18 : i % 6 === 0 ? 11 : 6, r1 = 232, r2 = r1 - l;
+    tickHtml += `<line x1="${(Math.sin(a) * r1).toFixed(1)}" y1="${(-Math.cos(a) * r1).toFixed(1)}" x2="${(Math.sin(a) * r2).toFixed(1)}" y2="${(-Math.cos(a) * r2).toFixed(1)}" stroke="var(--ink-2)" stroke-width="${i % 12 === 0 ? 1.5 : 1}"/>`; }
+  ticks.innerHTML = tickHtml;
+  const D = [
+    ['SI', '시스템 통합', '따로 노는 프로그램들이 같은 데이터를 보게 만듭니다. 쇼핑몰, 회계, 물류 사이의 복사·붙여넣기를 없앱니다.', '프로그램은 다섯 개인데 서로 대화를 하지 않을 때.'],
+    ['ERP', 'ERP 구축', '회사 업무 순서에 맞춘 ERP를 만듭니다. 오픈소스와 패키지를 먼저 비교하고 꼭 필요한 부분만 새로 개발합니다.', '월말 마감이 며칠씩 걸리고 숫자가 부서마다 다를 때.'],
+    ['AX', 'AI 전환', '사내 문서와 데이터에 연결된 에이전트를 업무 흐름 안에 넣습니다. 중요한 결정에는 사람의 승인 단계를 둡니다.', '같은 질문과 같은 서류 작업이 매일 반복될 때.'],
+    ['SaaS', '구독형 모듈', '구축에서 검증된 기능을 바로 쓰는 서비스로 제공합니다. 구축 없이 시작하고 필요하면 맞춤으로 확장합니다.', '지금 한 가지 문제만 빨리 풀고 싶을 때.'],
+  ];
+  let cur = 0;
+  const dots = $$('.dots i');
+  function show(i) {
+    if (i === cur) return; cur = i;
+    const els = ['#dCode', '#dName', '#dWhat', '#dWhen'].map($);
+    const set = () => { els[0].textContent = D[i][0]; els[1].textContent = D[i][1]; els[2].textContent = D[i][2]; els[3].textContent = D[i][3]; };
+    dots.forEach((d, j) => d.classList.toggle('on', j === i));
+    if (reduce) return set();
+    gsap.timeline().to(els, { opacity: 0, y: -10, duration: .18, stagger: .03, onComplete: set }).to(els, { opacity: 1, y: 0, duration: .4, stagger: .05, ease: 'power3.out' });
+  }
+  const labels = $('#labels'), tg = $('#ticks');
+  ScrollTrigger.create({ trigger: '#ring', start: 'top top', end: '+=220%', pin: true, scrub: reduce ? false : .6,
+    onUpdate: s => {
+      const deg = -s.progress * 270;
+      if (!reduce) { labels.setAttribute('transform', `rotate(${deg})`); tg.setAttribute('transform', `rotate(${deg})`); }
+      show(Math.min(3, Math.round(s.progress * 3)));
+    } });
+
+  /* ---------- Principles reveal ---------- */
+  if (!reduce) gsap.from('.stop', { opacity: .15, x: -24, stagger: .08, duration: .8, ease: 'power3.out', scrollTrigger: { trigger: '.stoplist', start: 'top 80%' } });
+
+  /* ---------- Shutter ---------- */
+  $('#shutter').addEventListener('click', () => {
+    const msg = $('#msg');
+    if (!reduce) gsap.timeline().set('#flash', { opacity: .9 }).to('#flash', { opacity: 0, duration: .6, ease: 'power2.out' });
+    msg.textContent = '찰칵. 진단 1/3 · 회사 규모를 골라 주세요 (시안)';
+  });
+})();
+</script>
