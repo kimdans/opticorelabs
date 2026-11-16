@@ -1,10 +1,11 @@
 <title>OptiCore Showreel</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<script>(function(){var h=location.hash,m=h==="#mobile"||(h!=="#desktop"&&innerWidth<640);if(m)document.documentElement.classList.add("f45")})()</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: 15초 브랜드 필름. 1920×1080 스테이지를 화면에 맞춰 축소 재생하고 아래에 조작부를 둔다.
+/* Layout: 15초 브랜드 필름. 1920×1080(데스크톱) 또는 1080×1350(휴대폰, html.f45) 스테이지를 화면에 맞춰 축소 재생하고 아래에 조작부를 둔다.
    카메라 뷰파인더 HUD가 여섯 장면(NOISE → FOCUS → LENS → STATE → CORE → OPTICORE)을 하나로 묶는다. 의도적 다크 단일 테마. */
 :root {
   --body: #0B0C0E; --body-2: #131619; --blade-a: #171A1E; --blade-b: #1D2126; --edge: #2E353B;
@@ -133,6 +134,71 @@ html.cap .ui { display: none; }
 #tag { position: absolute; left: 0; right: 0; top: 728px; text-align: center; font: 500 54px/1.2 var(--f-body); white-space: nowrap; opacity: 0; text-shadow: calc(var(--ab, 0) * -1px) 0 var(--ab-c), calc(var(--ab, 0) * 1px) 0 var(--ab-m); }
 #tag b { font-weight: 700; color: #FFFFFF; }
 #foot6 { position: absolute; left: 0; right: 0; top: 838px; text-align: center; font: 500 24px/1 var(--f-mono); letter-spacing: .22em; color: var(--ink-2); opacity: 0; }
+
+/* ---------- 4:5 mobile cut (1080×1350). Same timeline; only the composition changes. ---------- */
+html.f45 .player { aspect-ratio: 4 / 5; max-width: 480px; margin: 0 auto; }
+html.f45 .ui { max-width: 480px; margin-left: auto; margin-right: auto; }
+html.cap.f45 .player { width: 1080px; height: 1350px; max-width: none; }
+html.f45 #stage, html.f45 #iris { width: 1080px; height: 1350px; }
+html.f45 #hud { font-size: 26px; }
+html.f45 #hud .br { width: 40px; height: 40px; }
+html.f45 #hud .br.a, html.f45 #hud .br.b { top: 36px; } html.f45 #hud .br.c, html.f45 #hud .br.d { bottom: 36px; }
+html.f45 #hud .br.a, html.f45 #hud .br.c { left: 36px; } html.f45 #hud .br.b, html.f45 #hud .br.d { right: 36px; }
+html.f45 #hud .h.tl { left: 92px; top: 50px; } html.f45 #hud .h.brt { right: 92px; bottom: 50px; }
+html.f45 #hud .h.tr, html.f45 #hud .h.bl, html.f45 #hud .h.bc { display: none; }
+html.f45 #rec { width: 14px; height: 14px; }
+/* S1 */
+html.f45 .ghost { top: 540px; font-size: 200px; }
+html.f45 .tok { font-size: 34px; }
+html.f45 #reticle { left: 340px; top: 535px; }
+html.f45 #af { top: 860px; font-size: 26px; }
+html.f45 .s1-count { left: 72px; bottom: 140px; font-size: 24px; }
+html.f45 .s1-count b { font-size: 150px; }
+/* S2 */
+html.f45 .head { top: 400px; }
+html.f45 #l1 { font-size: 80px; }
+html.f45 #l2 { margin-top: 28px; font-size: 156px; line-height: 1.08; }
+html.f45 #fstrip { top: 1150px; font-size: 24px; }
+html.f45 #fstrip span { margin: 0 8px; }
+/* S3 */
+html.f45 #ring { left: -60px; top: 640px; }
+html.f45 .s3-idx { left: 80px; top: 150px; font-size: 24px; }
+html.f45 .m-code { left: 64px; top: 200px; width: 960px; height: 290px; }
+html.f45 .m-echo { left: 76px; top: 212px; width: 960px; height: 290px; }
+html.f45 .code { font-size: 270px; }
+html.f45 .m-sub { left: 74px; top: 500px; width: 940px; height: 170px; }
+html.f45 .sub b { font-size: 66px; }
+html.f45 .sub span { font-size: 36px; }
+/* S4: the four states stack and scroll upward instead of sliding sideways */
+html.f45 #ghost4, html.f45 .track, html.f45 .node, html.f45 #loop { display: none; }
+html.f45 .s4-cap { left: 72px; top: 170px; font-size: 44px; }
+html.f45 .s4-idx { left: 72px; right: auto; top: 110px; font-size: 24px; }
+html.f45 #stripwin { top: 290px; width: 1080px; height: 790px; }
+html.f45 #strip { left: 72px; top: 20px; width: 940px; height: 1700px; }
+html.f45 .stw { width: 940px; height: 400px; }
+html.f45 .stw .o, html.f45 .stw .f { font-size: 230px; }
+html.f45 .meta { top: 250px; font-size: 32px; }
+html.f45 .exit { top: 304px; font-size: 34px; }
+/* S5 */
+html.f45 .s5-cap { left: 72px; top: 130px; font-size: 46px; }
+html.f45 .s5-count { left: 72px; top: 200px; }
+html.f45 .s5-count b { font-size: 170px; }
+html.f45 .s5-count span { font-size: 64px; }
+html.f45 .s5-count em { display: inline; margin-left: 18px; font-size: 32px; }
+html.f45 .row { width: 700px; height: 88px; }
+html.f45 .row .old { font-size: 25px; }
+html.f45 .row .chip { font-size: 25px; }
+html.f45 #core5 { left: 877.5px; top: 771.5px; }
+html.f45 .s5-core-l { left: 830px; top: 900px; }
+/* S6: symbol above the wordmark */
+html.f45 #halo { left: -160px; top: -250px; }
+html.f45 #sym { left: 390px; top: 300px; width: 300px; height: 300px; }
+html.f45 #wm { top: 670px; font-size: 170px; }
+html.f45 #shock, html.f45 #shock2 { left: 390px; top: 300px; width: 300px; height: 300px; }
+html.f45 #rule { left: 240px; top: 900px; width: 600px; }
+html.f45 #tag { top: 935px; font-size: 46px; }
+html.f45 #foot6 { top: 1030px; font-size: 21px; letter-spacing: .14em; }
+.fmt { display: flex; gap: 8px; align-items: center; font: 500 13px var(--f-mono); color: var(--ink-2); }
 </style>
 
 <div class="page">
@@ -240,6 +306,7 @@ html.cap .ui { display: none; }
       <button type="button" id="bPlay" class="primary">일시정지</button>
       <button type="button" id="bSound" aria-pressed="false">소리 켜기</button>
       <button type="button" id="bFull">전체 화면</button>
+      <span class="fmt">화면 <button type="button" data-fmt="desktop">16:9</button><button type="button" data-fmt="mobile">4:5</button></span>
       <input type="range" id="scrub" min="0" max="15" step="0.01" value="0" aria-label="재생 위치">
       <span class="time" id="time">00.00 / 15.00</span>
     </div>
@@ -253,19 +320,21 @@ html.cap .ui { display: none; }
 <script>
 (() => {
   const DUR = 15, BPM = 128, BEAT = 60 / BPM;
+  const F45 = document.documentElement.classList.contains('f45');      // 4:5 휴대폰판
+  const W = F45 ? 1080 : 1920, H = F45 ? 1350 : 1080, CX = W / 2;
   const B = (bar, beat = 0) => (bar * 4 + beat) * BEAT;         // 0-indexed bar/beat → seconds
   const LOCK = B(1) + 1.5;                                       // AF lock
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const rng = seed => () => { seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
   const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
-  const split = node => { const txt = node.textContent; node.textContent = ''; return [...txt].map(c => { const o = el('span', 'ch'), i = el('i', '', c === ' ' ? ' ' : c); o.appendChild(i); node.appendChild(o); return i; }); };
+  const split = node => { const txt = node.textContent; node.textContent = ''; return [...txt].map(c => { const o = el('span', 'ch'), i = el('i', '', c === ' ' ? ' ' : c); if (c === '\n') { node.appendChild(el('br')); return null; } o.appendChild(i); node.appendChild(o); return i; }).filter(Boolean); };
 
   const player = $('#player'), stage = $('#stage');
   let capture = false;
   function fit() {
-    const pw = player.clientWidth, ph = player.clientHeight, k = Math.min(pw / 1920, ph / 1080);
-    stage.style.transform = `translate(${(pw - 1920 * k) / 2}px, ${(ph - 1080 * k) / 2}px) scale(${k})`;
+    const pw = player.clientWidth, ph = player.clientHeight, k = Math.min(pw / W, ph / H);
+    stage.style.transform = `translate(${(pw - W * k) / 2}px, ${(ph - H * k) / 2}px) scale(${k})`;
   }
   fit(); addEventListener('resize', fit); document.addEventListener('fullscreenchange', () => setTimeout(fit, 60));
 
@@ -274,10 +343,12 @@ html.cap .ui { display: none; }
   const TOK = ['견적서_최종_진짜최종.xlsx', '카톡으로 받는 결재', '수기 재고 장부', '쇼핑몰 주문 복붙', '월말 마감 4일', '담당자만 아는 매크로', '메일로 온 세금계산서', '"이거 누가 처리했죠?"', '재고_0412_수정(2).xls', '전화로 받은 발주', '포스트잇 메모', 'ERP ↔ 쇼핑몰 미연동', '거래처 중복 312건', '승인 대기 17건'];
   const SC = [0.62, 2.2, 0.85, 1.3, 1.0, 1.7, 0.7, 1.12, 2.6, 0.9, 1.45, 0.75, 1.9, 1.0];
   const r1 = rng(11), field = $('#field');
-  const toks = TOK.map((t, i) => {
+  const toks = (F45 ? TOK.slice(0, 10) : TOK).map((t, i) => {
     const e = el('div', 'tok', t); field.appendChild(e);
-    const col = i % 5, row = Math.floor(i / 5), s = SC[i];
-    const o = { e, s, x: 90 + col * 372 + (r1() - .5) * 210, y: 150 + row * 318 + (r1() - .5) * 170, rot: (r1() - .5) * 24, dy: (r1() - .5) * 50 };
+    const s = SC[i], col = F45 ? i % 3 : i % 5, row = Math.floor(i / (F45 ? 3 : 5));
+    const o = F45
+      ? { e, s, x: 40 + col * 330 + (r1() - .5) * 150, y: 170 + row * 270 + (r1() - .5) * 130, rot: (r1() - .5) * 24, dy: (r1() - .5) * 50 }
+      : { e, s, x: 90 + col * 372 + (r1() - .5) * 210, y: 150 + row * 318 + (r1() - .5) * 170, rot: (r1() - .5) * 24, dy: (r1() - .5) * 50 };
     e.style.filter = `blur(${(Math.abs(s - 1) * 7 + 0.6).toFixed(1)}px)`; e.style.zIndex = Math.round(s * 10);
     return o;
   });
@@ -287,17 +358,19 @@ html.cap .ui { display: none; }
   $('#ticks').innerHTML = th;
   // S5 rows + beams
   const ROWS = [['견적서_최종_진짜최종.xlsx', '견적·수주'], ['카톡으로 받는 결재', '전자결재'], ['수기 재고 장부', '실시간 재고'], ['쇼핑몰 주문 복붙', '주문 연동'], ['월말 마감 4일', '마감 자동화'], ['담당자만 아는 매크로', '워크플로'], ['메일로 온 세금계산서', '매입 수집'], ['"이거 누가 처리했죠?"', '감사 로그']];
-  const CORE5 = { x: 1640, y: 650 }, LOGO = { x: 960, y: 470 };
+  const CORE5 = F45 ? { x: 930, y: 824 } : { x: 1640, y: 650 }, LOGO = F45 ? { x: 540, y: 450, s: (7 / 24 * 300) / 105 } : { x: 960, y: 470, s: 1 };
+  const RW = F45 ? 700 : 600, RH = F45 ? 88 : 96;
+  $('#beams').setAttribute('viewBox', `0 0 ${W} ${H}`);
   const r5 = rng(23), rowsBox = $('#rows'), beams = $('#beams');
   const E5 = [0, .5, 1, 1.5, 2, 2.5, 2.75, 3].map(b => B(5) + b * BEAT);   // token landing times (accelerating at the end)
   const rows = ROWS.map(([a, b], i) => {
     const e = el('div', 'row'), old = el('span', 'old', a), strike = el('i', 'strike'), chip = el('span', 'chip', b);
     old.appendChild(strike); e.append(old, chip); rowsBox.appendChild(e);
-    const sx = 110 + (i % 2) * 630, sy = 280 + Math.floor(i / 2) * 124;
+    const sx = F45 ? 72 : 110 + (i % 2) * 630, sy = F45 ? 430 + i * 100 : 280 + Math.floor(i / 2) * 124;
     e.style.left = sx + 'px'; e.style.top = sy + 'px';
-    const x1 = sx + 600, y1 = sy + 48, len = Math.hypot(CORE5.x - x1, CORE5.y - y1);
+    const x1 = sx + RW, y1 = sy + RH / 2, len = Math.hypot(CORE5.x - x1, CORE5.y - y1);
     beams.insertAdjacentHTML('beforeend', `<line x1="${x1}" y1="${y1}" x2="${CORE5.x}" y2="${CORE5.y}" stroke="#7C86FF" stroke-width="2.5" stroke-opacity=".75" stroke-dasharray="${len.toFixed(1)}" stroke-dashoffset="${len.toFixed(1)}"/>`);
-    return { e, strike, chip, beam: beams.lastElementChild, sx, sy, fx: (r5() - .5) * 1500, fy: (r5() - .5) * 760 - 80, rot: (r5() - .5) * 44 };
+    return { e, strike, chip, beam: beams.lastElementChild, sx, sy, fx: (r5() - .5) * (F45 ? 800 : 1500), fy: (r5() - .5) * (F45 ? 900 : 760) - 80, rot: (r5() - .5) * 44 };
   });
   // Grain tile
   (() => { const c = document.createElement('canvas'); c.width = c.height = 256; const x = c.getContext('2d'), d = x.createImageData(256, 256), r = rng(5);
@@ -305,11 +378,11 @@ html.cap .ui { display: none; }
     x.putImageData(d, 0, 0); $('#grain').style.backgroundImage = `url(${c.toDataURL()})`; })();
 
   /* ---------- Iris ---------- */
-  const cv = $('#iris'), ctx = cv.getContext('2d'), iris = { open: 0.02, hole: 0, rot: 0 };
+  const cv = $('#iris'); cv.width = W; cv.height = H; const ctx = cv.getContext('2d'), iris = { open: 0.02, hole: 0, rot: 0 };
   const C = { body: '#0B0C0E', a: '#171A1E', b: '#1D2126', edge: '#2E353B' };
   let irisOn = false;
   function drawIris() {
-    const W = 1920, H = 1080, cx = W / 2, cy = H / 2, R0 = 470, diag = Math.hypot(W, H) / 2 + 40, R = R0 + (diag - R0) * iris.hole, N = 9;
+    const cx = W / 2, cy = H / 2, R0 = Math.min(W, H) * .435, diag = Math.hypot(W, H) / 2 + 40, R = R0 + (diag - R0) * iris.hole, N = 9;
     ctx.clearRect(0, 0, W, H); ctx.fillStyle = C.body; ctx.fillRect(0, 0, W, H);
     ctx.save(); ctx.globalCompositeOperation = 'destination-out'; ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill(); ctx.restore();
     if (iris.hole < .98) { ctx.save(); ctx.globalAlpha = 1 - iris.hole; ctx.strokeStyle = C.edge; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cx, cy, R + 16, 0, Math.PI * 2); ctx.stroke();
@@ -363,6 +436,7 @@ html.cap .ui { display: none; }
     tl.to('#af', { autoAlpha: 1, duration: .15 }, B(1)).set('#af', { color: '#7C86FF' }, LOCK).to('#af', { autoAlpha: 0, duration: .12 }, LOCK + .2);
 
     /* S2 · FOCUS (bar 3) */
+    if (F45) $('#l2').textContent = '선명한\n시스템으로.';
     const T2 = B(2), l2i = split($('#l2'));
     show('#s2', T2 - .01, B(3) + .02);
     ft('#flash', { opacity: .85 }, { opacity: 0, duration: .35, ease: 'power2.out' }, T2);
@@ -382,8 +456,8 @@ html.cap .ui { display: none; }
     /* S3 · LENS (bar 4) */
     const T3 = B(3), codes = $$('.m-code .code'), echos = $$('.m-echo .code'), subs = $$('.sub');
     show('#s3', T3 - .2, B(4) + .02);
-    gsap.set('#ring', { x: 1150 }); gsap.set('#ringrot', { rotation: 150, svgOrigin: '0 0' });
-    tl.to('#ring', { x: 0, duration: .5, ease: 'expo.out' }, T3 - .2).to('#ringrot', { rotation: 0, duration: .6, ease: 'back.out(1.5)' }, T3 - .2);
+    gsap.set('#ring', F45 ? { y: 900, rotation: 90 } : { x: 1150 }); gsap.set('#ringrot', { rotation: 150, svgOrigin: '0 0' });
+    tl.to('#ring', F45 ? { y: 0, duration: .5, ease: 'expo.out' } : { x: 0, duration: .5, ease: 'expo.out' }, T3 - .2).to('#ringrot', { rotation: 0, duration: .6, ease: 'back.out(1.5)' }, T3 - .2);
     for (let i = 1; i < 4; i++) tl.to('#ringrot', { rotation: -90 * i, duration: .42, ease: 'back.out(2.2)' }, B(3, i) - .12);
     gsap.set([...codes, ...echos], { yPercent: 106 }); gsap.set(subs, { opacity: 0, y: 40 }); gsap.set('.s3-idx', { opacity: 0 });
     tl.to('.s3-idx', { opacity: 1, duration: .2 }, T3);
@@ -394,15 +468,16 @@ html.cap .ui { display: none; }
         .to(subs[i], { opacity: 1, y: 0, duration: .3, ease: 'power3.out' }, t + .04);
       if (i < 3) tl.to([codes[i], echos[i]], { yPercent: -106, duration: .15, ease: 'power3.in' }, B(3, i + 1) - .15).to(subs[i], { opacity: 0, y: -30, duration: .12, ease: 'power2.in' }, B(3, i + 1) - .13);
     }
-    tl.to('#s3', { x: -1920, duration: .2, ease: 'power3.in' }, B(4) - .2);
+    tl.to('#s3', { x: -W, duration: .2, ease: 'power3.in' }, B(4) - .2);
 
     /* S4 · STATE (bar 5) */
     const T4 = B(4), fills = $$('.stw .f'), nodes = $$('.node'), metas = $$('.stw .meta'), exits = $$('.stw .exit');
     show('#s4', T4 - .08, B(5) + .02);
-    gsap.set('#s4', { x: 1920 }); gsap.set(nodes, { scale: 0 }); gsap.set([...metas, ...exits], { opacity: 0, y: 18 });
+    gsap.set('#s4', { x: W }); gsap.set(nodes, { scale: 0 }); gsap.set([...metas, ...exits], { opacity: 0, y: 18 });
     const lp = $('#loopp'), lpl = lp.getTotalLength(); gsap.set(lp, { strokeDasharray: lpl, strokeDashoffset: lpl }); gsap.set(['#looph', '#loopt'], { opacity: 0 });
     tl.to('#s4', { x: 0, duration: .34, ease: 'expo.out' }, T4 - .08);
-    for (let i = 1; i < 4; i++) tl.to('#strip', { x: -1150 * i, duration: .36, ease: 'expo.inOut' }, B(4, i) - .26).to('#ghost4', { x: -520 * i, duration: .5, ease: 'expo.inOut' }, B(4, i) - .3);
+    if (F45) { $$('.stw').forEach((e, i) => { e.style.left = '0px'; e.style.top = i * 420 + 'px'; }); exits[3].lastChild.textContent = '다음 과제 확정 → 다시 SCAN'; }
+    for (let i = 1; i < 4; i++) tl.to('#strip', F45 ? { y: -420 * i, duration: .36, ease: 'expo.inOut' } : { x: -1150 * i, duration: .36, ease: 'expo.inOut' }, B(4, i) - .26).to('#ghost4', { x: -520 * i, duration: .5, ease: 'expo.inOut' }, B(4, i) - .3);
     for (let i = 0; i < 4; i++) {
       const t = B(4, i);
       tl.to(fills[i], { clipPath: 'inset(0% 0% 0% 0%)', duration: .26, ease: 'power2.out' }, t + .02)
@@ -410,12 +485,12 @@ html.cap .ui { display: none; }
         .to(metas[i], { opacity: 1, y: 0, duration: .22, ease: 'power3.out' }, t + .05).to(exits[i], { opacity: 1, y: 0, duration: .22, ease: 'power3.out' }, t + .1);
     }
     tl.to(lp, { strokeDashoffset: 0, duration: .22, ease: 'power2.inOut' }, B(4, 3) + .05).set('#looph', { opacity: 1 }, B(4, 3) + .25).to('#loopt', { opacity: 1, duration: .1 }, B(4, 3) + .08);
-    tl.to('#s4', { y: -1080, duration: .18, ease: 'power3.in' }, B(5) - .2);
+    tl.to('#s4', { y: -H, duration: .18, ease: 'power3.in' }, B(5) - .2);
 
     /* S5 · CORE (bar 6) */
     const T5 = B(5), OUT5 = B(6) - .325;
     show('#s5', T5 - .1, B(6));
-    gsap.set('#s5', { y: 1080 }); gsap.set('#core5', { scale: .22 });
+    gsap.set('#s5', { y: H }); gsap.set('#core5', { scale: .22 });
     tl.to('#s5', { y: 0, duration: .3, ease: 'expo.out' }, T5 - .1);
     rows.forEach((r, i) => {
       const e = E5[i];
@@ -425,14 +500,14 @@ html.cap .ui { display: none; }
         .to(r.chip, { scale: 1, opacity: 1, duration: .26, ease: 'back.out(2.6)' }, e + .06)
         .to(r.beam, { strokeDashoffset: 0, duration: .2, ease: 'power2.out' }, e + .06)
         .to('#core5', { scale: .22 + .78 * (i + 1) / 8, duration: .24, ease: 'back.out(3.2)' }, e + .14);
-      tl.to(r.e, { x: LOGO.x - (r.sx + 300), y: LOGO.y - (r.sy + 48), scale: .02, opacity: 0, duration: .27, ease: 'expo.in' }, OUT5 + i * .006);
+      tl.to(r.e, { x: LOGO.x - (r.sx + RW / 2), y: LOGO.y - (r.sy + RH / 2), scale: .02, opacity: 0, duration: .27, ease: 'expo.in' }, OUT5 + i * .006);
     });
     tl.to('#beams', { opacity: 0, duration: .08 }, OUT5).to(['.s5-cap', '#cnt5', '#corel'], { opacity: 0, duration: .14 }, OUT5)
-      .to('#core5', { x: LOGO.x - CORE5.x, y: LOGO.y - CORE5.y, scale: 1, duration: .325, ease: 'expo.inOut' }, OUT5);
+      .to('#core5', { x: LOGO.x - CORE5.x, y: LOGO.y - CORE5.y, scale: LOGO.s, duration: .325, ease: 'expo.inOut' }, OUT5);
 
     /* S6 · OPTICORE (bars 7–8) */
-    const T6 = B(6), wmi = split($('#wm')), wm = $('#wm'), wmW = wm.offsetWidth, total = 330 + 44 + wmW, symC = 960 - total / 2 + 165;
-    wm.style.left = (symC + 165 + 44) + 'px'; gsap.set('#shock2', { x: symC - 960 });
+    const T6 = B(6), wmi = split($('#wm')), wm = $('#wm'), wmW = wm.offsetWidth, total = 330 + 44 + wmW, symC = F45 ? CX : CX - total / 2 + 165;
+    wm.style.left = (F45 ? CX - wmW / 2 : symC + 165 + 44) + 'px'; gsap.set('#shock2', { x: symC - CX });
     show('#s6', T6);
     ft('#flash', { opacity: .75 }, { opacity: 0, duration: .5, ease: 'power2.out' }, T6);
     gsap.set('#symring', { rotation: -300, svgOrigin: '12 12' }); gsap.set('#symcore', { svgOrigin: '12 12' }); gsap.set(wmi, { yPercent: 118, rotation: 5 }); gsap.set('#lock', { scale: 1 });
@@ -441,7 +516,7 @@ html.cap .ui { display: none; }
     tl.to('#symring', { strokeDashoffset: 0, rotation: -90, duration: .75, ease: 'expo.out' }, T6 + .02)
       .to('#halo', { opacity: 1, duration: .8, ease: 'power2.out' }, T6);
     ft('#shock', { scale: .5, opacity: .9 }, { scale: 4.6, opacity: 0, duration: 1.0, ease: 'expo.out' }, T6);
-    tl.to('#sym', { x: -(960 - symC), duration: .55, ease: 'expo.inOut' }, T6 + BEAT - .12)
+    tl.to('#sym', { x: -(CX - symC), duration: .55, ease: 'expo.inOut' }, T6 + BEAT - .12)
       .to(wmi, { yPercent: 0, rotation: 0, duration: .62, ease: 'expo.out', stagger: .035 }, T6 + BEAT + .08)
       .to('#rule', { scaleX: 1, duration: .6, ease: 'expo.out' }, B(7) - .1)
       .to('#tag', { opacity: 1, filter: 'blur(0px)', letterSpacing: '0.01em', '--ab': 0, duration: .7, ease: 'power3.out' }, B(7))
@@ -477,14 +552,14 @@ html.cap .ui { display: none; }
     txt(s3n, p2(1 + clamp(Math.floor((t - B(3)) / BEAT + 1e-6), 0, 3)));
     txt(s4n, String(1 + clamp(Math.floor((t - B(4)) / BEAT + 1e-6), 0, 3)));
     txt(s5n, String(E5.filter(e => t >= e + .04).length));
-    if (t >= B(2) - .03 && t < B(2) + 1.0) { drawIris(); irisOn = true; } else if (irisOn) { ctx.clearRect(0, 0, 1920, 1080); irisOn = false; }
+    if (t >= B(2) - .03 && t < B(2) + 1.0) { drawIris(); irisOn = true; } else if (irisOn) { ctx.clearRect(0, 0, W, H); irisOn = false; }
     grain.style.backgroundPosition = `${(f * 97) % 256}px ${(f * 57) % 256}px`;
   }
   /* Directional motion blur: 각 대상의 직전 1/120초 이동량을 재서 그 방향으로만 번지게 한다 (휩 팬의 잔상이 끊기지 않게). */
-  const gp = (e, p) => +gsap.getProperty(e, p) || 0, sumY = sel => $$(sel).reduce((a, e) => a + gp(e, 'yPercent'), 0) * 3.72;
+  const gp = (e, p) => +gsap.getProperty(e, p) || 0, sumY = sel => $$(sel).reduce((a, e) => a + gp(e, 'yPercent'), 0) * (F45 ? 2.7 : 3.72);
   const NS = 'http://www.w3.org/2000/svg', defs = document.createElementNS(NS, 'svg');
   defs.setAttribute('width', '0'); defs.setAttribute('height', '0'); defs.style.position = 'absolute'; stage.appendChild(defs);
-  const MB = [['#ring', () => [gp('#ring', 'x'), 0]], ['#s3', () => [gp('#s3', 'x'), 0]], ['#s4', () => [gp('#s4', 'x'), gp('#s4', 'y')]], ['#stripwin', () => [gp('#strip', 'x'), 0]],
+  const MB = [['#ring', () => [gp('#ring', 'x'), gp('#ring', 'y')]], ['#s3', () => [gp('#s3', 'x'), 0]], ['#s4', () => [gp('#s4', 'x'), gp('#s4', 'y')]], ['#stripwin', () => [gp('#strip', 'x'), gp('#strip', 'y')]],
     ['#s5', () => [0, gp('#s5', 'y')]], ['.m-code', () => [0, sumY('.m-code .code')]], ['.m-echo', () => [0, sumY('.m-echo .code')]], ['#sym', () => [gp('#sym', 'x'), 0]]].map(([sel, read], i) => {
     const f = document.createElementNS(NS, 'filter'), fe = document.createElementNS(NS, 'feGaussianBlur');
     f.id = 'mb' + i; ['x', 'y'].forEach(a => f.setAttribute(a, '-15%')); ['width', 'height'].forEach(a => f.setAttribute(a, '130%')); f.setAttribute('color-interpolation-filters', 'sRGB');
@@ -517,6 +592,7 @@ html.cap .ui { display: none; }
     else { sound = false; snd.pause(); t0 = performance.now() - cur * 1000; }
     bSound.setAttribute('aria-pressed', String(sound)); bSound.textContent = sound ? '소리 끄기' : '소리 켜기';
   });
+  $$('[data-fmt]').forEach(b => { b.setAttribute('aria-pressed', String((b.dataset.fmt === 'mobile') === F45)); b.addEventListener('click', () => { location.hash = b.dataset.fmt; location.reload(); }); });
   bFull.addEventListener('click', () => { const p = document.fullscreenElement ? document.exitFullscreen() : player.requestFullscreen?.(); p?.catch?.(() => {}); });
   scrub.addEventListener('input', () => { cur = +scrub.value; if (playing) setPlaying(false); seek(cur); timeEl.textContent = `${cur.toFixed(2).padStart(5, '0')} / 15.00`; });
   function loop(now) {
