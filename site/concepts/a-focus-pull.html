@@ -1,0 +1,319 @@
+<title>OptiCore Focus Pull</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: 한 편의 '초점 맞추기' 시퀀스 — 히어로 색수차 수렴 → 업무 노이즈 정렬(핀) → 상태 머신 가로 스크롤(핀) → 서비스 → 진단 */
+:root {
+  --glass: #EDF0EF; --glass-2: #E0E6E3; --ink: #121519; --ink-2: #4C555B; --line: #C6CECB;
+  --core: #2430E8; --on-core: #FFFFFF; --ab-c: #00A9BD; --ab-m: #D9246F;
+  --f-display: "Bricolage Grotesque", "IBM Plex Sans KR", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --blend: multiply;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --glass: #0D1012; --glass-2: #161B1E; --ink: #E6ECEA; --ink-2: #9AA4A8; --line: #2B3338;
+  --core: #8089FF; --on-core: #0D1012; --ab-c: #2FD3E6; --ab-m: #FF5AA5; --blend: screen; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --glass: #0D1012; --glass-2: #161B1E; --ink: #E6ECEA; --ink-2: #9AA4A8; --line: #2B3338;
+  --core: #8089FF; --on-core: #0D1012; --ab-c: #2FD3E6; --ab-m: #FF5AA5; --blend: screen; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { background: var(--glass); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.6; word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 50; background: var(--glass); }
+.gut { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.inner { max-width: 1240px; margin: 0 auto; }
+.mono { font-family: var(--f-mono); }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--core); outline-offset: 3px; }
+
+/* Top bar with live focus readout */
+.bar { position: fixed; top: env(safe-area-inset-top, 0px); left: 0; right: 0; z-index: 40; background: color-mix(in srgb, var(--glass) 78%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.bar .inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 14px; }
+.logo { display: flex; align-items: center; gap: 10px; font-family: var(--f-display); font-weight: 600; font-size: 19px; letter-spacing: -.02em; text-decoration: none; }
+.logo svg { width: 24px; height: 24px; }
+.logo .core { transform-origin: 12px 12px; animation: spin 14s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.readout { font-family: var(--f-mono); font-size: 12px; color: var(--ink-2); display: flex; gap: 14px; align-items: center; font-variant-numeric: tabular-nums; }
+.readout b { color: var(--core); font-weight: 500; min-width: 44px; display: inline-block; text-align: right; }
+.progress { position: fixed; left: 0; right: 0; top: env(safe-area-inset-top, 0px); height: 2px; background: var(--core); transform-origin: 0 50%; transform: scaleX(0); z-index: 41; }
+
+/* Reticle cursor */
+.reticle { position: fixed; left: 0; top: 0; width: 46px; height: 46px; margin: -23px 0 0 -23px; pointer-events: none; z-index: 60; display: none; }
+.reticle svg { width: 100%; height: 100%; overflow: visible; transition: transform .25s cubic-bezier(.2,.8,.2,1); }
+.reticle.hot svg { transform: scale(1.6) rotate(45deg); }
+@media (hover: hover) and (pointer: fine) { .reticle { display: block; } body, a, button { cursor: none; } }
+
+/* Hero */
+.hero { min-height: 100svh; display: grid; align-content: center; padding-block: 120px 64px; position: relative; }
+.hero .inner { width: 100%; }
+.stack { position: relative; font-family: var(--f-body); font-weight: 700; font-size: clamp(44px, 9.4vw, 148px); line-height: 1.02; letter-spacing: -.045em; margin-top: 24px; }
+.stack .ly { display: block; }
+.stack .ly + .ly { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: var(--blend); }
+.stack .c { color: var(--ab-c); }
+.stack .m { color: var(--ab-m); }
+.stack em { font-style: normal; color: var(--core); }
+.hero-foot { margin-top: 40px; display: flex; flex-wrap: wrap; gap: 28px 48px; align-items: end; justify-content: space-between; }
+.hero-foot p { max-width: 30em; color: var(--ink-2); font-size: 17px; }
+.mag { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 12px; background: var(--ink); color: var(--glass); padding: 18px 26px; border-radius: 999px; font-weight: 500; will-change: transform; }
+.mag .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--core); box-shadow: 0 0 0 4px color-mix(in srgb, var(--core) 30%, transparent); }
+.mag:focus-visible { outline: 2px solid var(--core); outline-offset: 4px; }
+.scrollhint { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); font-family: var(--f-mono); font-size: 11px; color: var(--ink-2); display: grid; justify-items: center; gap: 8px; }
+.scrollhint i { width: 1px; height: 36px; background: linear-gradient(var(--ink-2), transparent); animation: drip 1.8s ease-in-out infinite; transform-origin: top; }
+@keyframes drip { 0% { transform: scaleY(0); } 50% { transform: scaleY(1); } 100% { transform: scaleY(1); opacity: 0; } }
+
+/* Section shells */
+.sec { position: relative; }
+.sec-head { display: grid; gap: 14px; max-width: 44em; }
+.sec-head h2 { font-size: clamp(30px, 4.6vw, 60px); line-height: 1.12; letter-spacing: -.03em; font-weight: 700; }
+.w { display: inline-block; }
+
+/* Noise -> Core (pinned) */
+.noise { overflow: clip; min-height: 100svh; display: grid; grid-template-rows: auto 1fr; padding-block: 96px 40px; gap: 32px; }
+.noise .top { display: flex; justify-content: space-between; align-items: end; gap: 24px; flex-wrap: wrap; }
+.count { font-family: var(--f-display); font-weight: 800; font-size: clamp(48px, 7vw, 96px); line-height: .9; font-variation-settings: "opsz" 96; font-variant-numeric: tabular-nums; }
+.count small { font-size: .35em; color: var(--ink-2); font-weight: 400; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 24px; align-content: center; }
+@media (max-width: 720px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; } .tk { flex-direction: column; align-items: flex-start; padding: 10px 12px; gap: 8px; } .tk .old { font-size: 11.5px; max-width: 100%; } .tk .new { font-size: 12px; } .noise { padding-block: 80px 24px; gap: 20px; } }
+.tk { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-radius: 10px; background: var(--glass-2); min-width: 0; will-change: transform, filter; }
+.tk .old { font-family: var(--f-mono); font-size: 13px; position: relative; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tk .old::after { content: ""; position: absolute; left: 0; right: 0; top: 52%; height: 1.5px; background: var(--ink-2); transform: scaleX(var(--strike, 0)); transform-origin: 0 50%; }
+.tk .new { flex: none; font-weight: 500; font-size: 14px; color: var(--on-core); background: var(--core); padding: 5px 12px; border-radius: 999px; clip-path: inset(0 calc(100% * (1 - var(--chip, 0))) 0 0 round 999px); }
+
+/* State machine horizontal */
+.hz { height: 100svh; overflow: hidden; display: grid; grid-template-columns: minmax(0, 1fr); align-content: center; gap: 28px; }
+.hz .meter { display: flex; align-items: center; gap: 0; max-width: 560px; }
+.hz .node { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid var(--line); background: var(--glass); flex: none; transition: background .3s, border-color .3s; }
+.hz .node.on { background: var(--core); border-color: var(--core); }
+.hz .seg { flex: 1; height: 1.5px; background: var(--line); position: relative; overflow: hidden; }
+.hz .seg i { position: absolute; inset: 0; background: var(--core); transform: scaleX(0); transform-origin: 0 50%; }
+.track { display: flex; gap: 24px; width: max-content; will-change: transform; }
+.panel { width: min(78vw, 720px); min-height: 380px; border: 1px solid var(--line); border-radius: 18px; padding: 32px; display: grid; grid-template-rows: auto 1fr auto; gap: 18px; background: var(--glass); position: relative; overflow: hidden; }
+@media (max-width: 600px) { .panel { width: 86vw; padding: 22px; min-height: 420px; } }
+.panel .code { font-family: var(--f-display); font-weight: 800; font-size: clamp(64px, 11vw, 150px); line-height: .85; letter-spacing: -.05em; font-variation-settings: "opsz" 96; color: transparent; -webkit-text-stroke: 1.5px var(--ink); }
+.panel.active .code { color: var(--core); -webkit-text-stroke-color: var(--core); }
+.panel .code { transition: color .5s ease, -webkit-text-stroke-color .5s ease; }
+.panel ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; align-content: start; }
+.panel li { display: flex; gap: 10px; }
+.panel li::before { content: "○"; color: var(--core); font-size: 12px; line-height: 1.9; }
+.panel .exit { border-top: 1px solid var(--line); padding-top: 14px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 15px; }
+.panel .exit span:first-child { font-family: var(--f-mono); font-size: 12px; color: var(--core); letter-spacing: .06em; }
+.panel .ko { position: absolute; top: 32px; right: 32px; font-family: var(--f-mono); font-size: 12px; color: var(--ink-2); text-align: right; }
+
+/* Services */
+.svc { padding-block: 120px; }
+.rows { margin-top: 48px; border-top: 1px solid var(--ink); }
+.row { position: relative; display: grid; grid-template-columns: 220px minmax(0, 1fr) minmax(0, .9fr); gap: 28px; padding-block: 34px; border-bottom: 1px solid var(--line); overflow: hidden; isolation: isolate; }
+@media (max-width: 860px) { .row { grid-template-columns: 1fr; gap: 10px; padding-block: 26px; } }
+.row .flare { position: absolute; width: 360px; height: 360px; margin: -180px 0 0 -180px; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--core) 22%, transparent), transparent 65%); left: var(--mx, -999px); top: var(--my, -999px); z-index: -1; opacity: 0; transition: opacity .3s; pointer-events: none; }
+.row:hover .flare { opacity: 1; }
+.row .k { font-family: var(--f-display); font-weight: 800; font-size: clamp(56px, 7vw, 92px); line-height: .85; letter-spacing: -.05em; font-variation-settings: "opsz" 96; position: relative; }
+.row .k span { display: block; transition: transform .5s cubic-bezier(.2,.8,.2,1); }
+.row .k span + span { position: absolute; inset: 0; color: var(--core); transform: translateY(105%); }
+.row .kwrap { overflow: hidden; height: fit-content; }
+.row:hover .k span:first-child { transform: translateY(-105%); }
+.row:hover .k span + span { transform: translateY(0); }
+.row h3 { font-size: 22px; }
+.row .what { margin-top: 8px; color: var(--ink-2); }
+.row .when b { display: block; font-family: var(--f-mono); font-weight: 400; font-size: 12px; color: var(--ink-2); letter-spacing: .06em; margin-bottom: 6px; }
+
+/* CTA */
+.cta { padding-block: 140px 120px; text-align: left; }
+.cta h2 { font-size: clamp(40px, 8vw, 120px); line-height: 1; letter-spacing: -.045em; font-weight: 700; max-width: 11em; }
+.cta h2 em { font-style: normal; color: var(--core); }
+.cta .row2 { margin-top: 44px; display: flex; flex-wrap: wrap; gap: 20px; align-items: center; }
+.cta .row2 p { color: var(--ink-2); max-width: 28em; }
+footer .inner { padding-block: 32px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--ink-2); }
+
+@media (prefers-reduced-motion: reduce) { .logo .core, .scrollhint i { animation: none; } }
+</style>
+
+<div class="progress" id="progress"></div>
+<div class="reticle" id="reticle" aria-hidden="true">
+  <svg viewBox="0 0 46 46"><circle cx="23" cy="23" r="16" fill="none" stroke="var(--core)" stroke-width="1.25"/><path d="M23 1v9M23 36v9M1 23h9M36 23h9" stroke="var(--core)" stroke-width="1.25"/><circle cx="23" cy="23" r="1.6" fill="var(--core)"/></svg>
+</div>
+
+<header class="bar gut">
+  <div class="inner">
+    <a class="logo" href="#top" aria-label="오티코어 홈">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="3"/><rect class="core" x="8.5" y="8.5" width="7" height="7" rx="1.2" fill="var(--core)"/></svg>
+      opticore
+    </a>
+    <div class="readout" aria-label="현재 초점거리"><span>FOCUS</span><b id="dist">∞</b></div>
+  </div>
+</header>
+
+<main>
+  <section class="hero gut" id="top">
+    <div class="inner">
+      <p class="eyebrow">SI · ERP · AX · SaaS — 주식회사 오티코어</p>
+      <h1 class="stack" id="stack" aria-label="흐릿한 업무를 선명한 시스템으로.">
+        <span class="ly k" aria-hidden="true">흐릿한 업무를<br><em>선명한 시스템</em>으로.</span>
+        <span class="ly c" aria-hidden="true">흐릿한 업무를<br>선명한 시스템으로.</span>
+        <span class="ly m" aria-hidden="true">흐릿한 업무를<br>선명한 시스템으로.</span>
+      </h1>
+      <div class="hero-foot">
+        <p>엑셀, 메신저 결재, 담당자 머릿속에 흩어진 일을 하나의 코어로 모읍니다. 진단부터 운영까지 한 팀이 맡습니다.</p>
+        <button class="mag" type="button" data-mag><span class="dot"></span>3문항 진단 시작</button>
+      </div>
+    </div>
+    <div class="scrollhint" aria-hidden="true">SCROLL TO FOCUS<i></i></div>
+  </section>
+
+  <section class="sec noise gut" id="noise">
+    <div class="inner top">
+      <div class="sec-head">
+        <p class="eyebrow">5 m · 지금 회사의 업무</p>
+        <h2 class="reveal">스크롤할수록 흩어진 일이 제자리를 찾습니다.</h2>
+      </div>
+      <div class="count" aria-live="polite"><span id="cnt">0</span><small> / 8 정리됨</small></div>
+    </div>
+    <div class="inner grid" id="grid">
+      <div class="tk"><span class="old">견적서_최종_진짜최종.xlsx</span><span class="new">견적·수주</span></div>
+      <div class="tk"><span class="old">카톡으로 받는 결재</span><span class="new">전자결재</span></div>
+      <div class="tk"><span class="old">수기 재고 장부</span><span class="new">실시간 재고</span></div>
+      <div class="tk"><span class="old">쇼핑몰 주문 복붙</span><span class="new">주문 연동</span></div>
+      <div class="tk"><span class="old">월말 마감 4일</span><span class="new">마감 자동화</span></div>
+      <div class="tk"><span class="old">담당자만 아는 매크로</span><span class="new">워크플로</span></div>
+      <div class="tk"><span class="old">메일로 오는 세금계산서</span><span class="new">매입 자동 수집</span></div>
+      <div class="tk"><span class="old">"이거 누가 처리했죠?"</span><span class="new">감사 로그</span></div>
+    </div>
+  </section>
+
+  <section class="sec hz" id="hz">
+    <div class="gut"><div class="inner" style="display:grid;gap:22px">
+      <div class="sec-head"><p class="eyebrow">2 m · 일하는 순서</p><h2>프로젝트는 네 개의 상태만 가집니다.</h2></div>
+      <div class="meter" aria-hidden="true">
+        <span class="node on"></span><span class="seg"><i></i></span><span class="node"></span><span class="seg"><i></i></span><span class="node"></span><span class="seg"><i></i></span><span class="node"></span>
+      </div>
+    </div></div>
+    <div class="gut" style="overflow:visible">
+      <div class="inner"><div class="track" id="track">
+        <article class="panel active"><span class="ko">진단<br>2–3주</span><div class="code">SCAN</div><ul><li>현업 인터뷰와 실제 업무 관찰</li><li>업무 흐름 지도, 데이터 인벤토리</li><li>자동화·AI 적합도 점수</li></ul><div class="exit"><span>EXIT →</span><span>우선순위 3개에 경영진 합의</span></div></article>
+        <article class="panel"><span class="ko">설계<br>2–4주</span><div class="code">FOCUS</div><ul><li>목표 업무의 상태 전이 표</li><li>오픈소스 · 패키지 · 자체 개발 비교</li><li>화면 시안과 데이터 모델</li></ul><div class="exit"><span>EXIT →</span><span>화면과 데이터 모델 승인</span></div></article>
+        <article class="panel"><span class="ko">구축<br>6–16주</span><div class="code">BUILD</div><ul><li>2주마다 동작하는 버전 배포</li><li>매 스프린트 현업 시연</li><li>데이터 이관 리허설</li></ul><div class="exit"><span>EXIT →</span><span>실데이터 병행 운영 통과</span></div></article>
+        <article class="panel"><span class="ko">운영<br>계속</span><div class="code">RUN</div><ul><li>모니터링과 월간 리포트</li><li>개선 요청은 빈도 × 심각도로 분류</li><li>운영 데이터로 다음 과제 제안</li></ul><div class="exit"><span>EXIT →</span><span>다음 과제 확정 → SCAN</span></div></article>
+      </div></div>
+    </div>
+  </section>
+
+  <section class="sec svc gut" id="svc">
+    <div class="inner">
+      <div class="sec-head"><p class="eyebrow">1 m · 서비스</p><h2 class="reveal">네 개의 렌즈, 하나의 초점.</h2></div>
+      <div class="rows">
+        <article class="row"><span class="flare"></span><div class="kwrap"><div class="k"><span>SI</span><span>SI</span></div></div><div><h3>시스템 통합</h3><p class="what">따로 노는 프로그램들이 같은 데이터를 보게 만듭니다.</p></div><p class="when"><b>이럴 때</b>프로그램은 다섯 개인데 서로 대화를 하지 않을 때.</p></article>
+        <article class="row"><span class="flare"></span><div class="kwrap"><div class="k"><span>ERP</span><span>ERP</span></div></div><div><h3>ERP 구축</h3><p class="what">오픈소스와 패키지를 먼저 비교하고, 꼭 필요한 부분만 새로 만듭니다.</p></div><p class="when"><b>이럴 때</b>월말 마감이 며칠씩 걸리고 숫자가 부서마다 다를 때.</p></article>
+        <article class="row"><span class="flare"></span><div class="kwrap"><div class="k"><span>AX</span><span>AX</span></div></div><div><h3>AI 전환</h3><p class="what">사내 데이터에 연결된 에이전트를 업무 안에 넣고, 중요한 결정엔 사람의 승인을 둡니다.</p></div><p class="when"><b>이럴 때</b>같은 질문과 같은 서류 작업이 매일 반복될 때.</p></article>
+        <article class="row"><span class="flare"></span><div class="kwrap"><div class="k"><span>SaaS</span><span>SaaS</span></div></div><div><h3>구독형 모듈</h3><p class="what">구축에서 검증된 기능을 바로 쓰는 서비스로 제공합니다.</p></div><p class="when"><b>이럴 때</b>지금 한 가지 문제만 빨리 풀고 싶을 때.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec cta gut" id="cta">
+    <div class="inner">
+      <p class="eyebrow">0.3 m · 진단</p>
+      <h2 class="reveal" style="margin-top:18px">이제 <em>초점</em>을 맞춰볼 차례입니다.</h2>
+      <div class="row2"><button class="mag" type="button" data-mag><span class="dot"></span>3문항 진단 시작</button><p>세 가지만 고르면 어디서 시작할지 바로 나옵니다.</p></div>
+    </div>
+  </section>
+</main>
+<footer class="gut"><div class="inner"><span>주식회사 오티코어 · OptiCore — 모션 시안 A</span><span class="mono">focus → core</span></div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+  const hasGsap = typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined';
+
+  /* Reticle cursor + magnetic buttons */
+  const ret = $('#reticle');
+  if (fine) {
+    let x = innerWidth / 2, y = innerHeight / 2, cx = x, cy = y;
+    addEventListener('pointermove', e => { x = e.clientX; y = e.clientY; });
+    (function loop() { cx += (x - cx) * .22; cy += (y - cy) * .22; ret.style.transform = `translate(${cx}px, ${cy}px)`; requestAnimationFrame(loop); })();
+    $$('a, button, .row').forEach(el => { el.addEventListener('pointerenter', () => ret.classList.add('hot')); el.addEventListener('pointerleave', () => ret.classList.remove('hot')); });
+    $$('[data-mag]').forEach(b => {
+      b.addEventListener('pointermove', e => { const r = b.getBoundingClientRect(); const dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2); b.style.transform = `translate(${dx * .25}px, ${dy * .35}px)`; });
+      b.addEventListener('pointerleave', () => { b.style.transition = 'transform .5s cubic-bezier(.2,.8,.2,1)'; b.style.transform = ''; setTimeout(() => b.style.transition = '', 500); });
+    });
+    $$('.row').forEach(r => r.addEventListener('pointermove', e => { const b = r.getBoundingClientRect(); r.style.setProperty('--mx', (e.clientX - b.left) + 'px'); r.style.setProperty('--my', (e.clientY - b.top) + 'px'); }));
+  }
+
+  /* Hero: chromatic aberration converges on load; pointer speed re-splits it */
+  const c = $('.stack .c'), m = $('.stack .m'), k = $('.stack .k');
+  let split = reduce ? 0 : 1, kick = 0, lastX = 0;
+  const paint = () => {
+    const s = Math.min(1.4, split + kick);
+    c.style.transform = `translate(${-18 * s}px, ${2 * s}px)`; m.style.transform = `translate(${18 * s}px, ${-2 * s}px)`;
+    const b = `blur(${(9 * s).toFixed(2)}px)`; c.style.filter = b; m.style.filter = b; k.style.filter = `blur(${(6 * s).toFixed(2)}px)`;
+    c.style.opacity = m.style.opacity = Math.min(1, s * 1.4).toFixed(3);
+  };
+  paint();
+  if (!reduce) {
+    if (hasGsap) gsap.to({ v: 1 }, { v: 0, duration: 1.6, delay: .35, ease: 'expo.out', onUpdate() { split = this.targets()[0].v; paint(); } });
+    else { split = 0; paint(); }
+    if (fine) {
+      addEventListener('pointermove', e => { kick = Math.min(.45, kick + Math.abs(e.clientX - lastX) / 900); lastX = e.clientX; });
+      (function decay() { if (kick > .001) { kick *= .9; paint(); } requestAnimationFrame(decay); })();
+    }
+  }
+
+  if (!hasGsap) return;
+  gsap.registerPlugin(ScrollTrigger);
+
+  /* Smooth scroll */
+  if (!reduce && typeof Lenis !== 'undefined') {
+    const lenis = new Lenis({ lerp: .1 });
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add(t => lenis.raf(t * 1000));
+    gsap.ticker.lagSmoothing(0);
+  }
+
+  /* Progress + focus-distance readout */
+  const dists = ['∞', '10m', '5m', '3m', '2m', '1.5m', '1m', '0.5m', '0.3m'];
+  ScrollTrigger.create({ start: 0, end: 'max', onUpdate: s => {
+    $('#progress').style.transform = `scaleX(${s.progress})`;
+    $('#dist').textContent = dists[Math.min(dists.length - 1, Math.floor(s.progress * dists.length))];
+  }});
+
+  /* Word reveals (start partly visible so nothing is hidden at rest) */
+  $$('.reveal').forEach(h => {
+    h.innerHTML = h.innerHTML.split(/(<em>.*?<\/em>|\s+)/).map(t => /^\s+$/.test(t) ? t : t ? `<span class="w">${t}</span>` : '').join('');
+    if (!reduce) gsap.from(h.querySelectorAll('.w'), { yPercent: 40, opacity: .15, stagger: .06, ease: 'power3.out', duration: .9, scrollTrigger: { trigger: h, start: 'top 85%' } });
+  });
+
+  if (reduce) { $$('.tk').forEach(t => { t.style.setProperty('--strike', 1); t.style.setProperty('--chip', 1); }); $('#cnt').textContent = 8; return; }
+
+  /* Noise -> Core: scattered tokens converge into a grid, then resolve */
+  const tks = $$('.tk');
+  const seed = [[-.32, -.9, -14], [.36, -.6, 10], [-.42, .1, 8], [.3, .5, -12], [-.2, .9, 16], [.44, -.2, -7], [-.36, .7, 12], [.22, 1.1, -10]];
+  const tl = gsap.timeline({ scrollTrigger: { trigger: '#noise', start: 'top top', end: '+=180%', pin: true, scrub: .8, invalidateOnRefresh: true,
+    onUpdate: s => { $('#cnt').textContent = Math.round(gsap.utils.clamp(0, 1, (s.progress - .55) / .4) * 8); } } });
+  tl.fromTo(tks, {
+      x: i => seed[i][0] * innerWidth * .6, y: i => seed[i][1] * 140, rotation: i => seed[i][2], filter: 'blur(5px)', opacity: .55, scale: .92
+    }, { x: 0, y: 0, rotation: 0, filter: 'blur(0px)', opacity: 1, scale: 1, ease: 'power2.inOut', stagger: .04, duration: 1 })
+    .to(tks, { '--strike': 1, stagger: .05, duration: .3, ease: 'none' }, '>-0.1')
+    .to(tks, { '--chip': 1, stagger: .05, duration: .3, ease: 'power2.out' }, '<0.15');
+
+  /* State machine: horizontal track + meter */
+  const track = $('#track'), panels = $$('.panel'), nodes = $$('.hz .node'), segs = $$('.hz .seg i');
+  const dist = () => Math.max(0, track.scrollWidth - track.parentElement.clientWidth);
+  gsap.to(track, { x: () => -dist(), ease: 'none', scrollTrigger: { trigger: '#hz', start: 'top top', end: () => '+=' + (dist() + innerHeight * .4), pin: true, scrub: .6, invalidateOnRefresh: true,
+    onUpdate: s => {
+      const p = s.progress * 3;
+      segs.forEach((g, i) => g.style.transform = `scaleX(${gsap.utils.clamp(0, 1, p - i)})`);
+      const a = Math.min(3, Math.round(p));
+      nodes.forEach((n, i) => n.classList.toggle('on', i <= a));
+      panels.forEach((pn, i) => pn.classList.toggle('active', i === a));
+    } } });
+})();
+</script>

@@ -1,0 +1,291 @@
+<title>OptiCore Optical Bench</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: 광학 벤치 — 흩어진 빛(업무)이 렌즈(오티코어)를 지나 한 점(코어)에 모이는 실시간 시뮬레이션 → 프리즘이 한 줄기 빛을 네 서비스로 나눔 → 초점 계산기(진단) */
+:root {
+  --glass: #EEF1F0; --glass-2: #E1E7E4; --ink: #121519; --ink-2: #4C555B; --line: #C6CECB;
+  --core: #2430E8; --on-core: #FFFFFF;
+  --r1: #2430E8; --r2: #0094A8; --r3: #C81F66; --r4: #B07600;
+  --ray: rgba(18, 21, 25, .55);
+  --f-display: "Bricolage Grotesque", "IBM Plex Sans KR", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --glass: #0D1012; --glass-2: #161B1E; --ink: #E6ECEA; --ink-2: #9AA4A8; --line: #2B3338; --core: #8089FF; --on-core: #0D1012;
+  --r1: #8089FF; --r2: #2FD3E6; --r3: #FF5AA5; --r4: #F2B84B; --ray: rgba(230, 236, 234, .55); color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --glass: #0D1012; --glass-2: #161B1E; --ink: #E6ECEA; --ink-2: #9AA4A8; --line: #2B3338; --core: #8089FF; --on-core: #0D1012;
+  --r1: #8089FF; --r2: #2FD3E6; --r3: #FF5AA5; --r4: #F2B84B; --ray: rgba(230, 236, 234, .55); color-scheme: dark; }
+* { box-sizing: border-box; }
+body { background: var(--glass); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.6; word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 50; background: var(--glass); }
+.gut { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.inner { max-width: 1240px; margin: 0 auto; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+h1, h2, h3 { margin: 0; text-wrap: balance; } p { margin: 0; } a { color: inherit; }
+:focus-visible { outline: 2px solid var(--core); outline-offset: 3px; }
+
+header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--glass) 85%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+header.top .inner { display: flex; justify-content: space-between; align-items: center; padding-block: 14px; gap: 16px; }
+.logo { display: flex; align-items: center; gap: 10px; font-family: var(--f-display); font-weight: 600; font-size: 19px; letter-spacing: -.02em; text-decoration: none; }
+.logo svg { width: 24px; height: 24px; }
+.top .tag { font-family: var(--f-mono); font-size: 12px; color: var(--ink-2); }
+
+/* Bench */
+.hero { padding-block: 40px 24px; }
+.hero h1 { font-weight: 700; font-size: clamp(36px, 6vw, 84px); line-height: 1.05; letter-spacing: -.04em; max-width: 12em; }
+.hero h1 em { font-style: normal; color: var(--core); }
+.hero .lede { margin-top: 16px; color: var(--ink-2); max-width: 36em; font-size: 17px; }
+.bench { position: relative; margin-top: 28px; height: clamp(320px, 52svh, 520px); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.bench canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; }
+.lbl { position: absolute; font-family: var(--f-mono); font-size: 11.5px; color: var(--ink-2); letter-spacing: .04em; pointer-events: none; transform: translateX(-50%); white-space: nowrap; }
+.lbl b { display: block; font-family: var(--f-body); font-size: 14px; font-weight: 700; color: var(--ink); letter-spacing: 0; }
+.lbl.l1 { left: max(16px, env(safe-area-inset-left, 0px)); bottom: 14px; transform: none; } .lbl.l2 { left: 50%; bottom: 14px; } .lbl.l3 { right: max(16px, env(safe-area-inset-right, 0px)); bottom: 14px; transform: none; text-align: right; }
+.lbl.l3 b { color: var(--core); }
+.controls { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 14px; align-items: center; margin-top: 16px; font-family: var(--f-mono); font-size: 12px; color: var(--ink-2); }
+.controls input { width: 100%; accent-color: var(--core); }
+.meter { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px 22px; font-family: var(--f-mono); font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.meter b { color: var(--ink); font-weight: 500; }
+
+/* Prism */
+.prism { padding-block: 120px 80px; overflow-x: clip; }
+.prism h2, .calc h2 { font-size: clamp(30px, 4.6vw, 58px); letter-spacing: -.03em; line-height: 1.12; margin-top: 14px; max-width: 14em; }
+.split { margin-top: 48px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 420px); gap: 0; align-items: stretch; }
+@media (max-width: 900px) { .split { grid-template-columns: 1fr; gap: 20px; } }
+.split svg { width: 100%; height: 480px; display: block; overflow: visible; }
+@media (max-width: 900px) { .split svg { height: auto; aspect-ratio: 600 / 480; } }
+.cards { display: grid; grid-template-rows: repeat(4, 1fr); gap: 16px; height: 480px; }
+@media (max-width: 900px) { .cards { height: auto; grid-template-rows: none; } }
+.card { border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 14px; align-content: center; background: var(--glass); transition: border-color .25s, transform .35s cubic-bezier(.2,.8,.2,1); cursor: default; }
+.card .sw { grid-row: span 2; width: 10px; border-radius: 5px; background: var(--c); align-self: stretch; }
+.card h3 { font-size: 18px; display: flex; gap: 10px; align-items: baseline; }
+.card h3 span { font-family: var(--f-display); font-weight: 800; color: var(--c); font-size: 22px; letter-spacing: -.03em; }
+.card p { color: var(--ink-2); font-size: 14px; }
+.card:hover, .card.hot { border-color: var(--c); transform: translateX(-6px); }
+.ray { transition: stroke-width .25s, opacity .25s; }
+.split.hovering .ray { opacity: .25; }
+.split.hovering .ray.hot { opacity: 1; stroke-width: 5; }
+
+/* Focal calculator */
+.calc { padding-block: 100px 120px; }
+.calcgrid { margin-top: 40px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; }
+@media (max-width: 900px) { .calcgrid { grid-template-columns: 1fr; } }
+fieldset { border: 0; margin: 0 0 22px; padding: 0; }
+legend { font-weight: 700; margin-bottom: 10px; }
+.seg { display: flex; flex-wrap: wrap; gap: 8px; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg label { cursor: pointer; border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; font-size: 14px; transition: background .2s, color .2s; }
+.seg input:checked + label { background: var(--ink); color: var(--glass); border-color: var(--ink); }
+.seg input:focus-visible + label { outline: 2px solid var(--core); outline-offset: 2px; }
+.out { border-radius: 18px; padding: 28px; background: var(--glass-2); display: grid; gap: 12px; align-content: start; position: relative; overflow: hidden; }
+.out .st { font-family: var(--f-display); font-weight: 800; font-size: clamp(56px, 8vw, 96px); line-height: .9; color: var(--core); letter-spacing: -.04em; font-variation-settings: "opsz" 96; }
+.out .why { color: var(--ink-2); }
+.out .f { font-family: var(--f-mono); font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.out svg { width: 100%; height: 70px; }
+footer .inner { padding-block: 32px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--ink-2); }
+</style>
+
+<header class="top gut"><div class="inner">
+  <a class="logo" href="#top" aria-label="오티코어 홈"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="3"/><rect x="8.5" y="8.5" width="7" height="7" rx="1.2" fill="var(--core)"/></svg>opticore</a>
+  <span class="tag">OPTICAL BENCH · 01</span>
+</div></header>
+
+<main>
+  <section class="hero" id="top">
+    <div class="gut"><div class="inner">
+      <p class="eyebrow">SI · ERP · AX · SaaS — 주식회사 오티코어</p>
+      <h1 style="margin-top:16px">흩어진 빛을 <em>한&nbsp;점</em>에 모읍니다.</h1>
+      <p class="lede">회사의 업무는 사방으로 흩어진 빛과 같습니다. 오티코어는 렌즈가 되어 그 빛을 하나의 코어로 모읍니다. 아래 벤치 위에서 직접 초점을 맞춰 보세요.</p>
+    </div></div>
+    <div class="bench" id="bench">
+      <canvas id="cv" aria-label="흩어진 빛이 렌즈를 지나 한 점으로 모이는 시뮬레이션" role="img"></canvas>
+      <span class="lbl l1"><b>흩어진 업무</b>엑셀 · 메신저 · 수기</span>
+      <span class="lbl l2"><b>렌즈</b>오티코어</span>
+      <span class="lbl l3"><b>코어</b>하나의 시스템</span>
+    </div>
+    <div class="gut"><div class="inner">
+      <div class="controls"><label for="focus">흐림</label><input id="focus" type="range" min="0" max="100" value="100" aria-label="초점 조절"><span>선명</span></div>
+      <div class="meter"><span>초점 <b id="mF">100%</b></span><span>착란원 <b id="mC">0.02 mm</b></span><span>코어에 도달한 빛 <b id="mH">0</b></span></div>
+    </div></div>
+  </section>
+
+  <section class="prism gut" id="prism">
+    <div class="inner">
+      <p class="eyebrow">서비스</p>
+      <h2>한 줄기 요구를 네 개의 빛으로 나눕니다.</h2>
+      <div class="split" id="split">
+        <svg viewBox="0 0 600 480" preserveAspectRatio="xMaxYMid meet" aria-hidden="true">
+          <defs><linearGradient id="beam" x1="0" x2="1"><stop offset="0" stop-color="var(--ink)" stop-opacity="0"/><stop offset=".3" stop-color="var(--ink)"/></linearGradient></defs>
+          <path id="pBeam" d="M0 250 L246 240" stroke="url(#beam)" stroke-width="3" fill="none"/>
+          <polygon points="300,150 370,300 230,300" fill="var(--glass-2)" stroke="var(--ink)" stroke-width="1.25" opacity=".95"/>
+          <path class="ray" data-i="0" d="M318 236 C430 200 520 90 600 60" stroke="var(--r1)" stroke-width="3" fill="none"/>
+          <path class="ray" data-i="1" d="M322 244 C430 230 520 190 600 180" stroke="var(--r2)" stroke-width="3" fill="none"/>
+          <path class="ray" data-i="2" d="M324 252 C430 262 520 290 600 300" stroke="var(--r3)" stroke-width="3" fill="none"/>
+          <path class="ray" data-i="3" d="M322 260 C430 300 520 390 600 420" stroke="var(--r4)" stroke-width="3" fill="none"/>
+          <text x="40" y="228" font-family="IBM Plex Mono, monospace" font-size="12" fill="var(--ink-2)">"업무를 정리하고 싶다"</text>
+        </svg>
+        <div class="cards">
+          <article class="card" data-i="0" style="--c:var(--r1)"><span class="sw"></span><h3><span>SI</span>시스템 통합</h3><p>프로그램 다섯 개가 서로 대화하게 만듭니다.</p></article>
+          <article class="card" data-i="1" style="--c:var(--r2)"><span class="sw"></span><h3><span>ERP</span>ERP 구축</h3><p>오픈소스·패키지를 먼저 비교하고 필요한 것만 만듭니다.</p></article>
+          <article class="card" data-i="2" style="--c:var(--r3)"><span class="sw"></span><h3><span>AX</span>AI 전환</h3><p>반복 업무에 에이전트를, 중요한 결정엔 사람의 승인을.</p></article>
+          <article class="card" data-i="3" style="--c:var(--r4)"><span class="sw"></span><h3><span>SaaS</span>구독형 모듈</h3><p>한 가지 문제를 오늘 바로 풉니다.</p></article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="calc gut" id="calc">
+    <div class="inner">
+      <p class="eyebrow">진단</p>
+      <h2>우리 회사의 초점거리를 계산해 보세요.</h2>
+      <div class="calcgrid">
+        <form id="form">
+          <fieldset><legend>회사 규모</legend><div class="seg">
+            <input type="radio" name="size" id="s1" value="small" checked><label for="s1">~30명</label>
+            <input type="radio" name="size" id="s2" value="mid"><label for="s2">30–200명</label>
+            <input type="radio" name="size" id="s3" value="large"><label for="s3">200명 이상</label></div></fieldset>
+          <fieldset><legend>가장 아픈 곳</legend><div class="seg">
+            <input type="radio" name="pain" id="p1" value="excel" checked><label for="p1">엑셀과 수작업</label>
+            <input type="radio" name="pain" id="p2" value="link"><label for="p2">시스템 간 연동</label>
+            <input type="radio" name="pain" id="p3" value="ai"><label for="p3">반복 업무를 AI로</label>
+            <input type="radio" name="pain" id="p4" value="erp"><label for="p4">기존 ERP가 안 맞음</label></div></fieldset>
+          <fieldset><legend>지금 쓰는 시스템</legend><div class="seg">
+            <input type="radio" name="sys" id="y1" value="none" checked><label for="y1">거의 없음</label>
+            <input type="radio" name="sys" id="y2" value="pkg"><label for="y2">패키지 몇 개</label>
+            <input type="radio" name="sys" id="y3" value="legacy"><label for="y3">자체 개발 레거시</label></div></fieldset>
+        </form>
+        <div class="out" aria-live="polite">
+          <span class="eyebrow">추천 시작 상태</span>
+          <span class="st" id="oSt">FOCUS</span>
+          <span class="f">초점거리 <b id="oF">0.5</b> m · 추천 렌즈 <b id="oL">ERP + SaaS</b></span>
+          <svg viewBox="0 0 400 70" aria-hidden="true" preserveAspectRatio="none">
+            <line x1="0" y1="35" x2="400" y2="35" stroke="var(--line)"/>
+            <path id="oRays" d="" fill="none" stroke="var(--core)" stroke-width="1.5"/>
+            <circle id="oDot" cx="300" cy="35" r="4" fill="var(--core)"/>
+          </svg>
+          <p class="why" id="oWhy"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer class="gut"><div class="inner"><span>주식회사 오티코어 · OptiCore — 모션 시안 C</span><span>light → lens → core</span></div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const hasGsap = typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined';
+
+  /* ---------- Optical bench simulation ---------- */
+  const cv = $('#cv'), ctx = cv.getContext('2d'), slider = $('#focus');
+  let W = 0, H = 0, dpr = 1, focus = reduce ? 1 : .08, hits = 0, colors = {};
+  const readColors = () => { colors = { ray: css('--ray'), core: css('--core'), line: css('--line'), ink: css('--ink'), glass: css('--glass'), r: ['--r1', '--r2', '--r3', '--r4'].map(css) }; };
+  readColors();
+  matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', readColors);
+  function size() { dpr = Math.min(2, devicePixelRatio || 1); W = cv.clientWidth; H = cv.clientHeight; cv.width = W * dpr; cv.height = H * dpr; }
+  size(); addEventListener('resize', size);
+  const geo = () => ({ lx: W * .5, fx: W * .84, cy: H * .46, lh: H * .34 });
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const P = [];
+  function spawn(p) {
+    const g = geo();
+    p.x = rand(-40, W * .02); p.y = rand(H * .08, H * .84);
+    const ang = rand(-.32, .32) + (g.cy - p.y) / H * .5; p.vx = Math.cos(ang); p.vy = Math.sin(ang);
+    p.sp = rand(1.4, 2.6) * (W / 900 + .4); p.passed = false; p.trail = []; p.c = Math.random() < .12 ? colors.r[(Math.random() * 4) | 0] : null; p.err = rand(-1, 1);
+    return p;
+  }
+  const COUNT = W < 600 ? 110 : 220;
+  for (let i = 0; i < COUNT; i++) { const p = spawn({}); p.x = rand(0, W * .48); P.push(p); }
+  function step() {
+    const g = geo();
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+    // optical axis
+    ctx.strokeStyle = colors.line; ctx.setLineDash([4, 6]); ctx.beginPath(); ctx.moveTo(0, g.cy); ctx.lineTo(W, g.cy); ctx.stroke(); ctx.setLineDash([]);
+    // lens (biconvex)
+    const bulge = 10 + 18 * focus;
+    ctx.beginPath(); ctx.moveTo(g.lx, g.cy - g.lh);
+    ctx.quadraticCurveTo(g.lx + bulge * 2, g.cy, g.lx, g.cy + g.lh); ctx.quadraticCurveTo(g.lx - bulge * 2, g.cy, g.lx, g.cy - g.lh);
+    ctx.fillStyle = colors.core + '22'; ctx.fill(); ctx.strokeStyle = colors.core; ctx.lineWidth = 1.25; ctx.stroke();
+    // core sensor
+    const blur = (1 - focus) * g.lh * .9;
+    const gr = ctx.createRadialGradient(g.fx, g.cy, 0, g.fx, g.cy, 18 + blur * .5);
+    gr.addColorStop(0, colors.core + 'AA'); gr.addColorStop(1, colors.core + '00');
+    ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(g.fx, g.cy, 18 + blur * .5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = colors.core; ctx.fillRect(g.fx - 6, g.cy - 6, 12, 12);
+    // photons
+    ctx.lineWidth = 1.1;
+    for (const p of P) {
+      if (!p.passed && p.x >= g.lx && Math.abs(p.y - g.cy) < g.lh) {
+        p.passed = true;
+        const ty = g.cy + p.err * blur; const dx = g.fx - p.x, dy = ty - p.y, d = Math.hypot(dx, dy);
+        p.vx = dx / d; p.vy = dy / d;
+      }
+      p.x += p.vx * p.sp; p.y += p.vy * p.sp;
+      if (p.passed && p.x >= g.fx - 2) { hits++; spawn(p); continue; }
+      if (p.x > W + 20 || p.y < -20 || p.y > H + 20) { spawn(p); continue; }
+      p.trail.push(p.x, p.y); if (p.trail.length > 28) p.trail.splice(0, 2);
+      ctx.strokeStyle = p.c || colors.ray; ctx.globalAlpha = p.passed ? .9 : .45;
+      ctx.beginPath(); ctx.moveTo(p.trail[0], p.trail[1]); for (let i = 2; i < p.trail.length; i += 2) ctx.lineTo(p.trail[i], p.trail[i + 1]); ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+  function meters() {
+    $('#mF').textContent = Math.round(focus * 100) + '%';
+    $('#mC').textContent = (0.02 + (1 - focus) * 1.2).toFixed(2) + ' mm';
+    $('#mH').textContent = hits.toLocaleString('ko-KR');
+  }
+  let visible = true;
+  new IntersectionObserver(e => visible = e[0].isIntersecting).observe(cv);
+  if (reduce) { for (let i = 0; i < 400; i++) step(); meters(); }
+  else (function loop() { if (visible) { step(); meters(); } requestAnimationFrame(loop); })();
+  slider.addEventListener('input', () => { focus = slider.value / 100; if (hasGsap) gsap.killTweensOf(state); meters(); if (reduce) step(); });
+  const state = { get f() { return focus; }, set f(v) { focus = v; slider.value = Math.round(v * 100); } };
+  if (hasGsap && !reduce) {
+    gsap.to(state, { f: 1, duration: 2.6, delay: .5, ease: 'power2.inOut' });
+    cv.addEventListener('pointermove', e => { if (e.pointerType !== 'mouse') return; const r = cv.getBoundingClientRect(); gsap.to(state, { f: Math.min(1, Math.max(0, (e.clientX - r.left) / r.width * 1.3 - .1)), duration: .6, ease: 'power2.out', overwrite: true }); });
+  } else { focus = 1; slider.value = 100; }
+
+  /* ---------- Prism ---------- */
+  const split = $('#split'), rays = $$('.ray'), cards = $$('.card');
+  const hot = i => { split.classList.toggle('hovering', i !== null); rays.forEach((r, j) => r.classList.toggle('hot', j === i)); cards.forEach((c, j) => c.classList.toggle('hot', j === i)); };
+  cards.forEach((c, i) => { c.addEventListener('pointerenter', () => hot(i)); c.addEventListener('pointerleave', () => hot(null)); });
+
+  /* ---------- Focal calculator ---------- */
+  const form = $('#form');
+  const lens = { excel: 'ERP + SaaS', link: 'SI', ai: 'AX', erp: 'ERP' };
+  let shownF = .5;
+  function calc() {
+    const d = Object.fromEntries(new FormData(form));
+    let st = 'SCAN', f = 2, why = '어디가 가장 아픈지 숫자로 확인하는 2–3주 진단부터 시작합니다.';
+    if (d.size === 'small' && d.sys === 'none' && d.pain === 'excel') { st = 'FOCUS'; f = .5; why = '범위가 작고 기존 시스템이 적어서 진단을 짧게 끝내고 바로 설계로 갑니다.'; }
+    else if (d.sys === 'legacy') { f = 5; why = '레거시의 숨은 규칙부터 파악합니다. 남길 것과 다시 만들 것을 진단에서 정합니다.'; }
+    else if (d.pain === 'ai') { f = 3; why = '빈도와 효과로 업무 점수를 매기고, 점수가 높은 업무 하나로 시범 에이전트를 만듭니다.'; }
+    $('#oSt').textContent = st; $('#oL').textContent = lens[d.pain]; $('#oWhy').textContent = why;
+    const x = 380 - Math.min(1, f / 5) * 260;
+    const draw = (fx, v) => { $('#oF').textContent = v.toFixed(1); $('#oDot').setAttribute('cx', fx); $('#oRays').setAttribute('d', `M0 8 L${fx} 35 M0 22 L${fx} 35 M0 48 L${fx} 35 M0 62 L${fx} 35`); };
+    if (hasGsap && !reduce) { const o = { x: +$('#oDot').getAttribute('cx'), v: shownF }; gsap.to(o, { x, v: f, duration: .8, ease: 'expo.out', onUpdate: () => draw(o.x, o.v) }); }
+    else draw(x, f);
+    shownF = f;
+  }
+  form.addEventListener('change', calc); form.addEventListener('submit', e => e.preventDefault()); calc();
+
+  if (!hasGsap) return;
+  gsap.registerPlugin(ScrollTrigger);
+  if (!reduce && typeof Lenis !== 'undefined') { const lenis = new Lenis({ lerp: .1 }); lenis.on('scroll', ScrollTrigger.update); gsap.ticker.add(t => lenis.raf(t * 1000)); gsap.ticker.lagSmoothing(0); }
+  if (reduce) return;
+  [$('#pBeam'), ...rays].forEach(p => { const L = p.getTotalLength(); p.style.strokeDasharray = L; p.dataset.len = L; });
+  gsap.timeline({ scrollTrigger: { trigger: '#split', start: 'top 75%', end: 'center 45%', scrub: .6 } })
+    .fromTo('#pBeam', { strokeDashoffset: () => +$('#pBeam').dataset.len * .7 }, { strokeDashoffset: 0, duration: .4, ease: 'none' })
+    .fromTo(rays, { strokeDashoffset: (i, el) => +el.dataset.len * .85 }, { strokeDashoffset: 0, duration: .6, stagger: .08, ease: 'power1.out' })
+    .fromTo(cards, { x: 30, opacity: .3 }, { x: 0, opacity: 1, stagger: .08, duration: .5, ease: 'power2.out' }, '<');
+})();
+</script>
