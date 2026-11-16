@@ -41,4 +41,5 @@
 - 회사: **오티코어 (OptiCore)** — SI, AX(AI 전환), ERP 구축, SaaS 제공.
 - 브랜드 규칙: `brand/BRAND.md`
 - 사이트 구조: `docs/SITEMAP.md`
-- 사이트 프로토타입: `site/index.html`
+- **실제 사이트: `web/` (Astro, 시안 B 기반)** — 문구는 `web/src/data/site.ts` 한 곳에서 수정
+- 초기 프로토타입·모션 시안(참고용): `site/index.html`, `site/concepts/`
