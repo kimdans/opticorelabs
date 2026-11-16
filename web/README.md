@@ -32,6 +32,14 @@ npm run build    # dist/ 에 정적 파일 생성
 로컬에서 Pages와 같은 경로로 확인: `npm run build && npx astro preview` → `http://localhost:4321/opticorelabs/`
 루트 경로로 확인: `BASE_PATH=/ npm run build && BASE_PATH=/ npx astro preview`
 
+## 아티팩트로 미리 보기
+배포 전에 사이트 전체를 Claude 아티팩트로 올려 볼 수 있습니다. 아티팩트는 `/`로 시작하는 주소를 쓸 수 없어서, 링크를 상대 경로로 바꾼 묶음을 따로 만듭니다.
+
+```bash
+BASE_PATH=/__B__ OUT_DIR=/tmp/dist-art npx astro build
+node scripts/artifact-bundle.mjs /tmp/dist-art /tmp/site-artifact   # index.html + files.json(함께 올릴 파일 목록)
+```
+
 ## 남은 설정
 - `src/data/site.ts`의 이메일·사업자등록번호·주소 (지금은 예시 값, 화면에 "(예시)"로 표시됨)
 - 진단 전송: 환경 변수 `PUBLIC_DIAGNOSE_ENDPOINT`에 받을 주소를 넣으면 실제로 전송됩니다. 없으면 "준비 중" 안내와 함께 복사로 대체됩니다.
