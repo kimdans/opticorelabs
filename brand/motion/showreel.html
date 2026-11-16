@@ -1,0 +1,518 @@
+<title>OptiCore Showreel</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: 15초 브랜드 필름. 1920×1080 스테이지를 화면에 맞춰 축소 재생하고 아래에 조작부를 둔다.
+   카메라 뷰파인더 HUD가 여섯 장면(NOISE → FOCUS → LENS → STATE → CORE → OPTICORE)을 하나로 묶는다. 의도적 다크 단일 테마. */
+:root {
+  --body: #0B0C0E; --body-2: #131619; --blade-a: #171A1E; --blade-b: #1D2126; --edge: #2E353B;
+  --ink: #E8ECEB; --ink-2: #8B959A; --line: #252B30; --core: #7C86FF; --core-deep: #2430E8;
+  --ab-c: #2FD3E6; --ab-m: #FF5AA5; --rec: #FF4D5E;
+  --f-display: "Bricolage Grotesque", "IBM Plex Sans KR", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", "IBM Plex Sans KR", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--body); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.6; word-break: keep-all; -webkit-font-smoothing: antialiased; }
+.page { max-width: 1280px; margin: 0 auto; padding-block: 20px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.player { position: relative; width: 100%; aspect-ratio: 16 / 9; max-width: 100%; overflow: hidden; background: #000; border-radius: 10px; }
+.player:fullscreen { border-radius: 0; width: 100vw; height: 100vh; aspect-ratio: auto; }
+.ui { margin-top: 16px; display: grid; gap: 14px; }
+.ui .rowc { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.ui button { font: 500 14px var(--f-body); color: var(--ink); background: transparent; border: 1px solid var(--edge); border-radius: 999px; padding: 8px 16px; cursor: pointer; }
+.ui button[aria-pressed="true"], .ui button.primary { background: var(--core); border-color: var(--core); color: var(--body); }
+.ui button:focus-visible, .ui input:focus-visible { outline: 2px solid var(--core); outline-offset: 3px; }
+.ui input[type="range"] { flex: 1 1 220px; min-width: 0; accent-color: var(--core); }
+.ui .time { font: 500 13px var(--f-mono); color: var(--ink-2); font-variant-numeric: tabular-nums; min-width: 92px; text-align: right; }
+.ui h1 { margin: 6px 0 0; font: 700 22px/1.3 var(--f-body); letter-spacing: -.01em; }
+.ui p { margin: 0; color: var(--ink-2); max-width: 46em; }
+html.cap .page { max-width: none; padding: 0; margin: 0; }
+html.cap .player { position: fixed; left: 0; top: 0; width: 1920px; height: 1080px; border-radius: 0; aspect-ratio: auto; }
+html.cap .ui { display: none; }
+
+/* ---------- Stage (all px below are in 1920×1080 space) ---------- */
+#stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; background: var(--body); overflow: hidden; color: var(--ink); font-family: var(--f-body); line-height: 1; }
+#cam { position: absolute; inset: 0; transform-origin: 50% 50%; }
+.scene { position: absolute; inset: 0; visibility: hidden; }
+.mono { font-family: var(--f-mono); }
+.ch { display: inline-block; overflow: hidden; vertical-align: top; padding: .16em .02em .2em; margin: -.16em -.02em -.2em; }
+.ch i { display: inline-block; font-style: normal; }
+#iris { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
+
+/* HUD */
+#hud { position: absolute; inset: 0; font: 500 19px/1 var(--f-mono); letter-spacing: .1em; color: rgba(232, 236, 235, .6); pointer-events: none; }
+#hud .br { position: absolute; width: 44px; height: 44px; border: 2px solid rgba(232, 236, 235, .5); }
+#hud .br.a { left: 44px; top: 44px; border-right: 0; border-bottom: 0; }
+#hud .br.b { right: 44px; top: 44px; border-left: 0; border-bottom: 0; }
+#hud .br.c { left: 44px; bottom: 44px; border-right: 0; border-top: 0; }
+#hud .br.d { right: 44px; bottom: 44px; border-left: 0; border-top: 0; }
+#hud .h { position: absolute; white-space: nowrap; }
+#hud .h.tl { left: 108px; top: 58px; } #hud .h.tr { right: 108px; top: 58px; }
+#hud .h.bl { left: 108px; bottom: 58px; } #hud .h.brt { right: 108px; bottom: 58px; }
+#hud .h.bc { left: 0; right: 0; bottom: 58px; text-align: center; }
+#hud b { color: var(--ink); font-weight: 500; }
+#rec { display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: var(--rec); margin-right: 10px; }
+#fscale span { margin-right: 16px; } #fscale span.on { color: var(--core); }
+#grain { position: absolute; inset: -260px; background-size: 256px 256px; opacity: .5; pointer-events: none; }
+#vig { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 52%, rgba(0, 0, 0, .6) 100%); pointer-events: none; }
+#flash { position: absolute; inset: 0; background: #FFFFFF; opacity: 0; pointer-events: none; }
+
+/* S1 noise */
+#field { position: absolute; inset: 0; --ab: 5; transform-origin: 50% 50%; }
+.ghost { position: absolute; left: 0; right: 0; top: 330px; text-align: center; font: 700 360px/1 var(--f-body); letter-spacing: -.05em; color: rgba(232, 236, 235, .5); filter: blur(34px); white-space: nowrap; text-shadow: -26px 0 var(--ab-c), 26px 0 var(--ab-m); opacity: .42; }
+.tok { position: absolute; left: 0; top: 0; white-space: nowrap; font: 500 30px/1 var(--f-mono); padding: 14px 18px; border: 1.5px dashed rgba(232, 236, 235, .4); border-radius: 8px; background: rgba(19, 22, 25, .55); text-shadow: calc(var(--ab) * -1px) 0 var(--ab-c), calc(var(--ab) * 1px) 0 var(--ab-m); }
+#reticle { position: absolute; left: 760px; top: 400px; width: 400px; height: 280px; color: var(--ink); overflow: visible; }
+#af { position: absolute; left: 0; right: 0; top: 716px; text-align: center; font: 500 22px/1 var(--f-mono); letter-spacing: .16em; }
+.s1-count { position: absolute; left: 108px; bottom: 118px; font: 500 20px/1 var(--f-mono); letter-spacing: .14em; color: var(--ink-2); }
+.s1-count b { display: block; margin-top: 10px; font: 800 132px/1 var(--f-display); font-variation-settings: "opsz" 96; letter-spacing: -.03em; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+/* S2 focus */
+#s2 .glow { position: absolute; inset: -200px; background: radial-gradient(circle at 50% 50%, #3441F2 0%, #1C2499 20%, #0B0C0E 58%); }
+.head { position: absolute; left: 0; right: 0; top: 318px; text-align: center; transform-origin: 50% 62%; }
+#l1 { font: 500 104px/1.1 var(--f-body); color: rgba(232, 236, 235, .88); white-space: nowrap; text-shadow: calc(var(--ab, 0) * -1px) 0 var(--ab-c), calc(var(--ab, 0) * 1px) 0 var(--ab-m); }
+#l2 { margin-top: 30px; font: 700 196px/1.1 var(--f-body); letter-spacing: -.045em; color: #FFFFFF; white-space: nowrap; filter: drop-shadow(0 0 44px rgba(124, 134, 255, .7)); }
+#fstrip { position: absolute; left: 0; right: 0; top: 880px; text-align: center; font: 500 26px/1 var(--f-mono); letter-spacing: .12em; color: rgba(232, 236, 235, .42); opacity: 0; }
+#fstrip span { margin: 0 14px; } #fstrip span.on { color: #FFFFFF; }
+
+/* S3 lens ring */
+#ring { position: absolute; left: 960px; top: -20px; width: 1160px; height: 1120px; overflow: visible; }
+.s3-idx { position: absolute; left: 114px; top: 172px; font: 500 22px/1 var(--f-mono); letter-spacing: .14em; color: var(--ink-2); }
+.mask { position: absolute; overflow: hidden; }
+.m-code { left: 104px; top: 214px; width: 900px; height: 384px; }
+.m-echo { left: 118px; top: 228px; width: 900px; height: 384px; }
+.code { position: absolute; left: 0; top: 0; font: 800 372px/1 var(--f-display); font-variation-settings: "opsz" 96; letter-spacing: -.055em; color: var(--core); white-space: nowrap; }
+.m-echo .code { color: transparent; -webkit-text-stroke: 2px rgba(232, 236, 235, .36); }
+.m-sub { left: 112px; top: 636px; width: 860px; height: 180px; }
+.sub { position: absolute; left: 0; top: 0; white-space: nowrap; }
+.sub b { display: block; font: 700 72px/1.15 var(--f-body); letter-spacing: -.03em; }
+.sub span { display: block; margin-top: 16px; font: 400 34px/1.2 var(--f-body); color: var(--ink-2); }
+
+/* S4 state machine */
+#ghost4 { position: absolute; left: 60px; top: 60px; white-space: nowrap; font: 800 980px/1 var(--f-display); font-variation-settings: "opsz" 96; color: rgba(232, 236, 235, .04); letter-spacing: .18em; }
+.s4-cap { position: absolute; left: 140px; top: 168px; font: 500 46px/1.2 var(--f-body); letter-spacing: -.02em; color: var(--ink-2); white-space: nowrap; }
+.s4-cap b { color: var(--ink); font-weight: 700; }
+.s4-idx { position: absolute; right: 140px; top: 184px; font: 500 22px/1 var(--f-mono); letter-spacing: .14em; color: var(--ink-2); }
+#strip { position: absolute; left: 140px; top: 296px; width: 4800px; height: 700px; }
+.stw { position: absolute; top: 0; width: 1150px; }
+.stw .o, .stw .f { position: absolute; left: 0; top: 0; font: 800 340px/1 var(--f-display); font-variation-settings: "opsz" 96; letter-spacing: -.05em; white-space: nowrap; }
+.stw .o { color: transparent; -webkit-text-stroke: 3px rgba(232, 236, 235, .5); }
+.stw .f { color: var(--core); clip-path: inset(0% 100% 0% 0%); }
+.track { position: absolute; left: -400px; top: 399px; width: 5600px; height: 2px; background: var(--edge); }
+.node { position: absolute; left: 0; top: 388px; width: 24px; height: 24px; border-radius: 50%; background: var(--core); box-shadow: 0 0 0 9px rgba(124, 134, 255, .22); }
+.meta { position: absolute; left: 0; top: 452px; font: 500 32px/1 var(--f-mono); letter-spacing: .06em; white-space: nowrap; }
+.exit { position: absolute; left: 0; top: 506px; font: 400 34px/1.2 var(--f-body); color: var(--ink-2); white-space: nowrap; }
+.exit b { font: 500 22px/1 var(--f-mono); letter-spacing: .12em; color: var(--core); margin-right: 16px; }
+#loop { position: absolute; left: 3150px; top: 399px; width: 1300px; height: 260px; overflow: visible; }
+
+/* S5 core */
+.s5-cap { position: absolute; left: 112px; top: 150px; font: 500 52px/1.2 var(--f-body); letter-spacing: -.02em; color: var(--ink-2); white-space: nowrap; }
+.s5-cap b { color: var(--ink); font-weight: 700; }
+#beams { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
+.row { position: absolute; width: 600px; height: 96px; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 0 20px 0 26px; border-radius: 16px; background: var(--body-2); border: 1px solid var(--edge); }
+.row .old { position: relative; font: 500 27px/1 var(--f-mono); color: var(--ink-2); white-space: nowrap; }
+.row .strike { position: absolute; left: -4px; right: -4px; top: 50%; height: 2px; background: var(--ink-2); transform-origin: 0 50%; }
+.row .chip { font: 700 27px/1 var(--f-body); color: var(--body); background: var(--core); padding: 11px 18px; border-radius: 999px; white-space: nowrap; }
+#core5 { position: absolute; left: 1587.5px; top: 597.5px; width: 105px; height: 105px; border-radius: 18px; background: var(--core); box-shadow: 0 0 90px rgba(124, 134, 255, .75); }
+.s5-count { position: absolute; left: 1470px; top: 190px; white-space: nowrap; }
+.s5-count b { font: 800 240px/1 var(--f-display); font-variation-settings: "opsz" 96; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+.s5-count span { font: 800 88px/1 var(--f-display); color: var(--ink-2); margin-left: 12px; }
+.s5-count em { display: block; font: 500 34px/1 var(--f-body); font-style: normal; color: var(--ink-2); margin-top: 6px; }
+.s5-core-l { position: absolute; left: 1540px; width: 200px; top: 742px; text-align: center; font: 500 20px/1 var(--f-mono); letter-spacing: .3em; color: var(--ink-2); }
+
+/* S6 lockup */
+#halo { position: absolute; left: 260px; top: -230px; width: 1400px; height: 1400px; border-radius: 50%; background: radial-gradient(circle, rgba(52, 65, 242, .42) 0%, rgba(36, 48, 232, .12) 34%, transparent 62%); opacity: 0; }
+#lock { position: absolute; inset: 0; transform-origin: 50% 44%; }
+#sym { position: absolute; left: 780px; top: 290px; width: 360px; height: 360px; overflow: visible; }
+#wm { position: absolute; left: 0; top: 352px; font: 600 200px/1 var(--f-display); font-variation-settings: "opsz" 96; letter-spacing: -.035em; white-space: nowrap; }
+#shock, #shock2 { position: absolute; left: 810px; top: 320px; width: 300px; height: 300px; border-radius: 50%; border: 2px solid var(--core); opacity: 0; }
+#rule { position: absolute; left: 610px; top: 690px; width: 700px; height: 2px; background: var(--edge); transform: scaleX(0); }
+#tag { position: absolute; left: 0; right: 0; top: 728px; text-align: center; font: 500 54px/1.2 var(--f-body); white-space: nowrap; opacity: 0; text-shadow: calc(var(--ab, 0) * -1px) 0 var(--ab-c), calc(var(--ab, 0) * 1px) 0 var(--ab-m); }
+#tag b { font-weight: 700; color: #FFFFFF; }
+#foot6 { position: absolute; left: 0; right: 0; top: 838px; text-align: center; font: 500 24px/1 var(--f-mono); letter-spacing: .22em; color: var(--ink-2); opacity: 0; }
+</style>
+
+<div class="page">
+  <div class="player" id="player">
+    <div id="stage" role="img" aria-label="오티코어 15초 브랜드 필름. 흩어진 업무가 초점이 맞으며 하나의 코어로 모이고 오티코어 로고로 끝납니다.">
+      <div id="cam">
+        <div class="scene" id="s1">
+          <div id="field"><div class="ghost">흐릿한 업무</div></div>
+          <svg id="reticle" viewBox="0 0 400 280" fill="none" stroke="currentColor" stroke-width="3">
+            <path d="M0 50V0h50M350 0h50v50M400 230v50h-50M50 280H0v-50"/><path d="M200 118v44M178 140h44" stroke-width="2"/>
+          </svg>
+          <div id="af">AF-C · 초점 찾는 중</div>
+          <div class="s1-count">UNSORTED<b id="uns">000</b></div>
+        </div>
+
+        <div class="scene" id="s2">
+          <div class="glow"></div>
+          <div class="head"><div id="l1">흐릿한 업무를</div><div id="l2">선명한 시스템으로.</div></div>
+          <div id="fstrip">f/ <span>16</span><span>11</span><span>8</span><span>5.6</span><span>4</span><span>2.8</span><span>2</span><span>1.4</span></div>
+        </div>
+
+        <div class="scene" id="s3">
+          <svg id="ring" viewBox="-600 -560 1160 1120">
+            <circle r="556" fill="none" stroke="#2E353B" stroke-width="2"/>
+            <circle r="440" fill="#131619" stroke="#2E353B" stroke-width="2"/>
+            <circle r="270" fill="none" stroke="#252B30" stroke-width="2"/>
+            <circle r="150" fill="#0B0C0E" stroke="#2E353B" stroke-width="2"/>
+            <rect x="-52" y="-52" width="104" height="104" rx="18" fill="#7C86FF"/>
+            <g id="ringrot">
+              <g id="ticks" stroke="#8B959A"></g>
+              <g font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="84" fill="#E8ECEB" text-anchor="middle">
+                <text x="-352" y="30">SI</text><text x="-352" y="30" transform="rotate(90)">ERP</text><text x="-352" y="30" transform="rotate(180)">AX</text><text x="-352" y="30" transform="rotate(270)">SaaS</text>
+              </g>
+            </g>
+            <path d="M-598 -20L-562 0L-598 20z" fill="#7C86FF"/>
+          </svg>
+          <div class="s3-idx">LENS <b id="s3n" style="color:var(--ink)">01</b> / 04</div>
+          <div class="mask m-echo"><div class="code">SI</div><div class="code">ERP</div><div class="code">AX</div><div class="code">SaaS</div></div>
+          <div class="mask m-code"><div class="code">SI</div><div class="code">ERP</div><div class="code">AX</div><div class="code">SaaS</div></div>
+          <div class="mask m-sub">
+            <div class="sub"><b>시스템 통합</b><span>따로 놀던 프로그램을 하나로</span></div>
+            <div class="sub"><b>ERP 구축</b><span>회사 업무에 맞춘 ERP</span></div>
+            <div class="sub"><b>AI 전환</b><span>반복 업무는 에이전트에게</span></div>
+            <div class="sub"><b>구독형 모듈</b><span>오늘 바로 쓰는 검증된 기능</span></div>
+          </div>
+        </div>
+
+        <div class="scene" id="s4">
+          <div id="ghost4">1234</div>
+          <div class="s4-cap">프로젝트는 <b>네 개의 상태</b>만 가집니다.</div>
+          <div class="s4-idx">STATE <b id="s4n" style="color:var(--ink)">1</b> / 4</div>
+          <div id="strip">
+            <div class="track"></div>
+            <div class="stw" style="left:0"><div class="o">SCAN</div><div class="f">SCAN</div><div class="node"></div><div class="meta">진단 · 2–3주</div><div class="exit"><b>EXIT →</b>우선순위 과제 3개에 합의</div></div>
+            <div class="stw" style="left:1150px"><div class="o">FOCUS</div><div class="f">FOCUS</div><div class="node"></div><div class="meta">설계 · 2–4주</div><div class="exit"><b>EXIT →</b>화면과 데이터 모델 승인</div></div>
+            <div class="stw" style="left:2300px"><div class="o">BUILD</div><div class="f">BUILD</div><div class="node"></div><div class="meta">구축 · 6–16주</div><div class="exit"><b>EXIT →</b>실데이터 병행 운영 통과</div></div>
+            <div class="stw" style="left:3450px"><div class="o">RUN</div><div class="f">RUN</div><div class="node"></div><div class="meta">운영 · 계속</div><div class="exit"><b>EXIT →</b>다음 과제 확정</div></div>
+            <svg id="loop" viewBox="0 0 1300 260" fill="none" stroke="#7C86FF" stroke-width="3">
+              <path id="loopp" d="M1010 1C1130 1 1130 190 1010 190L40 190"/><path id="looph" d="M66 172L40 190L66 208"/>
+              <text x="330" y="244" fill="#E8ECEB" stroke="none" font-family="IBM Plex Mono, IBM Plex Sans KR, monospace" font-size="24" letter-spacing="2" id="loopt">RUN → SCAN · 운영 데이터가 다음 진단이 됩니다</text>
+            </svg>
+          </div>
+        </div>
+
+        <div class="scene" id="s5">
+          <div class="s5-cap">흩어진 일이 <b>제자리</b>를 찾습니다.</div>
+          <svg id="beams" viewBox="0 0 1920 1080"></svg>
+          <div id="rows"></div>
+          <div class="s5-count" id="cnt5"><b id="s5n">0</b><span>/ 8</span><em>정리됨</em></div>
+          <div class="s5-core-l" id="corel">CORE</div>
+          <div id="core5"></div>
+        </div>
+
+        <div class="scene" id="s6">
+          <div id="halo"></div>
+          <div id="shock"></div><div id="shock2"></div>
+          <div id="lock">
+            <svg id="sym" viewBox="0 0 24 24"><circle id="symring" cx="12" cy="12" r="9.5" fill="none" stroke="#E8ECEB" stroke-width="3" stroke-dasharray="59.7" stroke-dashoffset="59.7"/><rect id="symcore" x="8.5" y="8.5" width="7" height="7" rx="1.2" fill="#7C86FF"/></svg>
+            <div id="wm">opticore</div>
+            <div id="rule"></div>
+            <div id="tag">흐릿한 업무를, <b>선명한 시스템</b>으로.</div>
+            <div id="foot6">SI · ERP · AX · SaaS — 주식회사 오티코어</div>
+          </div>
+        </div>
+
+        <canvas id="iris" width="1920" height="1080"></canvas>
+      </div>
+
+      <div id="vig"></div>
+      <div id="grain"></div>
+      <div id="hud">
+        <i class="br a"></i><i class="br b"></i><i class="br c"></i><i class="br d"></i>
+        <div class="h tl"><i id="rec"></i>REC <b id="tc">00:00:00:00</b></div>
+        <div class="h tr">OPTICORE — BRAND FILM 2026</div>
+        <div class="h bl" id="fscale"><span>∞</span><span>10</span><span>5</span><span>3</span><span>2</span><span>1.5</span><span>1</span><span>0.5</span><span>0.3</span>m</div>
+        <div class="h brt"><b id="fn">f/16</b> · ISO 100 · 1/250</div>
+        <div class="h bc" id="sc">01 · NOISE</div>
+      </div>
+      <div id="flash"></div>
+    </div>
+  </div>
+
+  <div class="ui">
+    <div class="rowc">
+      <button type="button" id="bPlay" class="primary">일시정지</button>
+      <button type="button" id="bSound" aria-pressed="false">소리 켜기</button>
+      <button type="button" id="bFull">전체 화면</button>
+      <input type="range" id="scrub" min="0" max="15" step="0.01" value="0" aria-label="재생 위치">
+      <span class="time" id="time">00.00 / 15.00</span>
+    </div>
+    <h1>OptiCore 15초 브랜드 필름</h1>
+    <p>흩어진 업무(NOISE)에 초점을 맞추고(FOCUS), 네 개의 렌즈(LENS)와 네 개의 상태(STATE)를 지나, 하나의 코어(CORE)로 모이는 과정을 15초에 담았습니다. 128 BPM, 8마디. 슬라이더로 원하는 장면을 멈춰 볼 수 있습니다.</p>
+  </div>
+</div>
+<audio id="snd" src="showreel-audio.m4a" preload="auto" loop></audio>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+(() => {
+  const DUR = 15, BPM = 128, BEAT = 60 / BPM;
+  const B = (bar, beat = 0) => (bar * 4 + beat) * BEAT;         // 0-indexed bar/beat → seconds
+  const LOCK = B(1) + 1.5;                                       // AF lock
+  const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const rng = seed => () => { seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+  const split = node => { const txt = node.textContent; node.textContent = ''; return [...txt].map(c => { const o = el('span', 'ch'), i = el('i', '', c === ' ' ? ' ' : c); o.appendChild(i); node.appendChild(o); return i; }); };
+
+  const player = $('#player'), stage = $('#stage');
+  let capture = false;
+  function fit() {
+    const pw = player.clientWidth, ph = player.clientHeight, k = Math.min(pw / 1920, ph / 1080);
+    stage.style.transform = `translate(${(pw - 1920 * k) / 2}px, ${(ph - 1080 * k) / 2}px) scale(${k})`;
+  }
+  fit(); addEventListener('resize', fit); document.addEventListener('fullscreenchange', () => setTimeout(fit, 60));
+
+  /* ---------- Build static DOM ---------- */
+  // S1 tokens
+  const TOK = ['견적서_최종_진짜최종.xlsx', '카톡으로 받는 결재', '수기 재고 장부', '쇼핑몰 주문 복붙', '월말 마감 4일', '담당자만 아는 매크로', '메일로 온 세금계산서', '"이거 누가 처리했죠?"', '재고_0412_수정(2).xls', '전화로 받은 발주', '포스트잇 메모', 'ERP ↔ 쇼핑몰 미연동', '거래처 중복 312건', '승인 대기 17건'];
+  const SC = [0.62, 2.2, 0.85, 1.3, 1.0, 1.7, 0.7, 1.12, 2.6, 0.9, 1.45, 0.75, 1.9, 1.0];
+  const r1 = rng(11), field = $('#field');
+  const toks = TOK.map((t, i) => {
+    const e = el('div', 'tok', t); field.appendChild(e);
+    const col = i % 5, row = Math.floor(i / 5), s = SC[i];
+    const o = { e, s, x: 90 + col * 372 + (r1() - .5) * 210, y: 150 + row * 318 + (r1() - .5) * 170, rot: (r1() - .5) * 24, dy: (r1() - .5) * 50 };
+    e.style.filter = `blur(${(Math.abs(s - 1) * 7 + 0.6).toFixed(1)}px)`; e.style.zIndex = Math.round(s * 10);
+    return o;
+  });
+  // S3 ring ticks
+  let th = '';
+  for (let i = 0; i < 144; i++) { const a = i / 144 * Math.PI * 2, l = i % 12 === 0 ? 36 : i % 6 === 0 ? 22 : 12, a1 = 540, a2 = a1 - l; th += `<line x1="${(Math.sin(a) * a1).toFixed(1)}" y1="${(-Math.cos(a) * a1).toFixed(1)}" x2="${(Math.sin(a) * a2).toFixed(1)}" y2="${(-Math.cos(a) * a2).toFixed(1)}" stroke-width="${i % 12 === 0 ? 3 : 2}"/>`; }
+  $('#ticks').innerHTML = th;
+  // S5 rows + beams
+  const ROWS = [['견적서_최종_진짜최종.xlsx', '견적·수주'], ['카톡으로 받는 결재', '전자결재'], ['수기 재고 장부', '실시간 재고'], ['쇼핑몰 주문 복붙', '주문 연동'], ['월말 마감 4일', '마감 자동화'], ['담당자만 아는 매크로', '워크플로'], ['메일로 온 세금계산서', '매입 수집'], ['"이거 누가 처리했죠?"', '감사 로그']];
+  const CORE5 = { x: 1640, y: 650 }, LOGO = { x: 960, y: 470 };
+  const r5 = rng(23), rowsBox = $('#rows'), beams = $('#beams');
+  const E5 = [0, .5, 1, 1.5, 2, 2.5, 2.75, 3].map(b => B(5) + b * BEAT);   // token landing times (accelerating at the end)
+  const rows = ROWS.map(([a, b], i) => {
+    const e = el('div', 'row'), old = el('span', 'old', a), strike = el('i', 'strike'), chip = el('span', 'chip', b);
+    old.appendChild(strike); e.append(old, chip); rowsBox.appendChild(e);
+    const sx = 110 + (i % 2) * 630, sy = 280 + Math.floor(i / 2) * 124;
+    e.style.left = sx + 'px'; e.style.top = sy + 'px';
+    const x1 = sx + 600, y1 = sy + 48, len = Math.hypot(CORE5.x - x1, CORE5.y - y1);
+    beams.insertAdjacentHTML('beforeend', `<line x1="${x1}" y1="${y1}" x2="${CORE5.x}" y2="${CORE5.y}" stroke="#7C86FF" stroke-width="2.5" stroke-opacity=".75" stroke-dasharray="${len.toFixed(1)}" stroke-dashoffset="${len.toFixed(1)}"/>`);
+    return { e, strike, chip, beam: beams.lastElementChild, sx, sy, fx: (r5() - .5) * 1500, fy: (r5() - .5) * 760 - 80, rot: (r5() - .5) * 44 };
+  });
+  // Grain tile
+  (() => { const c = document.createElement('canvas'); c.width = c.height = 256; const x = c.getContext('2d'), d = x.createImageData(256, 256), r = rng(5);
+    for (let i = 0; i < d.data.length; i += 4) { const v = r(); d.data[i] = d.data[i + 1] = d.data[i + 2] = v > .5 ? 255 : 0; d.data[i + 3] = Math.abs(v - .5) * 44; }
+    x.putImageData(d, 0, 0); $('#grain').style.backgroundImage = `url(${c.toDataURL()})`; })();
+
+  /* ---------- Iris ---------- */
+  const cv = $('#iris'), ctx = cv.getContext('2d'), iris = { open: 0.02, hole: 0, rot: 0 };
+  const C = { body: '#0B0C0E', a: '#171A1E', b: '#1D2126', edge: '#2E353B' };
+  let irisOn = false;
+  function drawIris() {
+    const W = 1920, H = 1080, cx = W / 2, cy = H / 2, R0 = 470, diag = Math.hypot(W, H) / 2 + 40, R = R0 + (diag - R0) * iris.hole, N = 9;
+    ctx.clearRect(0, 0, W, H); ctx.fillStyle = C.body; ctx.fillRect(0, 0, W, H);
+    ctx.save(); ctx.globalCompositeOperation = 'destination-out'; ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    if (iris.hole < .98) { ctx.save(); ctx.globalAlpha = 1 - iris.hole; ctx.strokeStyle = C.edge; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cx, cy, R + 16, 0, Math.PI * 2); ctx.stroke();
+      for (let i = 0; i < 120; i++) { const a = i / 120 * Math.PI * 2 + iris.rot * .25, l = i % 10 === 0 ? 18 : 8; ctx.beginPath(); ctx.moveTo(cx + Math.cos(a) * (R + 28), cy + Math.sin(a) * (R + 28)); ctx.lineTo(cx + Math.cos(a) * (R + 28 + l), cy + Math.sin(a) * (R + 28 + l)); ctx.stroke(); } ctx.restore(); }
+    const r = Math.max(2, R0 * iris.open); if (r >= R) return;
+    const V = Array.from({ length: N + 2 }, (_, i) => { const a = iris.rot + i * Math.PI * 2 / N; return [cx + Math.cos(a) * r, cy + Math.sin(a) * r]; });
+    const E = i => { const dx = V[i + 1][0] - V[i][0], dy = V[i + 1][1] - V[i][1], d = Math.hypot(dx, dy) || 1; return [dx / d, dy / d]; }, L = R * 3;
+    ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.clip();
+    for (let i = 0; i < N; i++) { const p1 = V[i + 1], p2 = V[i + 2] || V[1], e1 = E(i), e2 = E(i + 1 > N ? 0 : i + 1);
+      ctx.beginPath(); ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p1[0] + e1[0] * L, p1[1] + e1[1] * L); ctx.lineTo(p2[0] + e2[0] * L, p2[1] + e2[1] * L); ctx.lineTo(p2[0], p2[1]); ctx.closePath();
+      const g = ctx.createLinearGradient(p1[0], p1[1], p1[0] + e1[0] * R, p1[1] + e1[1] * R); g.addColorStop(0, i % 2 ? C.b : C.a); g.addColorStop(1, C.body);
+      ctx.fillStyle = g; ctx.fill(); ctx.strokeStyle = C.edge; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p1[0] + e1[0] * L, p1[1] + e1[1] * L); ctx.stroke(); }
+    ctx.restore();
+  }
+
+  /* ---------- Timeline ---------- */
+  let tl = null;
+  function build() {
+    const ft = (t, from, to, pos) => tl.fromTo(t, from, { ...to, immediateRender: false }, pos);
+    const show = (id, a, b) => { tl.set(id, { autoAlpha: 1 }, a); if (b != null) tl.set(id, { autoAlpha: 0 }, b); };
+    tl = gsap.timeline({ paused: true, defaults: { overwrite: false } });
+    tl.to({}, { duration: DUR }, 0);
+
+    /* S1 · NOISE (bars 1–2) */
+    show('#s1', 0, B(2));
+    gsap.set('#field', { filter: 'blur(0px)' });
+    const rs = rng(3), order = toks.map((_, i) => i).sort(() => rs() - .5);
+    order.forEach((idx, k) => {
+      const o = toks[idx], t0 = 0.04 + k * 0.095;
+      gsap.set(o.e, { x: o.x, y: o.y, scale: o.s, rotation: o.rot, opacity: 0 });
+      tl.set(o.e, { opacity: 1 }, t0).set(o.e, { opacity: .15 }, t0 + .045).set(o.e, { opacity: 1 }, t0 + .09);
+      tl.to(o.e, { x: o.x - 50 - (o.s - .6) * 170, y: o.y + o.dy, rotation: o.rot * .35, duration: B(2), ease: 'none' }, 0);
+    });
+    tl.to('.ghost', { scale: 1.2, duration: B(2), ease: 'none' }, 0);
+    [[1, -70, 0], [2, 54, -34], [3, -24, 26]].forEach(([b, x, y]) => { tl.set('#field', { x, y }, B(0, b)); ft('#field', { '--ab': 22 }, { '--ab': 5, duration: .28, ease: 'power2.out' }, B(0, b)); });
+    tl.to('#field', { filter: 'blur(16px)', scale: 1.07, duration: .42, ease: 'sine.inOut' }, B(1))
+      .to('#field', { filter: 'blur(1px)', scale: 1.0, duration: .36, ease: 'sine.inOut' }, '>')
+      .to('#field', { filter: 'blur(22px)', scale: 1.12, duration: .42, ease: 'sine.inOut' }, '>')
+      .to('#field', { filter: 'blur(0px)', scale: 1.03, duration: .3, ease: 'power3.out' }, '>')
+      .to('#field', { filter: 'blur(30px)', scale: 3.4, opacity: 0, duration: B(2) - LOCK - .08, ease: 'expo.in' }, LOCK + .08);
+    gsap.set('#reticle', { autoAlpha: 0, scale: 1.8, transformOrigin: '50% 50%' }); gsap.set(['#af', '.s1-count'], { autoAlpha: 0 });
+    tl.to('.s1-count', { autoAlpha: 1, duration: .2 }, .1).to('.s1-count', { autoAlpha: 0, duration: .2 }, LOCK + .1);
+    tl.to('#reticle', { autoAlpha: 1, scale: 1, duration: .22, ease: 'expo.out' }, B(1) - .05)
+      .to('#reticle', { scale: 1.3, duration: .25, ease: 'sine.inOut' }, B(1) + .17)
+      .to('#reticle', { scale: .86, duration: .36, ease: 'sine.inOut' }, '>')
+      .to('#reticle', { scale: 1.36, duration: .42, ease: 'sine.inOut' }, '>')
+      .to('#reticle', { scale: 1, duration: .3, ease: 'power3.out' }, '>')
+      .set('#reticle', { color: '#7C86FF' }, LOCK)
+      .to('#reticle', { scale: .9, duration: .06 }, LOCK).to('#reticle', { scale: 1, duration: .1 }, LOCK + .06)
+      .to('#reticle', { scale: 7, autoAlpha: 0, duration: B(2) - LOCK - .1, ease: 'expo.in' }, LOCK + .1);
+    tl.to('#af', { autoAlpha: 1, duration: .15 }, B(1)).set('#af', { color: '#7C86FF' }, LOCK).to('#af', { autoAlpha: 0, duration: .12 }, LOCK + .2);
+
+    /* S2 · FOCUS (bar 3) */
+    const T2 = B(2), l2i = split($('#l2'));
+    show('#s2', T2 - .01, B(3) + .02);
+    ft('#flash', { opacity: .85 }, { opacity: 0, duration: .35, ease: 'power2.out' }, T2);
+    tl.set(iris, { open: 0.02, hole: 0, rot: 0 }, T2 - .02)
+      .to(iris, { open: .7, rot: .9, duration: .5, ease: 'expo.out' }, T2)
+      .to(iris, { open: 1.08, rot: 1.7, duration: .42, ease: 'power2.inOut' }, T2 + BEAT)
+      .to(iris, { hole: 1, duration: .34, ease: 'power2.in' }, T2 + BEAT + .08);
+    gsap.set('#l1', { filter: 'blur(22px)', letterSpacing: '0.3em', opacity: 0, '--ab': 14 });
+    gsap.set(l2i, { yPercent: 118, rotation: 6 }); gsap.set('.head', { scale: .94, filter: 'blur(0px)' }); gsap.set('#s2 .glow', { scale: .8 });
+    tl.to('#l1', { filter: 'blur(0px)', letterSpacing: '-0.03em', opacity: 1, '--ab': 0, duration: .55, ease: 'power3.out' }, T2 + .05)
+      .to(l2i, { yPercent: 0, rotation: 0, duration: .62, ease: 'expo.out', stagger: .03 }, T2 + BEAT - .02)
+      .to('.head', { scale: 1.04, duration: B(3) - T2 - .24, ease: 'none' }, T2)
+      .to('#s2 .glow', { scale: 1.25, duration: B(3) - T2, ease: 'power1.out' }, T2)
+      .to('#fstrip', { opacity: 1, duration: .2 }, T2 + .05).to('#fstrip', { opacity: 0, duration: .15 }, B(3) - .25)
+      .to('.head', { scale: 1.7, filter: 'blur(20px)', opacity: 0, duration: .24, ease: 'power3.in' }, B(3) - .24);
+
+    /* S3 · LENS (bar 4) */
+    const T3 = B(3), codes = $$('.m-code .code'), echos = $$('.m-echo .code'), subs = $$('.sub');
+    show('#s3', T3 - .2, B(4) + .02);
+    gsap.set('#ring', { x: 1150 }); gsap.set('#ringrot', { rotation: 150, svgOrigin: '0 0' });
+    tl.to('#ring', { x: 0, duration: .5, ease: 'expo.out' }, T3 - .2).to('#ringrot', { rotation: 0, duration: .6, ease: 'back.out(1.5)' }, T3 - .2);
+    for (let i = 1; i < 4; i++) tl.to('#ringrot', { rotation: -90 * i, duration: .42, ease: 'back.out(2.2)' }, B(3, i) - .12);
+    gsap.set([...codes, ...echos], { yPercent: 106 }); gsap.set(subs, { opacity: 0, y: 40 }); gsap.set('.s3-idx', { opacity: 0 });
+    tl.to('.s3-idx', { opacity: 1, duration: .2 }, T3);
+    for (let i = 0; i < 4; i++) {
+      const t = B(3, i);
+      ft(codes[i], { color: '#FFFFFF' }, { color: '#7C86FF', duration: .34, ease: 'power2.out' }, t + .02);
+      tl.to(codes[i], { yPercent: 0, duration: .42, ease: 'expo.out' }, t).to(echos[i], { yPercent: 0, duration: .5, ease: 'expo.out' }, t + .05)
+        .to(subs[i], { opacity: 1, y: 0, duration: .3, ease: 'power3.out' }, t + .04);
+      if (i < 3) tl.to([codes[i], echos[i]], { yPercent: -106, duration: .15, ease: 'power3.in' }, B(3, i + 1) - .15).to(subs[i], { opacity: 0, y: -30, duration: .12, ease: 'power2.in' }, B(3, i + 1) - .13);
+    }
+    tl.to('#s3', { x: -1920, duration: .2, ease: 'power3.in' }, B(4) - .2);
+
+    /* S4 · STATE (bar 5) */
+    const T4 = B(4), fills = $$('.stw .f'), nodes = $$('.node'), metas = $$('.stw .meta'), exits = $$('.stw .exit');
+    show('#s4', T4 - .08, B(5) + .02);
+    gsap.set('#s4', { x: 1920 }); gsap.set(nodes, { scale: 0 }); gsap.set([...metas, ...exits], { opacity: 0, y: 18 });
+    const lp = $('#loopp'), lpl = lp.getTotalLength(); gsap.set(lp, { strokeDasharray: lpl, strokeDashoffset: lpl }); gsap.set(['#looph', '#loopt'], { opacity: 0 });
+    tl.to('#s4', { x: 0, duration: .34, ease: 'expo.out' }, T4 - .08);
+    for (let i = 1; i < 4; i++) tl.to('#strip', { x: -1150 * i, duration: .36, ease: 'expo.inOut' }, B(4, i) - .26).to('#ghost4', { x: -520 * i, duration: .5, ease: 'expo.inOut' }, B(4, i) - .3);
+    for (let i = 0; i < 4; i++) {
+      const t = B(4, i);
+      tl.to(fills[i], { clipPath: 'inset(0% 0% 0% 0%)', duration: .26, ease: 'power2.out' }, t + .02)
+        .to(nodes[i], { scale: 1, duration: .3, ease: 'back.out(3)' }, t)
+        .to(metas[i], { opacity: 1, y: 0, duration: .22, ease: 'power3.out' }, t + .05).to(exits[i], { opacity: 1, y: 0, duration: .22, ease: 'power3.out' }, t + .1);
+    }
+    tl.to(lp, { strokeDashoffset: 0, duration: .22, ease: 'power2.inOut' }, B(4, 3) + .05).set('#looph', { opacity: 1 }, B(4, 3) + .25).to('#loopt', { opacity: 1, duration: .1 }, B(4, 3) + .08);
+    tl.to('#s4', { y: -1080, duration: .18, ease: 'power3.in' }, B(5) - .2);
+
+    /* S5 · CORE (bar 6) */
+    const T5 = B(5), OUT5 = B(6) - .325;
+    show('#s5', T5 - .1, B(6));
+    gsap.set('#s5', { y: 1080 }); gsap.set('#core5', { scale: .22 });
+    tl.to('#s5', { y: 0, duration: .3, ease: 'expo.out' }, T5 - .1);
+    rows.forEach((r, i) => {
+      const e = E5[i];
+      gsap.set(r.e, { x: r.fx, y: r.fy, rotation: r.rot, scale: 1.7, opacity: 0, filter: 'blur(10px)' }); gsap.set(r.strike, { scaleX: 0 }); gsap.set(r.chip, { scale: 0, opacity: 0 });
+      tl.to(r.e, { x: 0, y: 0, rotation: 0, scale: 1, opacity: 1, filter: 'blur(0px)', duration: .3, ease: 'expo.out' }, e - .08)
+        .to(r.strike, { scaleX: 1, duration: .1, ease: 'none' }, e + .04)
+        .to(r.chip, { scale: 1, opacity: 1, duration: .26, ease: 'back.out(2.6)' }, e + .06)
+        .to(r.beam, { strokeDashoffset: 0, duration: .2, ease: 'power2.out' }, e + .06)
+        .to('#core5', { scale: .22 + .78 * (i + 1) / 8, duration: .24, ease: 'back.out(3.2)' }, e + .14);
+      tl.to(r.e, { x: CORE5.x - (r.sx + 300), y: CORE5.y - (r.sy + 48), scale: .02, opacity: 0, duration: .25, ease: 'expo.in' }, OUT5 + i * .008);
+    });
+    tl.to('#beams', { opacity: 0, duration: .14 }, OUT5 + .08).to(['.s5-cap', '#cnt5', '#corel'], { opacity: 0, duration: .14 }, OUT5)
+      .to('#core5', { x: LOGO.x - CORE5.x, y: LOGO.y - CORE5.y, scale: 1, duration: .3, ease: 'expo.inOut' }, B(6) - .3);
+
+    /* S6 · OPTICORE (bars 7–8) */
+    const T6 = B(6), wmi = split($('#wm')), wm = $('#wm'), wmW = wm.offsetWidth, total = 330 + 44 + wmW, symC = 960 - total / 2 + 165;
+    wm.style.left = (symC + 165 + 44) + 'px'; gsap.set('#shock2', { x: symC - 960 });
+    show('#s6', T6);
+    ft('#flash', { opacity: .75 }, { opacity: 0, duration: .5, ease: 'power2.out' }, T6);
+    gsap.set('#symring', { rotation: -300, svgOrigin: '12 12' }); gsap.set('#symcore', { svgOrigin: '12 12' }); gsap.set(wmi, { yPercent: 118, rotation: 5 }); gsap.set('#lock', { scale: 1 });
+    gsap.set('#tag', { filter: 'blur(14px)', letterSpacing: '0.4em', '--ab': 12 }); gsap.set('#foot6', { y: 22 });
+    ft('#symcore', { scale: 1.55 }, { scale: 1, duration: .7, ease: 'elastic.out(1,0.45)' }, T6);
+    tl.to('#symring', { strokeDashoffset: 0, rotation: -90, duration: .75, ease: 'expo.out' }, T6 + .02)
+      .to('#halo', { opacity: 1, duration: .8, ease: 'power2.out' }, T6);
+    ft('#shock', { scale: .5, opacity: .9 }, { scale: 4.6, opacity: 0, duration: 1.0, ease: 'expo.out' }, T6);
+    tl.to('#sym', { x: -(960 - symC), duration: .55, ease: 'expo.inOut' }, T6 + BEAT - .12)
+      .to(wmi, { yPercent: 0, rotation: 0, duration: .62, ease: 'expo.out', stagger: .035 }, T6 + BEAT + .08)
+      .to('#rule', { scaleX: 1, duration: .6, ease: 'expo.out' }, B(7) - .1)
+      .to('#tag', { opacity: 1, filter: 'blur(0px)', letterSpacing: '0.01em', '--ab': 0, duration: .7, ease: 'power3.out' }, B(7))
+      .to('#foot6', { opacity: 1, y: 0, duration: .5, ease: 'power3.out' }, B(7, 1))
+      .to('#lock', { scale: 1.035, duration: DUR - T6, ease: 'none' }, T6);
+    ft('#symcore', { scale: 1.22 }, { scale: 1, duration: .7, ease: 'elastic.out(1,0.4)' }, B(7, 2));
+    ft('#shock2', { scale: .5, opacity: .7 }, { scale: 3.2, opacity: 0, duration: .9, ease: 'expo.out' }, B(7, 2));
+
+    [B(2), B(6)].forEach(t => { ft('#cam', { x: 16, y: -10 }, { x: 0, y: 0, duration: .45, ease: 'elastic.out(1.1,0.28)' }, t); });
+    /* Beat pump on the camera (bars 4–6) */
+    for (let b = 12; b < 24; b++) ft('#cam', { scale: 1.012 }, { scale: 1, duration: .3, ease: 'power2.out' }, b * BEAT);
+  }
+
+  /* ---------- Per-frame extras (pure functions of t) ---------- */
+  const tc = $('#tc'), sc = $('#sc'), fnEl = $('#fn'), rec = $('#rec'), uns = $('#uns'), af = $('#af'), s3n = $('#s3n'), s4n = $('#s4n'), s5n = $('#s5n'), grain = $('#grain');
+  const fsc = $$('#fscale span'), fst = $$('#fstrip span'), STOPS = ['16', '11', '8', '5.6', '4', '2.8', '2', '1.4'];
+  const SCN = [[0, '01 · NOISE'], [B(2), '02 · FOCUS'], [B(3), '03 · LENS'], [B(4), '04 · STATE'], [B(5), '05 · CORE'], [B(6), '06 · OPTICORE']], FIDX = [0, 2, 4, 6, 7, 8];
+  const txt = (e, v) => { if (e.textContent !== v) e.textContent = v; }, p2 = n => String(n).padStart(2, '0');
+  function extras(t) {
+    const f = Math.floor(t * 30 + 1e-6);
+    txt(tc, `00:00:${p2(Math.floor(t + 1e-6))}:${p2(f % 30)}`);
+    let si = 0; for (let i = 0; i < SCN.length; i++) if (t >= SCN[i][0]) si = i;
+    txt(sc, SCN[si][1]);
+    let fi = FIDX[si]; if (t >= B(1) && t < LOCK) fi = [0, 1, 3, 1, 2, 0, 1, 3][Math.floor((t - B(1)) / (BEAT / 4)) % 8];
+    fsc.forEach((s, i) => s.classList.toggle('on', i === fi));
+    let fn = 'f/1.4';
+    if (t < B(1)) fn = 'f/16'; else if (t < LOCK) fn = ['f/16', 'f/11', 'f/8', 'f/11'][Math.floor((t - B(1)) / (BEAT / 2)) % 4]; else if (t < B(2)) fn = 'f/16';
+    else if (t < B(3)) { const i = clamp(Math.round((iris.open - .02) / 1.06 * 7), 0, 7); fn = 'f/' + STOPS[i]; fst.forEach((s, j) => s.classList.toggle('on', j === i)); }
+    txt(fnEl, fn);
+    rec.style.opacity = (t / BEAT) % 1 < .5 ? 1 : .25;
+    txt(uns, String(Math.min(247, Math.floor(Math.pow(Math.min(1, t / 3.3), 1.6) * 247))).padStart(3, '0'));
+    txt(af, t < LOCK ? 'AF-C · 초점 찾는 중' : 'AF LOCK ●');
+    txt(s3n, p2(1 + clamp(Math.floor((t - B(3)) / BEAT + 1e-6), 0, 3)));
+    txt(s4n, String(1 + clamp(Math.floor((t - B(4)) / BEAT + 1e-6), 0, 3)));
+    txt(s5n, String(E5.filter(e => t >= e + .04).length));
+    if (t >= B(2) - .03 && t < B(2) + 1.0) { drawIris(); irisOn = true; } else if (irisOn) { ctx.clearRect(0, 0, 1920, 1080); irisOn = false; }
+    grain.style.backgroundPosition = `${(f * 97) % 256}px ${(f * 57) % 256}px`;
+  }
+  function seek(t) { t = clamp(t, 0, DUR - 1e-4); if (tl) tl.time(t); extras(t); }
+
+  /* ---------- Player ---------- */
+  const snd = $('#snd'), bPlay = $('#bPlay'), bSound = $('#bSound'), bFull = $('#bFull'), scrub = $('#scrub'), timeEl = $('#time');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let playing = !reduce, sound = false, cur = reduce ? 14.4 : 0, t0 = performance.now();
+  const setPlaying = p => { playing = p; bPlay.textContent = p ? '일시정지' : '재생'; t0 = performance.now() - cur * 1000; if (sound) { if (p) { snd.currentTime = cur; snd.play().catch(() => {}); } else snd.pause(); } };
+  bPlay.addEventListener('click', () => setPlaying(!playing));
+  bSound.addEventListener('click', async () => {
+    if (!sound) { try { snd.currentTime = cur; await snd.play(); sound = true; if (!playing) snd.pause(); } catch (e) { sound = false; bSound.textContent = '소리를 재생할 수 없습니다'; return; } }
+    else { sound = false; snd.pause(); t0 = performance.now() - cur * 1000; }
+    bSound.setAttribute('aria-pressed', String(sound)); bSound.textContent = sound ? '소리 끄기' : '소리 켜기';
+  });
+  bFull.addEventListener('click', () => { const p = document.fullscreenElement ? document.exitFullscreen() : player.requestFullscreen?.(); p?.catch?.(() => {}); });
+  scrub.addEventListener('input', () => { cur = +scrub.value; if (playing) setPlaying(false); seek(cur); timeEl.textContent = `${cur.toFixed(2).padStart(5, '0')} / 15.00`; });
+  function loop(now) {
+    if (capture) return;
+    if (playing) {
+      cur = sound && !snd.paused ? snd.currentTime % DUR : ((now - t0) / 1000) % DUR;
+      seek(cur); scrub.value = cur; timeEl.textContent = `${cur.toFixed(2).padStart(5, '0')} / 15.00`;
+    }
+    requestAnimationFrame(loop);
+  }
+
+  const ready = (async () => {
+    const all = stage.textContent + 'opticore0123456789/';
+    try { await Promise.all([['800', 'Bricolage Grotesque'], ['600', 'Bricolage Grotesque'], ['700', 'IBM Plex Sans KR'], ['500', 'IBM Plex Sans KR'], ['400', 'IBM Plex Sans KR'], ['500', 'IBM Plex Mono'], ['400', 'IBM Plex Mono']].map(([w, f]) => document.fonts.load(`${w} 80px "${f}"`, all))); await document.fonts.ready; } catch (e) {}
+    if (typeof gsap === 'undefined') { $('#s6').style.visibility = 'visible'; $('#symring').setAttribute('stroke-dashoffset', '0'); $('#tag').style.opacity = 1; return; }
+    build(); seek(cur); if (!playing) bPlay.textContent = '재생';
+    requestAnimationFrame(loop);
+  })();
+
+  /* Capture hooks for the frame-by-frame renderer (brand/motion/render.cjs) */
+  window.__capture = async () => { capture = true; document.documentElement.classList.add('cap'); await ready; fit(); seek(0); return DUR; };
+  window.__seek = t => seek(t);
+})();
+</script>
