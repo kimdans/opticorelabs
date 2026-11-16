@@ -80,7 +80,7 @@ const film = {
       video.poster = d[`${v}Poster`]!;
       // <source>를 순서대로 두면 브라우저가 형식을 못 읽거나 파일이 없을 때 다음 것으로 넘어간다.
       const src = (href: string, type: string) => Object.assign(document.createElement('source'), { src: href, type });
-      video.replaceChildren(src(d[`${v}Webm`]!, 'video/webm; codecs="av01.0.08M.10, opus"'), src(d[`${v}Mp4`]!, 'video/mp4'));
+      video.replaceChildren(src(d[`${v}Webm`]!, 'video/webm; codecs="av01.0.09M.10, opus"'), src(d[`${v}Mp4`]!, 'video/mp4'));
       video.load();
     }
     async function play(byUser = false) {
