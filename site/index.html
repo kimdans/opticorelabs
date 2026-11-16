@@ -391,7 +391,7 @@ footer .wrap { padding-block: 40px; display: flex; flex-wrap: wrap; justify-cont
         <label class="small" for="rText">보낼 내용</label>
         <textarea id="rText" readonly></textarea>
         <button class="btn" id="copy" type="button">진단 결과 복사</button>
-        <p class="small" id="copyMsg">contact@opticore.kr (예시 주소) 로 보내 주세요.</p>
+        <p class="small" id="copyMsg">contact@opticore.co.kr 로 보내 주세요.</p>
       </div>
     </div>
   </div>
@@ -506,7 +506,7 @@ SCAN -&gt; FOCUS -&gt; BUILD -&gt; RUN -&gt; SCAN
 
 <span class="k">## Contact</span>
 - diagnose: POST /api/diagnose
-- email: contact@opticore.kr  <span class="c"># 예시</span>`,
+- email: contact@opticore.co.kr`,
     state: `<span class="c">// GET /api/project-state?id=demo</span>
 {
   <span class="k">"project"</span>: <span class="s">"demo-erp"</span>,
@@ -544,7 +544,7 @@ SCAN -&gt; FOCUS -&gt; BUILD -&gt; RUN -&gt; SCAN
   form.addEventListener('change', diagnose); form.addEventListener('submit', e => e.preventDefault()); diagnose();
   document.getElementById('copy').addEventListener('click', () => {
     const ta = document.getElementById('rText'), msg = document.getElementById('copyMsg');
-    const ok = () => msg.textContent = '복사했습니다. contact@opticore.kr (예시 주소) 로 보내 주세요.';
+    const ok = () => msg.textContent = '복사했습니다. contact@opticore.co.kr 로 보내 주세요.';
     const fallback = () => { ta.focus(); ta.select(); msg.textContent = '텍스트를 선택했습니다. 복사(Ctrl+C / ⌘C) 해 주세요.'; };
     try { navigator.clipboard.writeText(ta.value).then(ok, fallback); } catch (e) { fallback(); }
   });

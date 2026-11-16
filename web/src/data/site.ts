@@ -6,8 +6,8 @@ export const company = {
   nameEn: 'OptiCore Inc.',
   tagline: '흐릿한 업무를, 선명한 시스템으로.',
   summary: '엑셀, 메신저 결재, 담당자 머릿속에 흩어진 일을 하나의 코어로 모읍니다. 시스템 통합, ERP, AI 전환, 구독형 SaaS까지 한 팀이 진단부터 운영까지 맡습니다.',
-  // 아래 값은 예시입니다. 실제 값으로 바꾸세요.
-  email: 'contact@opticore.kr',
+  email: 'contact@opticore.co.kr',
+  // 아래 사업자등록번호와 주소는 예시입니다 (placeholder: true인 동안 화면에 "(예시)"로 표시). 실제 값으로 바꾸세요.
   bizNo: '000-00-00000',
   address: '서울특별시 (주소 확정 전)',
   placeholder: true,

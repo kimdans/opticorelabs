@@ -2,7 +2,6 @@
 import { company, states, lenses, principles, erpOptions } from '../data/site';
 import { SIZES, PAINS, SYSTEMS } from './diagnose';
 
-const note = company.placeholder ? ' (예시 값)' : '';
 
 /** root = 사이트의 맨 앞 주소 (base 경로 포함). 예: https://kimdans.github.io/opticorelabs */
 export function llmsShort(root: string): string {
@@ -21,7 +20,7 @@ export function llmsShort(root: string): string {
     `- pain: ${Object.keys(PAINS).join(' | ')}`,
     `- systems: ${Object.keys(SYSTEMS).join(' | ')}`, '',
     '## Contact',
-    `- email: ${company.email}${note}`, '',
+    `- email: ${company.email}`, '',
     '## Optional',
     `- [전체 텍스트](${u('/llms-full.txt')})`,
     `- [원칙](${u('/principles')})`,
