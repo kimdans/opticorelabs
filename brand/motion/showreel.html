@@ -56,7 +56,7 @@ html.cap .ui { display: none; }
 #hud b { color: var(--ink); font-weight: 500; }
 #rec { display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: var(--rec); margin-right: 10px; }
 #fscale span { margin-right: 16px; } #fscale span.on { color: var(--core); }
-#grain { position: absolute; inset: -260px; background-size: 256px 256px; opacity: .5; pointer-events: none; }
+#grain { position: absolute; inset: -260px; background-size: 256px 256px; opacity: .2; pointer-events: none; }
 #vig { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 52%, rgba(0, 0, 0, .6) 100%); pointer-events: none; }
 #flash { position: absolute; inset: 0; background: #FFFFFF; opacity: 0; pointer-events: none; }
 
@@ -95,7 +95,8 @@ html.cap .ui { display: none; }
 .s4-cap { position: absolute; left: 140px; top: 168px; font: 500 46px/1.2 var(--f-body); letter-spacing: -.02em; color: var(--ink-2); white-space: nowrap; }
 .s4-cap b { color: var(--ink); font-weight: 700; }
 .s4-idx { position: absolute; right: 140px; top: 184px; font: 500 22px/1 var(--f-mono); letter-spacing: .14em; color: var(--ink-2); }
-#strip { position: absolute; left: 140px; top: 296px; width: 4800px; height: 700px; }
+#stripwin { position: absolute; left: 0; top: 256px; width: 1920px; height: 760px; overflow: hidden; }
+#strip { position: absolute; left: 140px; top: 40px; width: 4800px; height: 700px; }
 .stw { position: absolute; top: 0; width: 1150px; }
 .stw .o, .stw .f { position: absolute; left: 0; top: 0; font: 800 340px/1 var(--f-display); font-variation-settings: "opsz" 96; letter-spacing: -.05em; white-space: nowrap; }
 .stw .o { color: transparent; -webkit-text-stroke: 3px rgba(232, 236, 235, .5); }
@@ -183,7 +184,7 @@ html.cap .ui { display: none; }
           <div id="ghost4">1234</div>
           <div class="s4-cap">프로젝트는 <b>네 개의 상태</b>만 가집니다.</div>
           <div class="s4-idx">STATE <b id="s4n" style="color:var(--ink)">1</b> / 4</div>
-          <div id="strip">
+          <div id="stripwin"><div id="strip">
             <div class="track"></div>
             <div class="stw" style="left:0"><div class="o">SCAN</div><div class="f">SCAN</div><div class="node"></div><div class="meta">진단 · 2–3주</div><div class="exit"><b>EXIT →</b>우선순위 과제 3개에 합의</div></div>
             <div class="stw" style="left:1150px"><div class="o">FOCUS</div><div class="f">FOCUS</div><div class="node"></div><div class="meta">설계 · 2–4주</div><div class="exit"><b>EXIT →</b>화면과 데이터 모델 승인</div></div>
@@ -193,7 +194,7 @@ html.cap .ui { display: none; }
               <path id="loopp" d="M1010 1C1130 1 1130 190 1010 190L40 190"/><path id="looph" d="M66 172L40 190L66 208"/>
               <text x="330" y="244" fill="#E8ECEB" stroke="none" font-family="IBM Plex Mono, IBM Plex Sans KR, monospace" font-size="24" letter-spacing="2" id="loopt">RUN → SCAN · 운영 데이터가 다음 진단이 됩니다</text>
             </svg>
-          </div>
+          </div></div>
         </div>
 
         <div class="scene" id="s5">
@@ -246,7 +247,7 @@ html.cap .ui { display: none; }
     <p>흩어진 업무(NOISE)에 초점을 맞추고(FOCUS), 네 개의 렌즈(LENS)와 네 개의 상태(STATE)를 지나, 하나의 코어(CORE)로 모이는 과정을 15초에 담았습니다. 128 BPM, 8마디. 슬라이더로 원하는 장면을 멈춰 볼 수 있습니다.</p>
   </div>
 </div>
-<audio id="snd" src="showreel-audio.m4a" preload="auto" loop></audio>
+<audio id="snd" src="showreel-audio.mp3" preload="auto" loop></audio>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script>
@@ -424,10 +425,10 @@ html.cap .ui { display: none; }
         .to(r.chip, { scale: 1, opacity: 1, duration: .26, ease: 'back.out(2.6)' }, e + .06)
         .to(r.beam, { strokeDashoffset: 0, duration: .2, ease: 'power2.out' }, e + .06)
         .to('#core5', { scale: .22 + .78 * (i + 1) / 8, duration: .24, ease: 'back.out(3.2)' }, e + .14);
-      tl.to(r.e, { x: CORE5.x - (r.sx + 300), y: CORE5.y - (r.sy + 48), scale: .02, opacity: 0, duration: .25, ease: 'expo.in' }, OUT5 + i * .008);
+      tl.to(r.e, { x: LOGO.x - (r.sx + 300), y: LOGO.y - (r.sy + 48), scale: .02, opacity: 0, duration: .27, ease: 'expo.in' }, OUT5 + i * .006);
     });
-    tl.to('#beams', { opacity: 0, duration: .14 }, OUT5 + .08).to(['.s5-cap', '#cnt5', '#corel'], { opacity: 0, duration: .14 }, OUT5)
-      .to('#core5', { x: LOGO.x - CORE5.x, y: LOGO.y - CORE5.y, scale: 1, duration: .3, ease: 'expo.inOut' }, B(6) - .3);
+    tl.to('#beams', { opacity: 0, duration: .08 }, OUT5).to(['.s5-cap', '#cnt5', '#corel'], { opacity: 0, duration: .14 }, OUT5)
+      .to('#core5', { x: LOGO.x - CORE5.x, y: LOGO.y - CORE5.y, scale: 1, duration: .325, ease: 'expo.inOut' }, OUT5);
 
     /* S6 · OPTICORE (bars 7–8) */
     const T6 = B(6), wmi = split($('#wm')), wm = $('#wm'), wmW = wm.offsetWidth, total = 330 + 44 + wmW, symC = 960 - total / 2 + 165;
@@ -479,7 +480,31 @@ html.cap .ui { display: none; }
     if (t >= B(2) - .03 && t < B(2) + 1.0) { drawIris(); irisOn = true; } else if (irisOn) { ctx.clearRect(0, 0, 1920, 1080); irisOn = false; }
     grain.style.backgroundPosition = `${(f * 97) % 256}px ${(f * 57) % 256}px`;
   }
-  function seek(t) { t = clamp(t, 0, DUR - 1e-4); if (tl) tl.time(t); extras(t); }
+  /* Directional motion blur: 각 대상의 직전 1/120초 이동량을 재서 그 방향으로만 번지게 한다 (휩 팬의 잔상이 끊기지 않게). */
+  const gp = (e, p) => +gsap.getProperty(e, p) || 0, sumY = sel => $$(sel).reduce((a, e) => a + gp(e, 'yPercent'), 0) * 3.72;
+  const NS = 'http://www.w3.org/2000/svg', defs = document.createElementNS(NS, 'svg');
+  defs.setAttribute('width', '0'); defs.setAttribute('height', '0'); defs.style.position = 'absolute'; stage.appendChild(defs);
+  const MB = [['#ring', () => [gp('#ring', 'x'), 0]], ['#s3', () => [gp('#s3', 'x'), 0]], ['#s4', () => [gp('#s4', 'x'), gp('#s4', 'y')]], ['#stripwin', () => [gp('#strip', 'x'), 0]],
+    ['#s5', () => [0, gp('#s5', 'y')]], ['.m-code', () => [0, sumY('.m-code .code')]], ['.m-echo', () => [0, sumY('.m-echo .code')]], ['#sym', () => [gp('#sym', 'x'), 0]]].map(([sel, read], i) => {
+    const f = document.createElementNS(NS, 'filter'), fe = document.createElementNS(NS, 'feGaussianBlur');
+    f.id = 'mb' + i; ['x', 'y'].forEach(a => f.setAttribute(a, '-15%')); ['width', 'height'].forEach(a => f.setAttribute(a, '130%')); f.setAttribute('color-interpolation-filters', 'sRGB');
+    fe.setAttribute('stdDeviation', '0 0'); f.appendChild(fe); defs.appendChild(f);
+    return { node: $(sel), read, fe, id: f.id, on: false };
+  });
+  function seek(t) {
+    t = clamp(t, 0, DUR - 1e-4);
+    if (tl) {
+      tl.time(Math.max(0, t - 1 / 120)); const prev = MB.map(m => m.read());
+      tl.time(t);
+      MB.forEach((m, i) => {
+        const now = m.read(), sx = Math.min(70, Math.abs(now[0] - prev[i][0]) / 2), sy = Math.min(70, Math.abs(now[1] - prev[i][1]) / 2);
+        if (sx < .6 && sy < .6) { if (m.on) { m.node.style.filter = ''; m.on = false; } return; }
+        m.fe.setAttribute('stdDeviation', sx.toFixed(1) + ' ' + sy.toFixed(1));
+        if (!m.on) { m.node.style.filter = 'url(#' + m.id + ')'; m.on = true; }
+      });
+    }
+    extras(t);
+  }
 
   /* ---------- Player ---------- */
   const snd = $('#snd'), bPlay = $('#bPlay'), bSound = $('#bSound'), bFull = $('#bFull'), scrub = $('#scrub'), timeEl = $('#time');
