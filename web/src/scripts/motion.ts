@@ -20,7 +20,7 @@ export function initMotion() {
   // [data-reveal] 요소는 반쯤 보이는 상태에서 떠오른다 (스크롤 전에도 내용이 읽힌다).
   document.querySelectorAll<HTMLElement>('[data-reveal]').forEach(el => {
     const items = el.dataset.reveal === 'children' ? Array.from(el.children) : [el];
-    gsap.from(items, { opacity: 0.2, y: 24, duration: 0.9, stagger: 0.07, ease: 'power3.out',
+    gsap.from(items, { opacity: 0.6, y: 16, duration: 0.9, stagger: 0.07, ease: 'power3.out',
       scrollTrigger: { trigger: el, start: 'top 85%', refreshPriority: -1 } });
   });
   addEventListener('load', () => ScrollTrigger.refresh());

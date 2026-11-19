@@ -44,8 +44,8 @@ export function summaryText(a: Answers, r: Recommendation): string {
     `규모: ${SIZES[a.size]}`,
     `문제: ${PAINS[a.pain]}`,
     `현재 시스템: ${SYSTEMS[a.systems]}`,
-    `추천 시작 상태: ${r.start_state}`,
-    `추천 렌즈: ${r.lens.join(' + ')}`,
+    `추천 시작 단계: ${r.start_state}`,
+    `추천 서비스: ${r.lens.join(' + ')}`,
   ].join('\n');
 }
 

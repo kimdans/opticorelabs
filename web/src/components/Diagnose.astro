@@ -1,28 +1,18 @@
 ---
-import { SIZES, PAINS, SYSTEMS, recommend, summaryText, type Answers } from '../lib/diagnose';
+import { SIZES, PAINS, SYSTEMS } from '../lib/diagnose';
 import { company } from '../data/site';
 
-interface Props { shutter?: boolean; headingLevel?: 'h1' | 'h2'; }
-const { shutter = false, headingLevel = 'h2' } = Astro.props;
-const H = headingLevel;
-const initial: Answers = { size: 'lt30', pain: 'manual', systems: 'none' };
-const rec = recommend(initial);
+// bare: 바깥에서 섹션 제목을 이미 보여줄 때 (홈). 아니면 화면 낭독기용 제목을 단다.
+interface Props { bare?: boolean }
+const { bare = false } = Astro.props;
 const groups = [
   { name: 'size', legend: '회사 규모', opts: SIZES },
   { name: 'pain', legend: '가장 아픈 곳', opts: PAINS },
   { name: 'systems', legend: '지금 쓰는 시스템', opts: SYSTEMS },
 ] as const;
 ---
-<div class="diag" data-state="result" id="diagnose">
-  {shutter && (
-    <div class="shot">
-      <p class="eyebrow"><span class="dist">0.3 m</span> · 진단</p>
-      <H class="big">셔터를 누르면<br />진단이 시작됩니다.</H>
-      <button class="shutter" type="button" data-shutter aria-label="진단 시작: 첫 문항으로 이동"><span></span></button>
-      <p class="hint">3문항 · 약 1분</p>
-    </div>
-  )}
-  {!shutter && <H class="sr-only">진단</H>}
+<div class="diag" data-state="idle" id="diagnose">
+  {!bare && <h2 class="sr-only">진단</h2>}
 
   <div class="grid">
     <form class="questions" data-answers>
@@ -32,7 +22,7 @@ const groups = [
           <div class="opts">
             {Object.entries(g.opts).map(([value, label], i) => (
               <>
-                <input type="radio" name={g.name} id={`${g.name}-${value}`} value={value} checked={i === 0} />
+                <input type="radio" name={g.name} id={`${g.name}-${value}`} value={value} />
                 <label for={`${g.name}-${value}`}>{label}</label>
               </>
             ))}
@@ -42,10 +32,13 @@ const groups = [
     </form>
 
     <div class="result" aria-live="polite">
-      <span class="eyebrow">추천 시작 상태</span>
-      <span class="st" data-out="state">{rec.start_state}</span>
-      <p class="lens">추천 렌즈: <b data-out="lens">{rec.lens.join(' + ')}</b></p>
-      <p class="why" data-out="reason">{rec.reason}</p>
+      <span class="eyebrow">추천 시작 단계</span>
+      <p class="idle-msg" data-when="idle">왼쪽 세 가지를 고르면 어디서부터 시작하면 좋을지, 어떤 서비스가 맞는지 여기에 나옵니다.</p>
+      <div class="rec" data-when="result contact submitting submitted failed copied">
+        <span class="st"><span data-out="state"></span> <small data-out="code"></small></span>
+        <p class="lens">추천 서비스: <b data-out="lens"></b></p>
+        <p class="why" data-out="reason"></p>
+      </div>
 
       <div class="actions" data-when="result copied">
         <button class="btn" type="button" data-act="contact">이 결과로 상담 요청</button>
@@ -67,22 +60,12 @@ const groups = [
 
       <p class="msg ok" data-when="submitted">보냈습니다. 담당자가 영업일 기준 1일 안에 연락드립니다.</p>
       <p class="msg" data-when="copied" data-out="copied">복사했습니다. {company.email} 로 보내 주세요.</p>
-      <textarea class="sr-only" data-out="summary" readonly aria-hidden="true" tabindex="-1">{summaryText(initial, rec)}</textarea>
+      <textarea class="sr-only" data-out="summary" readonly aria-hidden="true" tabindex="-1"></textarea>
     </div>
   </div>
 </div>
-<div class="flash" aria-hidden="true"></div>
 
 <style>
-  .shot { display: grid; justify-items: center; text-align: center; gap: 24px; margin-bottom: 64px; }
-  .big { font-size: clamp(32px, 6vw, 80px); letter-spacing: -.04em; line-height: 1.05; }
-  .shutter { all: unset; cursor: pointer; width: 124px; height: 124px; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle, var(--body-2) 58%, transparent 59%), conic-gradient(from 0deg, var(--edge), #3A4249, var(--edge), #3A4249, var(--edge)); box-shadow: 0 0 0 1px var(--edge), 0 20px 60px -20px #000; }
-  .shutter span { width: 60px; height: 60px; border-radius: 50%; background: var(--core); box-shadow: 0 0 40px color-mix(in srgb, var(--core) 60%, transparent); transition: transform .15s; }
-  .shutter:hover span { transform: scale(1.08); }
-  .shutter:active span { transform: scale(.88); }
-  .shutter:focus-visible { outline: 2px solid var(--core); outline-offset: 6px; }
-  .hint { font: 13px var(--f-mono); color: var(--ink-2); }
-  .flash { position: fixed; inset: 0; background: #FFFFFF; opacity: 0; pointer-events: none; z-index: 70; }
 
   .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; align-items: start; }
   @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
@@ -95,7 +78,10 @@ const groups = [
   .opts input:focus-visible + label { outline: 2px solid var(--core); outline-offset: 2px; }
 
   .result { border: 1px solid var(--core); border-radius: 16px; padding: 26px; display: grid; gap: 12px; background: var(--body-2); }
-  .st { font-family: var(--f-display); font-weight: 800; font-size: 56px; line-height: 1; color: var(--core); font-variation-settings: "opsz" 96; }
+  .st { font-weight: 700; font-size: 44px; line-height: 1.1; letter-spacing: -.03em; color: var(--core); }
+  .st small { font: 500 14px var(--f-mono); color: var(--ink-2); letter-spacing: .06em; vertical-align: middle; }
+  .rec { display: grid; gap: 12px; }
+  .idle-msg { color: var(--ink-2); font-size: 15px; }
   .lens b { color: var(--ink); }
   .why { color: var(--ink-2); }
   .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
@@ -113,6 +99,7 @@ const groups = [
 
   /* 상태별 표시: data-when 목록에 현재 상태가 있을 때만 보인다. 불가능한 조합(전송 중 + 완료)이 화면에 나오지 않는다. */
   [data-when] { display: none; }
+  .diag[data-state="idle"] [data-when~="idle"],
   .diag[data-state="result"] [data-when~="result"],
   .diag[data-state="contact"] [data-when~="contact"],
   .diag[data-state="submitting"] [data-when~="submitting"],
@@ -125,7 +112,6 @@ const groups = [
 
 <script>
   import { recommend, summaryText, next, SUBMIT_TIMEOUT_MS, type Answers, type FlowEvent, type FlowState } from '../lib/diagnose';
-  import { gsap, reduceMotion } from '../scripts/motion';
   import { track } from '../scripts/track';
 
   const ENDPOINT = import.meta.env.PUBLIC_DIAGNOSE_ENDPOINT as string | undefined;
@@ -138,6 +124,8 @@ const groups = [
     let state = root.dataset.state as FlowState;
     let started = false;
 
+    const KO: Record<string, string> = { SCAN: '진단', FOCUS: '설계', BUILD: '구축', RUN: '운영' };
+    const complete = () => ['size', 'pain', 'systems'].every(n => answers.querySelector(`input[name="${n}"]:checked`));
     const read = (): Answers => Object.fromEntries(new FormData(answers)) as unknown as Answers;
     function send(e: FlowEvent) {
       const to = next(state, e);
@@ -149,7 +137,8 @@ const groups = [
     }
     function render() {
       const a = read(), r = recommend(a);
-      out('state').textContent = r.start_state;
+      out('state').textContent = `${KO[r.start_state]}부터 시작`;
+      out('code').textContent = r.start_state;
       out('lens').textContent = r.lens.join(' + ');
       out('reason').textContent = r.reason;
       (out('summary') as HTMLTextAreaElement).value = summaryText(a, r);
@@ -159,6 +148,7 @@ const groups = [
 
     answers.addEventListener('change', () => {
       if (!started) { started = true; track('diagnose_started', { from: location.pathname }); }
+      if (!complete()) return;                       // 세 문항을 다 고르기 전에는 결과를 보이지 않는다
       send('ANSWER'); render();
     });
     root.querySelector('[data-act="contact"]')?.addEventListener('click', () => {
@@ -199,10 +189,5 @@ const groups = [
       }
     });
 
-    root.querySelector('[data-shutter]')?.addEventListener('click', () => {
-      if (!reduceMotion()) gsap.timeline().set('.flash', { opacity: 0.85 }).to('.flash', { opacity: 0, duration: 0.6, ease: 'power2.out' });
-      root.querySelector<HTMLInputElement>('input[type="radio"]:checked')?.focus();
-      track('diagnose_started', { from: 'shutter' }); started = true;
-    });
   });
 </script>

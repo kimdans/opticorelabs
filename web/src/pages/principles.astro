@@ -1,14 +1,20 @@
 ---
+import { url } from '../lib/paths';
 import Base from '../layouts/Base.astro';
-import Stops from '../components/Stops.astro';
+import Promises from '../components/Promises.astro';
 ---
-<Base title="원칙" description="옵티코어의 엔지니어와 AI 에이전트가 함께 지키는 여섯 가지 원칙.">
+<Base title="약속" description="옵티코어가 프로젝트 동안 고객에게 지키는 세 가지 약속.">
   <section class="page-hero gut">
     <div class="inner">
-      <p class="eyebrow">원칙</p>
-      <h1 class="page-title">코드 한 줄 전에 지키는 여섯 가지.</h1>
-      <p class="lede">사람 엔지니어와 AI 에이전트가 같은 원칙으로 일합니다. 조리개를 조이듯, 위에서 아래로 갈수록 더 넓은 범위의 결정을 다룹니다.</p>
+      <p class="eyebrow">약속</p>
+      <h1 class="page-title">프로젝트 동안 지키는 세 가지.</h1>
+      <p class="lede">일정이 밀리거나 비용이 늘어나는 일은 대부분 "몰랐던 것"에서 시작됩니다. 그래서 무엇을 언제 보여드리고, 언제 먼저 말씀드릴지 정해 두었습니다.</p>
     </div>
   </section>
-  <section class="gut" style="padding-bottom:112px"><div class="inner"><Stops /></div></section>
+  <section class="gut" style="padding-bottom:112px">
+    <div class="inner">
+      <Promises />
+      <p style="margin-top:40px"><a class="btn" href={url('/diagnose')}>어디서 시작할지 진단하기</a></p>
+    </div>
+  </section>
 </Base>
