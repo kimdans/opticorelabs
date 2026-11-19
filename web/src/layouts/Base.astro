@@ -5,7 +5,7 @@ import { company, nav } from '../data/site';
 
 interface Props { title?: string; description?: string; }
 const { title, description = company.summary } = Astro.props;
-const fullTitle = title ? `${title} · 오티코어` : `오티코어 OptiCore · ${company.tagline}`;
+const fullTitle = title ? `${title} · 옵티코어` : `옵티코어 OptiCore · ${company.tagline}`;
 const path = Astro.url.pathname;
 const canonical = new URL(path.replace(/index\.html$/, '').replace(/\.html$/, ''), Astro.site).href;
 const org = {
@@ -37,7 +37,7 @@ const org = {
   <a class="skip" href="#main">본문으로 건너뛰기</a>
   <header class="hud gut">
     <div class="inner bar">
-      <a class="logo" href={url('/')} aria-label="오티코어 홈">
+      <a class="logo" href={url('/')} aria-label="옵티코어 홈">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="3"/><rect x="8.5" y="8.5" width="7" height="7" rx="1.2" fill="var(--core)"/></svg>
         opticore
       </a>
