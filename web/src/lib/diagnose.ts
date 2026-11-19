@@ -40,7 +40,7 @@ export function parseAnswers(input: unknown):
 
 export function summaryText(a: Answers, r: Recommendation): string {
   return [
-    '[오티코어 진단]',
+    '[옵티코어 진단]',
     `규모: ${SIZES[a.size]}`,
     `문제: ${PAINS[a.pain]}`,
     `현재 시스템: ${SYSTEMS[a.systems]}`,

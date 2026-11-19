@@ -41,5 +41,5 @@ node scripts/artifact-bundle.mjs /tmp/dist-art /tmp/site-artifact   # index.html
 ```
 
 ## 남은 설정
-- `src/data/site.ts`의 사업자등록번호·주소 (지금은 예시 값, 화면에 "(예시)"로 표시됨). 이메일은 `contact@opticore.co.kr`로 확정
+- `src/data/site.ts`의 사업자등록번호·주소 (지금은 예시 값, 화면에 "(예시)"로 표시됨). 이메일은 `contact@opticorelabs.co.kr`로 확정
 - 진단 전송: 환경 변수 `PUBLIC_DIAGNOSE_ENDPOINT`에 받을 주소를 넣으면 실제로 전송됩니다. 없으면 "준비 중" 안내와 함께 복사로 대체됩니다.

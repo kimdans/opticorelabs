@@ -1,4 +1,4 @@
-# OptiCore (주식회사 오티코어)
+# OptiCore (주식회사 옵티코어)
 
 > 흐릿한 업무를 선명한 시스템으로. SI, ERP 구축, AX(AI 전환), 구독형 SaaS를 진단부터 운영까지 한 팀이 맡는 회사.
 
@@ -14,4 +14,4 @@ SCAN(진단) -> FOCUS(설계) -> BUILD(구축) -> RUN(운영) -> SCAN
 
 ## Contact
 - diagnose: POST /api/diagnose (planned)
-- email: contact@opticore.co.kr
+- email: contact@opticorelabs.co.kr

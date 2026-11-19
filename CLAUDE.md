@@ -38,7 +38,7 @@
 ---
 
 ## 프로젝트 맥락
-- 회사: **오티코어 (OptiCore)** — SI, AX(AI 전환), ERP 구축, SaaS 제공.
+- 회사: **옵티코어 (OptiCore)** — SI, AX(AI 전환), ERP 구축, SaaS 제공.
 - 브랜드 규칙: `brand/BRAND.md`
 - 사이트 구조: `docs/SITEMAP.md`
 - **실제 사이트: `web/` (Astro, 시안 B 기반)** — 문구는 `web/src/data/site.ts` 한 곳에서 수정
