@@ -1,0 +1,81 @@
+---
+// 옵티코어 방식의 핵심: 어떤 업무부터 AI에 맡길지 "빈도 × 효과" 점수로 정한다 (진단 단계의 산출물).
+// 점과 목록은 서로 연결되어 있다: 한쪽에 포인터를 올리거나 누르면 같은 업무에 초점이 맞는다. 업무와 점수는 설명을 위한 예시다.
+const tasks = [
+  { n: '세금계산서 매입 수집', f: 9, e: 8 }, { n: '견적서 초안 작성', f: 7, e: 8 }, { n: '미수금 안내 메일', f: 6, e: 7 },
+  { n: '재고 발주 제안', f: 4, e: 8 }, { n: '회의록 요약', f: 8, e: 3 }, { n: '신입 교육 자료 정리', f: 2, e: 5 },
+  { n: '연말 결산 보고서', f: 1, e: 9 }, { n: '명함 정리', f: 3, e: 2 },
+].map(t => ({ ...t, s: t.f * t.e })).sort((a, b) => b.s - a.s).map((t, i) => ({ ...t, id: i, top: i < 3 }));
+---
+<div class="fit" data-fit data-pick="0">
+  <div class="plot" aria-hidden="true">
+    <span class="ax y">효과 · 맡기면 줄어드는 시간</span>
+    <span class="ax x">빈도 · 얼마나 자주 하는 일인가</span>
+    <span class="zone">먼저 맡길 업무</span>
+    {tasks.map(t => <button type="button" tabindex="-1" class={`dot ${t.top ? 'top' : ''}`} data-id={t.id} style={`--f:${t.f};--e:${t.e}`}><i></i><b>{t.n}</b></button>)}
+  </div>
+  <ol class="rank">
+    {tasks.map((t, i) => (
+      <li><button type="button" class={t.top ? 'top' : ''} data-id={t.id} aria-pressed={i === 0 ? 'true' : 'false'}>
+        <span class="no">{i + 1}</span><span class="nm">{t.n}{t.top && <em>1차 과제</em>}</span><span class="calc">{t.f} × {t.e}</span><b>{t.s}</b>
+      </button></li>
+    ))}
+  </ol>
+</div>
+<p class="note">예시 업무와 점수입니다. 실제 점수는 진단 단계에서 현업 담당자와 함께 매기고, 상위 3개에 경영진이 합의하면 설계로 넘어갑니다.</p>
+
+<style>
+  .fit { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); align-items: stretch; }
+  @media (max-width: 900px) { .fit { grid-template-columns: 1fr; } }
+  /* 점수판: 가로 빈도, 세로 효과 (1~10). 오른쪽 위가 먼저 맡길 업무다. */
+  .plot { position: relative; background: var(--surface); border-radius: 24px; min-height: 380px; aspect-ratio: 5 / 4; overflow: hidden;
+          background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 100% 20%, 20% 100%; background-position: 0 -1px, -1px 0; }
+  @media (max-width: 900px) { .plot { min-height: 0; aspect-ratio: 1; } }
+  .zone { position: absolute; right: 0; top: 0; width: 50%; height: 50%; background: var(--core-soft); border-radius: 0 0 0 20px; font-size: 13px; font-weight: 600; color: var(--core); padding: 14px 16px; text-align: right; }
+  .ax { position: absolute; font: 500 12px var(--f-mono); color: var(--ink-3); z-index: 1; }
+  .ax.x { right: 14px; bottom: 12px; }
+  .ax.y { left: 14px; top: 12px; }
+  .dot { all: unset; position: absolute; left: calc((var(--f) - .5) * 10%); bottom: calc((var(--e) - .5) * 10%); width: 44px; height: 44px; margin: 0 0 -22px -22px; display: grid; place-items: center; cursor: pointer; z-index: 2; }
+  .dot i { width: 14px; height: 14px; border-radius: 50%; background: var(--ink-3); transition: scale .3s var(--ease), background .2s; }
+  .dot.top i { background: var(--ink); }
+  .dot b { position: absolute; left: 50%; bottom: calc(100% - 6px); translate: -50% 0; white-space: nowrap; font-size: 13px; font-weight: 600; background: var(--ink); color: var(--body); padding: 5px 10px; border-radius: 8px; opacity: 0; pointer-events: none; transition: opacity .2s, translate .2s; }
+  .dot.on { z-index: 3; }
+  .dot.on i { background: var(--core); scale: 1.25; border-radius: 4px; }
+  .dot.on b { opacity: 1; translate: -50% -4px; }
+  .dot[style*="--f:9"] b, .dot[style*="--f:8"] b { left: auto; right: 0; translate: 0 0; }
+  .dot[style*="--f:9"].on b, .dot[style*="--f:8"].on b { translate: 0 -4px; }
+  .dot[style*="--f:1"] b, .dot[style*="--f:2"] b { left: 0; translate: 0 0; }
+  .dot[style*="--f:1"].on b, .dot[style*="--f:2"].on b { translate: 0 -4px; }
+
+  .rank { list-style: none; margin: 0; padding: 0; display: grid; align-content: space-between; }
+  .rank button { all: unset; box-sizing: border-box; width: 100%; cursor: pointer; display: grid; grid-template-columns: 22px minmax(0, 1fr) auto 38px; align-items: center; gap: 12px; padding: 11px 12px; border-top: 1px solid var(--line); font-size: 16px; }
+  .rank li:last-child button { border-bottom: 1px solid var(--line); }
+  .rank button:focus-visible { outline: 2px solid var(--core); outline-offset: -2px; }
+  .no { font: 500 13px var(--f-mono); color: var(--ink-3); }
+  .nm { font-weight: 500; color: var(--ink-2); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .top .nm { font-weight: 700; color: var(--ink); }
+  .nm em { font-style: normal; font-size: 12px; font-weight: 600; color: var(--core); border: 1px solid currentColor; border-radius: 999px; padding: 1px 8px; }
+  .calc { font: 500 13px var(--f-mono); color: var(--ink-3); }
+  .rank b { font: 500 17px var(--f-mono); text-align: right; font-variant-numeric: tabular-nums; }
+  .rank button[aria-pressed="true"] { background-color: var(--surface); border-top-color: transparent; }
+  .rank button[aria-pressed="true"] b { color: var(--core); }
+  .note { margin-top: 24px; font-size: 14.5px; color: var(--ink-2); max-width: 44em; }
+</style>
+
+<script>
+  // 고른 업무는 항상 하나다 (data-pick). 점과 목록이 같은 번호를 본다.
+  document.querySelectorAll<HTMLElement>('[data-fit]').forEach(root => {
+    const dots = Array.from(root.querySelectorAll<HTMLElement>('.dot')), rows = Array.from(root.querySelectorAll<HTMLElement>('.rank button'));
+    const pick = (id: string) => {
+      root.dataset.pick = id;
+      dots.forEach(d => d.classList.toggle('on', d.dataset.id === id));
+      rows.forEach(r => { const on = r.dataset.id === id; r.setAttribute('aria-pressed', String(on)); r.classList.toggle('focus-mark', on); });
+    };
+    [...dots, ...rows].forEach(el => {
+      el.addEventListener('pointerenter', () => pick(el.dataset.id!));
+      el.addEventListener('click', () => pick(el.dataset.id!));
+      el.addEventListener('focus', () => pick(el.dataset.id!));
+    });
+    pick(root.dataset.pick ?? '0');
+  });
+</script>

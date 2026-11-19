@@ -19,8 +19,8 @@ import { lenses } from '../data/site';
 <style>
   .cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
   @media (max-width: 760px) { .cards { grid-template-columns: 1fr; } }
-  .card a { height: 100%; display: grid; grid-template-rows: auto auto 1fr auto; gap: 18px; padding: clamp(24px, 3vw, 40px); border-radius: 28px; background: var(--body-2); text-decoration: none; transition: background .25s, transform .35s var(--ease); }
-  .card a:hover, .card a:focus-visible { background: var(--blade-b); transform: translateY(-4px); }
+  .card a { height: 100%; display: grid; grid-template-rows: auto auto 1fr auto; gap: 18px; padding: clamp(24px, 3vw, 40px); border-radius: 28px; background: var(--surface); text-decoration: none; transition: box-shadow .35s, transform .35s var(--ease); }
+  .card a:hover, .card a:focus-visible { transform: translateY(-4px); box-shadow: 0 24px 40px -28px rgba(18, 21, 25, .35); }
   .when { font-size: clamp(21px, 2vw, 27px); font-weight: 700; line-height: 1.4; letter-spacing: -.03em; }
   .who { display: flex; align-items: baseline; gap: 8px; }
   .code { font-size: 13px; font-weight: 500; color: var(--ink-3); order: 2; }

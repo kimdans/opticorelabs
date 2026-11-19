@@ -49,7 +49,7 @@ const menu = ['대시보드', '견적·수주', '구매·발주', '재고', '회
         <p class="ai-link"><i></i>AI 업무비서</p>
       </aside>
       <div class="main">
-        <div class="top"><b>대시보드</b><span>11월 3주차</span><em>옵티코어 이후</em></div>
+        <div class="top"><b>대시보드</b><span>11월 3주차</span><em>정리한 뒤</em></div>
         <ul class="kpis">{kpis.map(x => <li><span>{x.k}</span><b>{x.v}</b><small>{x.d}</small></li>)}</ul>
         <div class="row">
           <section class="card chart">
@@ -85,7 +85,7 @@ const menu = ['대시보드', '견적·수주', '구매·발주', '재고', '회
     </div>
 
     <input type="range" min="0" max="100" value="50" step="0.1" id="compare-range"
-      aria-label="도입 전후 비교. 왼쪽은 지금의 엑셀과 메신저, 오른쪽은 옵티코어 도입 이후의 통합 업무 화면" />
+      aria-label="도입 전후 비교. 왼쪽은 지금의 엑셀과 메신저, 오른쪽은 정리한 뒤의 통합 업무 화면" />
     <div class="divider" aria-hidden="true"><span class="knob"><svg viewBox="0 0 24 24"><path d="M9 6l-5 6 5 6M15 6l5 6-5 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
   </div>
   <figcaption>손잡이를 좌우로 움직여 보세요. 설명을 위한 예시 화면입니다.</figcaption>
@@ -93,12 +93,12 @@ const menu = ['대시보드', '견적·수주', '구매·발주', '재고', '회
 
 <style>
   .cmp { margin: 0; padding: clamp(14px, 3.6vw, 52px); padding-bottom: 0; border-radius: clamp(20px, 2.6vw, 36px); display: grid; gap: 0;
-         background: radial-gradient(90% 120% at 12% 0%, #DCE0FF 0%, transparent 60%), radial-gradient(80% 110% at 100% 100%, #CFE7FF 0%, transparent 62%), #EEF0F7; }
+         background: var(--body-2); }
   figcaption { font-size: 14px; color: var(--ink-2); text-align: center; padding-block: 16px 18px; }
 
   /* 창: 손잡이 위치 --p(0~1)는 스크립트가 바꾼다. --x는 손잡이의 가로 위치(손잡이 폭 44px 보정). */
   .win { --x: calc(22px + (100% - 44px) * var(--p)); position: relative; aspect-ratio: 16 / 10; border-radius: clamp(10px, 1.2vw, 16px); overflow: hidden; container-type: inline-size; background: #fff;
-         box-shadow: 0 1px 0 rgba(12, 16, 22, .04), 0 24px 60px -20px rgba(26, 35, 176, .28), 0 8px 20px -12px rgba(12, 16, 22, .2); }
+         box-shadow: 0 1px 0 rgba(18, 21, 25, .04), 0 28px 60px -28px rgba(18, 21, 25, .35), 0 8px 20px -12px rgba(18, 21, 25, .18); }
   @media (max-width: 700px) { .win { aspect-ratio: 5 / 6; } }
   .mock { position: absolute; inset: 0; font-size: 1.19cqw; line-height: 1.4; letter-spacing: -.01em; color: #1A202B; }
   @container (max-width: 600px) { .mock { font-size: 2.95cqw; } }

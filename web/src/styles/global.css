@@ -1,13 +1,13 @@
-/* 밝은 단일 테마. 흰 바탕 + 잉크 + 코발트 한 가지 강조색. 글꼴은 Pretendard 하나로 통일한다.
-   토큰 이름은 이전 테마와 같다 (--body 바탕, --ink 글자, --core 강조). */
+/* 옵티코어 브랜드 팔레트 (brand/BRAND.md): 바탕은 순백이 아니라 렌즈 유리의 차가운 회녹색,
+   흰색은 "초점이 맞은 면"(패널)에만, 코어 코발트는 초점이 맞은 한 점(실행 중인 단계, 주 버튼, 심볼)에만 쓴다. */
 :root {
-  --body: #FFFFFF; --body-2: #F4F5F8; --blade-a: #F4F5F8; --blade-b: #ECEEF3; --edge: #D4D8E0;
-  --ink: #0C1016; --ink-2: #56606E; --ink-3: #8D96A3; --line: #E6E9EE;
-  --core: #2430E8; --core-deep: #1A23B0; --core-soft: #EDEFFF; --on-core: #FFFFFF; --ok: #0B8F62; --bad: #D4281C;
-  --night: #0C1016; --night-2: #171C25; --on-night: #F4F6F8; --on-night-2: #9AA3B0;
+  --body: #EDF0EF; --body-2: #E3E8E5; --surface: #FFFFFF; --blade-a: #E3E8E5; --blade-b: #D8DEDB; --edge: #C6CECB;
+  --ink: #121519; --ink-2: #4C555B; --ink-3: #7C868B; --line: #D6DCD9;
+  --core: #2430E8; --core-deep: #1A23B0; --core-soft: #E3E6FB; --on-core: #FFFFFF; --ok: #0B7F58; --bad: #C8261B;
+  --night: #121519; --night-2: #1E2428; --on-night: #EDF0EF; --on-night-2: #9AA4A8;
   --f-display: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
   --f-body: var(--f-display);
-  --f-mono: var(--f-display);
+  --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, var(--f-display);
   --ease: cubic-bezier(.2, .7, .2, 1);
   color-scheme: light;
 }
@@ -26,7 +26,7 @@ p { margin: 0; text-wrap: pretty; }
 
 .gut { padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
 .inner { max-width: 1200px; margin: 0 auto; }
-.eyebrow { font-size: 15px; font-weight: 600; color: var(--core); letter-spacing: -.01em; }
+.eyebrow { font-size: 15px; font-weight: 600; color: var(--ink-2); letter-spacing: -.01em; }
 .mono { font-variant-numeric: tabular-nums; }
 .dist { color: var(--core); }
 
@@ -36,17 +36,20 @@ p { margin: 0; text-wrap: pretty; }
 .sec-head { display: grid; gap: 16px; max-width: 44em; margin-bottom: 56px; }
 @media (max-width: 760px) { .sec-head { margin-bottom: 36px; } }
 .sec-head h2, .page-title { font-size: clamp(30px, 3.9vw, 52px); font-weight: 700; }
-.sec-head .eyebrow { color: var(--core); font-size: 15px; }
+/* 섹션 머리표: 코어 사각형 한 점 + 라벨 */
+.sec-head .eyebrow { color: var(--ink); font-size: 15px; display: flex; align-items: center; gap: 10px; }
+.sec-head .eyebrow::before { content: ""; width: 9px; height: 9px; border-radius: 2.5px; background: var(--core); flex: none; }
 .sec-head p, .lede { color: var(--ink-2); font-size: clamp(16px, 1.4vw, 19px); max-width: 36em; }
 
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 26px; border-radius: 999px; background: var(--ink); color: var(--body); font: 600 16px var(--f-body); letter-spacing: -.01em; text-decoration: none; border: 0; cursor: pointer; transition: transform .25s var(--ease), background .2s; }
 .btn:hover { transform: translateY(-2px); }
 .btn:active { transform: none; }
-.btn.ghost { background: var(--body-2); color: var(--ink); }
-.btn.ghost:hover { background: var(--blade-b); }
+.btn.core { background: var(--core); color: var(--on-core); }
+.btn.ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--edge); }
+.btn.ghost:hover { box-shadow: inset 0 0 0 1.5px var(--ink); }
 .btn[disabled] { opacity: .5; cursor: progress; transform: none; }
 
-.chip { font-size: 13px; font-weight: 500; padding: 5px 11px; border-radius: 999px; background: var(--body-2); color: var(--ink-2); }
+.chip { font-size: 13px; font-weight: 500; padding: 5px 11px; border-radius: 999px; background: var(--surface); color: var(--ink-2); }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
 
 /* 하위 페이지 머리 */
@@ -60,3 +63,9 @@ p { margin: 0; text-wrap: pretty; }
 .rv.in { opacity: 1; transform: none; transition: opacity .8s var(--ease), transform .8s var(--ease); transition-delay: calc(var(--d, 0) * 80ms); }
 
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation: none !important; transition: none !important; } .rv { opacity: 1; transform: none; } }
+
+/* 초점 표시: 네 모서리의 꺾쇠. 지금 초점이 맞은 것(실행 중인 단계, 고른 항목)에만 쓴다. */
+.focus-mark { --fm: var(--core); --fl: 11px; --fw: 2px; background-repeat: no-repeat;
+  background-image: linear-gradient(var(--fm) 0 0), linear-gradient(var(--fm) 0 0), linear-gradient(var(--fm) 0 0), linear-gradient(var(--fm) 0 0), linear-gradient(var(--fm) 0 0), linear-gradient(var(--fm) 0 0), linear-gradient(var(--fm) 0 0), linear-gradient(var(--fm) 0 0);
+  background-position: left top, left top, right top, right top, left bottom, left bottom, right bottom, right bottom;
+  background-size: var(--fl) var(--fw), var(--fw) var(--fl), var(--fl) var(--fw), var(--fw) var(--fl), var(--fl) var(--fw), var(--fw) var(--fl), var(--fl) var(--fw), var(--fw) var(--fl); }

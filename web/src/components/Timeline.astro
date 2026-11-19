@@ -33,14 +33,14 @@ const ticks = [0, 4, 8, 12, 16, 20, 24];
   .label { display: grid; gap: 8px; }
   .name { display: flex; align-items: center; gap: 12px; font-size: clamp(22px, 2.2vw, 28px); font-weight: 700; letter-spacing: -.03em; }
   .name span { width: 28px; height: 28px; border-radius: 50%; background: var(--ink); color: var(--body); font-size: 14px; font-weight: 600; display: grid; place-items: center; letter-spacing: 0; }
-  .name em { font-style: normal; font-size: 15px; font-weight: 600; color: var(--core); letter-spacing: -.01em; }
+  .name em { font: 500 14px var(--f-mono); font-style: normal; color: var(--ink-2); letter-spacing: 0; }
   .exit { color: var(--ink-2); font-size: 15px; max-width: 26em; }
   /* 눈금선이 깔린 일정 칸 */
   .track { position: relative; height: 44px; background: repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px calc(4 / var(--total) * 100%)); }
-  .bar { position: absolute; top: 6px; bottom: 6px; left: calc(var(--start) / var(--total) * 100%); width: calc(var(--max) / var(--total) * 100%); border-radius: 999px; background: color-mix(in srgb, var(--core) 22%, var(--body)); overflow: hidden; transform-origin: left; }
-  .bar b { position: absolute; inset: 0 auto 0 0; width: calc(var(--min) / var(--max) * 100%); border-radius: 999px; background: var(--core); }
+  .bar { position: absolute; top: 6px; bottom: 6px; left: calc(var(--start) / var(--total) * 100%); width: calc(var(--max) / var(--total) * 100%); border-radius: 999px; background: var(--edge); overflow: hidden; transform-origin: left; }
+  .bar b { position: absolute; inset: 0 auto 0 0; width: calc(var(--min) / var(--max) * 100%); border-radius: 999px; background: var(--ink); }
   /* 운영은 끝이 없다: 오른쪽이 열린 막대 */
-  .run .bar { background: var(--ink); border-radius: 999px 0 0 999px; display: grid; align-items: center; padding-left: 16px; color: var(--body); font-size: 13px; font-weight: 600; font-style: normal; white-space: nowrap; }
+  .run .bar { background: var(--core); border-radius: 999px 0 0 999px; display: grid; align-items: center; padding-left: 16px; color: var(--body); font-size: 13px; font-weight: 600; font-style: normal; white-space: nowrap; }
   .run .bar::after { content: "계속 운영 →"; }
   .run .bar b { display: none; }
   /* 화면에 들어오면 단계 순서대로 막대가 자란다 (.wait는 스크립트가 붙였다 뗀다) */

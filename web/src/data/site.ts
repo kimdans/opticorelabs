@@ -5,7 +5,7 @@ export const company = {
   nameKo: '주식회사 옵티코어',
   nameEn: 'OptiCore Inc.',
   tagline: '흐릿한 업무를, 선명한 시스템으로.',
-  summary: '엑셀, 메신저 결재, 담당자 머릿속에 흩어진 일을 하나의 코어로 모읍니다. 시스템 통합, ERP, AI 전환, 구독형 SaaS까지 한 팀이 진단부터 운영까지 맡습니다.',
+  summary: 'AX(AI 전환) 전문 구축팀입니다. 엑셀, 메신저 결재, 담당자 머릿속에 흩어진 일을 하나의 시스템으로 정리하고, 그 위에 사람이 승인하는 업무 에이전트를 올립니다. 시스템 통합, ERP, 구독형 SaaS까지 한 팀이 진단부터 운영까지 맡습니다.',
   ceo: '김건영',
   email: 'contact@opticorelabs.co.kr',
   // 아래 사업자등록번호와 주소는 예시입니다 (placeholder: true인 동안 화면에 "(예시)"로 표시). 실제 값으로 바꾸세요.
