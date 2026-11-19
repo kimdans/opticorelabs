@@ -1,29 +1,17 @@
 ---
 import { promises } from '../data/site';
+// 어두운 띠 위에 놓이는 세 가지 약속. 색은 바깥 섹션(.night)이 정한다.
 ---
-<ul class="promises" data-reveal="children" data-promises>
-  {promises.map((p, i) => (
-    <li style={`--i:${i}`}><span class="no" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span><h3>{p.title}</h3><p>{p.body}</p></li>
+<ul class="promises" data-reveal="children">
+  {promises.map(p => (
+    <li><h3>{p.title}</h3><p>{p.body}</p></li>
   ))}
 </ul>
 
 <style>
-  .promises { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .promises { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px 48px; }
   @media (max-width: 900px) { .promises { grid-template-columns: 1fr; } }
-  li { position: relative; padding: 24px; background: var(--body-2); border-radius: 0 0 16px 16px; display: grid; gap: 10px; align-content: start; transition: translate .35s cubic-bezier(.2, .8, .2, 1); }
-  /* 윗선이 왼쪽에서 그어진다. 스크립트가 꺼져 있으면 처음부터 그어져 있다. */
-  li::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: var(--core); transform-origin: left; transition: transform .9s cubic-bezier(.6, 0, .2, 1); transition-delay: calc(var(--i, 0) * 140ms); }
-  .promises.wait li::before { transform: scaleX(0); }
-  li:hover { translate: 0 -4px; }
-  .no { font: 500 13px var(--f-mono); color: var(--core); letter-spacing: .08em; }
-  h3 { font-size: 19px; line-height: 1.4; }
-  p { color: var(--ink-2); font-size: 15px; }
+  li { padding-top: 28px; border-top: 1px solid color-mix(in srgb, currentColor 22%, transparent); display: grid; gap: 14px; align-content: start; }
+  h3 { font-size: clamp(21px, 1.9vw, 26px); font-weight: 700; line-height: 1.4; }
+  p { color: var(--muted, var(--ink-2)); font-size: 16px; }
 </style>
-
-<script>
-  // 화면에 들어오면 윗선을 긋는다.
-  document.querySelectorAll<HTMLElement>('[data-promises]').forEach(list => {
-    list.classList.add('wait');
-    new IntersectionObserver(([e], io) => { if (e.isIntersecting) { list.classList.remove('wait'); io.disconnect(); } }, { threshold: 0.3 }).observe(list);
-  });
-</script>

@@ -70,7 +70,7 @@ const nextLens = lenses[(i + 1) % lenses.length];
   .tablewrap { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; min-width: 560px; }
   th, td { text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
-  thead th { font: 400 12px var(--f-mono); color: var(--ink-2); letter-spacing: .06em; }
+  thead th { font: 600 14px var(--f-body); color: var(--ink-2); }
   tbody th { font-family: var(--f-display); font-weight: 600; white-space: nowrap; }
   td { color: var(--ink-2); }
   /* 휴대폰: 표를 방식별 카드로 쌓는다 (가로로 잘리지 않게) */
@@ -79,7 +79,7 @@ const nextLens = lenses[(i + 1) % lenses.length];
     thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
     tr { display: grid; gap: 6px; padding: 16px 0; border-bottom: 1px solid var(--line); }
     th, td { display: block; padding: 0; border: 0; }
-    td::before { content: attr(data-label); display: block; font: 400 12px var(--f-mono); color: var(--core); letter-spacing: .04em; margin-bottom: 2px; }
+    td::before { content: attr(data-label); display: block; font: 600 13px var(--f-body); color: var(--core); margin-bottom: 2px; }
   }
   .end { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
   .nextlink { text-decoration: none; color: var(--ink-2); }
