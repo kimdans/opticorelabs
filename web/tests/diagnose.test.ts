@@ -60,7 +60,7 @@ describe('flow state machine', () => {
 });
 
 import { llmsShort, llmsFull } from '../src/lib/llms';
-import { lenses, states } from '../src/data/site';
+import { lenses, states, promises } from '../src/data/site';
 describe('llms.txt', () => {
   it('lists every service and state from the same data the pages use', () => {
     const t = llmsShort('https://example.com');
@@ -68,7 +68,7 @@ describe('llms.txt', () => {
     for (const s of states) expect(t).toContain(s.exit);
     expect(t.startsWith('# ')).toBe(true);
   });
-  it('full text contains every principle', () => {
-    expect(llmsFull('https://example.com')).toContain('f/8');
+  it('full text contains every customer promise', () => {
+    for (const p of promises) expect(llmsFull('https://example.com')).toContain(p.title);
   });
 });

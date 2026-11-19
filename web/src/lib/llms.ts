@@ -1,5 +1,5 @@
 // /llms.txt 와 /llms-full.txt 본문. 사람용 페이지와 같은 데이터(src/data/site.ts)에서 만든다.
-import { company, states, lenses, principles, erpOptions } from '../data/site';
+import { company, states, lenses, promises, erpOptions } from '../data/site';
 import { SIZES, PAINS, SYSTEMS } from './diagnose';
 
 
@@ -23,7 +23,7 @@ export function llmsShort(root: string): string {
     `- email: ${company.email}`, '',
     '## Optional',
     `- [전체 텍스트](${u('/llms-full.txt')})`,
-    `- [원칙](${u('/principles')})`,
+    `- [고객 약속](${u('/principles')})`,
     '',
   ].join('\n');
 }
@@ -39,7 +39,7 @@ export function llmsFull(root: string): string {
     ]),
     '## 일하는 순서 (상세)',
     ...states.flatMap(s => [`### ${s.code} · ${s.ko} (${s.duration})`, ...s.items.map(i => `- ${i}`), `- 다음 상태로 가는 조건: ${s.exit}`, '']),
-    '## 원칙',
-    ...principles.map(p => `- ${p.stop} ${p.title}: ${p.body}`), '',
+    '## 고객 약속',
+    ...promises.map(p => `- ${p.title}: ${p.body}`), '',
   ].join('\n');
 }

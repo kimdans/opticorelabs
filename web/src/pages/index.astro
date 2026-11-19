@@ -1,75 +1,61 @@
 ---
 import { url } from '../lib/paths';
 import Base from '../layouts/Base.astro';
-import Iris from '../components/Iris.astro';
-import BrandFilm from '../components/BrandFilm.astro';
+import Hero from '../components/Hero.astro';
+import Services from '../components/Services.astro';
 import StateStrip from '../components/StateStrip.astro';
-import LensRing from '../components/LensRing.astro';
-import Stops from '../components/Stops.astro';
+import Promises from '../components/Promises.astro';
+import BrandFilm from '../components/BrandFilm.astro';
 import Diagnose from '../components/Diagnose.astro';
+import { company } from '../data/site';
+// 홈 순서: 누구인가 → 어떤 상황에 부르나(서비스) → 어떻게 진행하나 → 무엇을 약속하나 → 브랜드 필름 → 진단·연락
 ---
 <Base>
-  <Iris />
+  <Hero />
 
-  <BrandFilm />
+  <section class="section gut" id="services" aria-labelledby="services-title">
+    <div class="inner">
+      <div class="sec-head" data-reveal>
+        <p class="eyebrow">서비스</p>
+        <h2 id="services-title">이럴 때 옵티코어를 찾으세요.</h2>
+        <p>지금 겪고 있는 상황을 고르시면 됩니다. 대부분의 회사는 두 가지 이상이 필요하고, 그래도 계약 창구와 책임자는 한 명입니다.</p>
+      </div>
+      <Services />
+    </div>
+  </section>
 
   <section class="section gut" id="method" aria-labelledby="method-title">
     <div class="inner">
       <div class="sec-head" data-reveal>
-        <p class="eyebrow"><span class="dist">5 m</span> · 일하는 순서</p>
-        <h2 id="method-title">프로젝트는 네 개의 상태만 가집니다.</h2>
-        <p>각 상태에는 끝나는 조건이 정해져 있습니다. 조건을 통과해야 다음 상태로 넘어갑니다.</p>
+        <p class="eyebrow">진행 방식</p>
+        <h2 id="method-title">진단부터 운영까지 4단계, 단계마다 통과 조건이 있습니다.</h2>
+        <p>조건을 통과해야 다음 단계로 넘어갑니다. 지금 어디까지 왔는지 언제든 같은 기준으로 확인할 수 있습니다.</p>
       </div>
       <StateStrip />
       <p style="margin-top:28px"><a class="btn ghost" href={url('/method')}>단계별 산출물 보기</a></p>
     </div>
   </section>
 
-  <LensRing />
-
-  <section class="section gut" id="principles" aria-labelledby="pr-title">
+  <section class="section gut" id="promises" aria-labelledby="promises-title">
     <div class="inner">
       <div class="sec-head" data-reveal>
-        <p class="eyebrow"><span class="dist">1 m</span> · 원칙</p>
-        <h2 id="pr-title">여섯 단계의 조리개로 일합니다.</h2>
-        <p>옵티코어의 엔지니어와 AI 에이전트가 같은 원칙으로 일합니다. 그래서 누가 맡아도 결과가 같습니다.</p>
+        <p class="eyebrow">약속</p>
+        <h2 id="promises-title">프로젝트 동안 지키는 세 가지.</h2>
       </div>
-      <Stops />
+      <Promises />
     </div>
   </section>
 
-  <section class="section gut" id="agents" aria-labelledby="ag-title">
-    <div class="inner agent">
-      <div data-reveal>
-        <p class="eyebrow"><span class="dist">0.5 m</span> · 에이전트 입구</p>
-        <h2 id="ag-title" class="ag-h">사람이 보는 사이트, AI가 읽는 사이트.</h2>
-        <p class="lede" style="margin-top:16px">고객의 AI 비서가 먼저 우리를 찾아오는 시대입니다. 이 사이트는 사람용 화면과 같은 내용을 AI가 읽기 좋은 텍스트로도 제공합니다.</p>
-        <p style="margin-top:22px;display:flex;gap:10px;flex-wrap:wrap"><a class="btn ghost" href={url('/llms.txt')}>/llms.txt</a><a class="btn ghost" href={url('/llms-full.txt')}>/llms-full.txt</a></p>
+  <BrandFilm />
+
+  <section class="section gut" id="diagnose-section" aria-labelledby="diag-title">
+    <div class="inner">
+      <div class="sec-head" data-reveal>
+        <p class="eyebrow">진단 · 약 1분</p>
+        <h2 id="diag-title">세 가지만 고르면 어디서 시작할지 알려드립니다.</h2>
+        <p>결과를 보내 주시면 담당자가 같은 내용을 보고 이야기를 시작합니다. 메일({company.email})로 바로 문의하셔도 됩니다.</p>
       </div>
-      <pre class="term" aria-label="llms.txt 미리보기"><span class="c"># 주식회사 옵티코어 (OptiCore Inc.)</span>
-<span class="c">&gt; 흐릿한 업무를, 선명한 시스템으로.</span>
-
-<span class="k">## Services</span>
-- [SI](/lenses/si): 시스템 통합
-- [ERP](/lenses/erp): ERP 구축
-- [AX](/lenses/ax): AI 전환
-- [SaaS](/lenses/saas): 구독형 모듈
-
-<span class="k">## Method</span>
-SCAN -&gt; FOCUS -&gt; BUILD -&gt; RUN -&gt; SCAN</pre>
+      <Diagnose bare />
     </div>
-  </section>
-
-  <section class="section gut" aria-label="진단">
-    <div class="inner"><Diagnose shutter /></div>
   </section>
 </Base>
-
-<style>
-  .agent { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; align-items: start; }
-  @media (max-width: 900px) { .agent { grid-template-columns: 1fr; } }
-  .ag-h { font-size: clamp(30px, 4.6vw, 58px); letter-spacing: -.03em; margin-top: 14px; }
-  .term { margin: 0; background: #07080A; border: 1px solid var(--edge); border-radius: 12px; padding: 20px; font: 12.5px/1.7 var(--f-mono); color: #C9D1CE; overflow-x: auto; min-width: 0; }
-  .term .c { color: #6F7C80; }
-  .term .k { color: var(--core); }
-</style>

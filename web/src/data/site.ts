@@ -19,16 +19,16 @@ export type ProjectState = 'SCAN' | 'FOCUS' | 'BUILD' | 'RUN';
 export const states: { code: ProjectState; ko: string; duration: string; items: string[]; exit: string; next: ProjectState }[] = [
   { code: 'SCAN', ko: '진단', duration: '2–3주', next: 'FOCUS',
     items: ['현업 담당자 인터뷰와 실제 업무 관찰', '업무 흐름 지도와 데이터 인벤토리', '자동화·AI 적합도 점수 (빈도 × 효과)', '바로 고칠 것과 기록만 할 것 분류'],
-    exit: '우선순위 과제 3개에 경영진이 합의하면 FOCUS로 넘어갑니다.' },
+    exit: '우선순위 과제 3개에 경영진이 합의하면 설계로 넘어갑니다.' },
   { code: 'FOCUS', ko: '설계', duration: '2–4주', next: 'BUILD',
     items: ['목표 업무의 상태 전이 표', '오픈소스 · 패키지 · 자체 개발 비교안', '화면 시안과 데이터 모델', '범위와 견적 확정'],
-    exit: '화면과 데이터 모델을 승인하면 BUILD로 넘어갑니다.' },
+    exit: '화면과 데이터 모델을 승인하면 구축으로 넘어갑니다.' },
   { code: 'BUILD', ko: '구축', duration: '6–16주', next: 'RUN',
     items: ['2주 단위로 실제 동작하는 버전 배포', '매 스프린트 현업 시연', '데이터 이관 리허설', '자동화 테스트와 CI 감사'],
-    exit: '실데이터 병행 운영을 문제 없이 통과하면 RUN으로 넘어갑니다.' },
+    exit: '실데이터 병행 운영을 문제 없이 통과하면 운영으로 넘어갑니다.' },
   { code: 'RUN', ko: '운영', duration: '계속', next: 'SCAN',
     items: ['장애·성능 모니터링', '월간 운영 리포트', '개선 요청은 빈도 × 심각도로 분류', '사용 데이터 기반 다음 과제 제안'],
-    exit: '다음 개선 과제가 정해지면 다시 SCAN에서 시작합니다.' },
+    exit: '다음 개선 과제가 정해지면 다시 진단부터 시작합니다.' },
 ];
 
 export type LensSlug = 'si' | 'erp' | 'ax' | 'saas';
@@ -72,18 +72,16 @@ export const erpOptions = [
   { name: '자체 개발', fit: '업무 방식 자체가 경쟁력일 때', watch: '기간과 비용이 가장 큼' },
 ];
 
-export const principles = [
-  { stop: 'f/1.4', title: '숨은 상태를 꺼냅니다', body: '로딩 중인데 에러도 보이는 화면은 상태가 숨어 있다는 신호입니다. 상태와 전이를 표로 드러내서 사용자, 개발자, AI 모두가 읽을 수 있게 합니다.' },
-  { stop: 'f/2', title: '먼저 찾아보고 만듭니다', body: '처음 보는 기능은 맨땅에 짓지 않습니다. 관련 오픈소스를 찾아 접근 방식을 비교한 뒤에 시작합니다.' },
-  { stop: 'f/2.8', title: '버그는 점수로 다룹니다', body: '빈도와 심각도를 곱해 5 미만이면 기록만 합니다. 아무도 요청하지 않은 미래를 위해 설계하지 않습니다.' },
-  { stop: 'f/4', title: '끝까지 갑니다', body: '중간에 "계속할까요?"를 묻지 않습니다. 무언가를 지우기 전에만 확인하고, 마지막 보고는 핵심부터 쉬운 말로 씁니다.' },
-  { stop: 'f/5.6', title: '느린 빌드를 숫자로 봅니다', body: '최근 150번의 CI 실행을 대기, 셋업, 실행 시간으로 나누어 가장 느린 작업 다섯 개를 먼저 보고합니다. 고치는 건 보고 다음입니다.' },
-  { stop: 'f/8', title: '처음부터라면 무엇을 남길까', body: '큰 변경 전에 같은 목표로 오늘 다시 시작한다고 가정합니다. 남길 것, 버릴 것, 다시 만들 것을 나눠서 결정합니다.' },
+// 고객에게 하는 약속. 회사 내부 작업 규칙(CLAUDE.md)이 아니라, 고객이 프로젝트에서 실제로 겪게 될 일만 적는다.
+export const promises = [
+  { title: '2주마다 동작하는 화면을 보여드립니다', body: '문서와 회의록 대신, 2주마다 실제로 눌러 볼 수 있는 버전을 현업 담당자와 함께 확인합니다. 방향이 틀어지면 2주 안에 알 수 있습니다.' },
+  { title: '범위가 바뀌면 견적부터 다시 드립니다', body: '요청이 늘거나 바뀌면 일정과 비용에 미치는 영향을 먼저 알려드리고, 합의한 뒤에 작업합니다. 끝나고 나서 청구서로 알게 되는 일은 없습니다.' },
+  { title: '데이터는 리허설을 마친 뒤에 옮깁니다', body: '실제 데이터로 이관 리허설을 하고, 기존 시스템과 병행 운영으로 숫자가 맞는지 확인한 뒤에 전환합니다.' },
 ];
 
 export const nav = [
-  { href: '/method', label: '일하는 순서' },
-  { href: '/lenses/si', label: '서비스', match: '/lenses' },
-  { href: '/principles', label: '원칙' },
+  { href: '/lenses', label: '서비스', match: '/lenses' },
+  { href: '/method', label: '진행 방식' },
+  { href: '/principles', label: '약속' },
   { href: '/company', label: '회사' },
 ];

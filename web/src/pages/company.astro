@@ -5,8 +5,8 @@ const rows = [
   ['법인명', `${company.nameKo} (${company.nameEn})`],
   ['대표', company.ceo],
   ['사업 분야', 'SI, ERP 구축, AX(AI 전환), 구독형 SaaS'],
-  ['사업자등록번호', `${company.bizNo}${company.placeholder ? ' (예시)' : ''}`],
-  ['주소', `${company.address}${company.placeholder ? ' (예시)' : ''}`],
+  // 사업자등록번호·주소는 확정되기 전(placeholder)에는 보이지 않는다
+  ...(company.placeholder ? [] : [['사업자등록번호', company.bizNo], ['주소', company.address]]),
   ['연락처', company.email],
 ];
 ---
@@ -14,14 +14,13 @@ const rows = [
   <section class="page-hero gut">
     <div class="inner">
       <p class="eyebrow">회사</p>
-      <h1 class="page-title">렌즈처럼, 흩어진 것을 한 점에 모읍니다.</h1>
+      <h1 class="page-title">흩어진 업무를 하나의 시스템으로 정리하는 회사입니다.</h1>
       <p class="lede">{company.summary}</p>
     </div>
   </section>
   <section class="gut" style="padding-bottom:112px">
     <div class="inner">
       <dl class="info">{rows.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
-      <p class="note">팀 소개와 채용 정보는 준비 중입니다.</p>
     </div>
   </section>
 </Base>
