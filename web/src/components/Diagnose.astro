@@ -42,10 +42,8 @@ const groups = [
             <p class="why" data-out="reason"></p>
           </div>
         </div>
-        <div class="meter">
-          <canvas class="iris" data-iris width="120" height="120" aria-hidden="true"></canvas>
-          <span class="mono"><b data-out="count">0</b> / 3 선택</span>
-        </div>
+        <div class="meter" aria-hidden="true"><i></i><i></i><i></i></div>
+        <p class="count"><b data-out="count">0</b> / 3 선택</p>
       </div>
 
       <div class="actions" data-when="result copied">
@@ -74,47 +72,54 @@ const groups = [
 </div>
 
 <style>
-
-  .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; align-items: start; }
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(32px, 5vw, 72px); align-items: start; }
   @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
-  fieldset { border: 0; padding: 0; margin: 0 0 24px; }
-  legend { font-weight: 700; margin-bottom: 10px; }
+  fieldset { border: 0; padding: 0; margin: 0 0 32px; }
+  legend { font-weight: 700; font-size: 19px; margin-bottom: 14px; padding: 0; }
   .opts { display: flex; flex-wrap: wrap; gap: 8px; }
   .opts input { position: absolute; opacity: 0; pointer-events: none; }
-  .opts label { cursor: pointer; border: 1px solid var(--edge); border-radius: 999px; padding: 8px 15px; font-size: 14px; transition: background .2s, color .2s; }
-  .opts input:checked + label { background: var(--ink); color: var(--body); border-color: var(--ink); }
+  .opts label { cursor: pointer; border-radius: 999px; padding: 12px 20px; font-size: 16px; font-weight: 500; background: var(--surface); color: var(--ink); transition: background .2s, color .2s, transform .2s var(--ease); }
+  .opts label:hover { box-shadow: inset 0 0 0 1.5px var(--ink); }
+  .opts input:checked + label { background: var(--ink); color: var(--body); }
   .opts input:focus-visible + label { outline: 2px solid var(--core); outline-offset: 2px; }
 
-  .result { border: 1px solid var(--edge); border-radius: 16px; padding: 26px; display: grid; gap: 12px; background: var(--body-2); transition: border-color .6s, box-shadow .6s; }
-  .diag:not([data-state="idle"]) .result { border-color: var(--core); box-shadow: 0 0 60px color-mix(in srgb, var(--core) 14%, transparent); }
-  @media (min-width: 901px) { .result { position: sticky; top: 96px; } }
-  /* 답을 하나 고를 때마다 조리개가 3분의 1씩 열린다 */
-  .top { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px; align-items: start; }
-  .txt { display: grid; gap: 12px; }
-  .meter { display: grid; justify-items: center; gap: 8px; font-size: 12px; color: var(--ink-2); letter-spacing: .04em; white-space: nowrap; }
-  .meter b { color: var(--core); font-weight: 500; }
-  .iris { width: 120px; height: 120px; }
-  @media (max-width: 480px) { .top { gap: 14px; } .iris { width: 84px; height: 84px; } }
-  .opts label:hover { border-color: var(--ink-2); }
-  .st { font-weight: 700; font-size: 40px; line-height: 1.1; letter-spacing: -.03em; color: var(--core); }
-  @media (max-width: 480px) { .st { font-size: 34px; } }
-  .st small { font: 500 14px var(--f-mono); color: var(--ink-2); letter-spacing: .06em; vertical-align: middle; }
-  .rec { display: grid; gap: 12px; }
-  .idle-msg { color: var(--ink-2); font-size: 15px; }
-  .lens b { color: var(--ink); }
-  .why { color: var(--ink-2); }
-  .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
-  .contact { display: grid; gap: 12px; border-top: 1px solid var(--line); padding-top: 16px; margin-top: 4px; }
-  .field { display: grid; gap: 4px; }
-  .field label { font-size: 13px; color: var(--ink-2); }
-  .field input { font: inherit; color: var(--ink); background: var(--body); border: 1px solid var(--edge); border-radius: 8px; padding: 10px 12px; }
-  .consent { font-size: 13px; color: var(--ink-2); display: flex; gap: 8px; align-items: flex-start; }
-  .consent input { margin-top: 4px; accent-color: var(--core); }
+  .result { border-radius: 28px; padding: clamp(24px, 3vw, 40px); display: grid; gap: 16px; background: var(--surface); transition: background .5s, color .5s; }
+  @media (min-width: 901px) { .result { position: sticky; top: 100px; } }
+  .diag:not([data-state="idle"]) .result { background: var(--night); color: var(--on-night); --muted: var(--on-night-2); }
+  .top { display: grid; gap: 16px; }
+  .txt { display: grid; gap: 12px; order: 3; }
+  /* 고른 문항 수만큼 칸이 찬다 (data-n은 스크립트가 넣는다) */
+  .meter { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; order: 1; }
+  .meter i { height: 4px; border-radius: 999px; background: color-mix(in srgb, currentColor 14%, transparent); transition: background .4s; }
+  .diag[data-n="1"] .meter i:nth-child(-n+1), .diag[data-n="2"] .meter i:nth-child(-n+2), .diag[data-n="3"] .meter i { background: var(--core); }
+  .diag[data-n="3"] .meter i { background: #8089FF; }
+  .count { order: 2; font-size: 14px; color: var(--muted, var(--ink-2)); font-variant-numeric: tabular-nums; }
+  .count b { font-weight: 600; color: inherit; }
+  .eyebrow { color: var(--muted, var(--core)); }
+  .diag:not([data-state="idle"]) .eyebrow { color: #A5ACFF; }
+  .st { font-weight: 700; font-size: clamp(34px, 3.6vw, 48px); line-height: 1.2; letter-spacing: -.04em; }
+  .st small { font-size: 14px; font-weight: 500; color: var(--muted, var(--ink-3)); letter-spacing: 0; vertical-align: middle; }
+  .rec { display: grid; gap: 12px; animation: result-in .6s var(--ease); }
+  @keyframes result-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  .idle-msg { color: var(--ink-2); font-size: 17px; }
+  .lens { font-size: 17px; }
+  .lens b { font-weight: 700; }
+  .why { color: var(--muted, var(--ink-2)); }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+  .diag:not([data-state="idle"]) .result :global(.btn) { background: #fff; color: var(--night); }
+  .diag:not([data-state="idle"]) .result :global(.btn.ghost) { background: var(--night-2); color: var(--on-night); box-shadow: none; }
+  .contact { display: grid; gap: 14px; border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent); padding-top: 20px; margin-top: 4px; }
+  .field { display: grid; gap: 6px; }
+  .field label { font-size: 14px; color: var(--muted, var(--ink-2)); }
+  .field input { font: inherit; color: var(--on-night); background: var(--night-2); border: 1px solid transparent; border-radius: 12px; padding: 13px 14px; }
+  .field input:focus-visible { outline: none; border-color: #8C95FF; }
+  .consent { font-size: 13.5px; color: var(--muted, var(--ink-2)); display: flex; gap: 8px; align-items: flex-start; }
+  .consent input { margin-top: 4px; accent-color: #8C95FF; }
   .hp { position: absolute; left: -9999px; }
-  .err { color: var(--bad); font-size: 14px; min-height: 0; }
+  .err { color: #FF8A80; font-size: 14.5px; min-height: 0; }
   .err:empty { display: none; }
-  .msg { font-size: 15px; }
-  .msg.ok { color: var(--ok); }
+  .msg { font-size: 16px; white-space: pre-wrap; }
+  .msg.ok { color: #6EE7B7; }
 
   /* 상태별 표시: data-when 목록에 현재 상태가 있을 때만 보인다. 불가능한 조합(전송 중 + 완료)이 화면에 나오지 않는다. */
   [data-when] { display: none; }
@@ -127,13 +132,12 @@ const groups = [
   .diag[data-state="copied"] [data-when~="copied"] { display: revert; }
   .diag[data-state="result"] .actions[data-when], .diag[data-state="copied"] .actions[data-when] { display: flex; }
   .diag[data-state="contact"] .contact, .diag[data-state="submitting"] .contact, .diag[data-state="failed"] .contact { display: grid; }
+  .diag:not([data-state="idle"]) .rec { display: grid; }
 </style>
 
 <script>
   import { recommend, summaryText, next, SUBMIT_TIMEOUT_MS, type Answers, type FlowEvent, type FlowState } from '../lib/diagnose';
   import { track } from '../scripts/track';
-  import { gsap, reduceMotion } from '../scripts/motion';
-  import { createIris } from '../scripts/iris';
 
   const ENDPOINT = import.meta.env.PUBLIC_DIAGNOSE_ENDPOINT as string | undefined;
 
@@ -145,20 +149,9 @@ const groups = [
     let state = root.dataset.state as FlowState;
     let started = false;
 
-    // 조리개: 고른 문항 수(0~3)에 맞춰 열린다. 다 고르면 결과에 초점이 맞는다.
-    const iris = createIris(root.querySelector<HTMLCanvasElement>('[data-iris]')!);
-    const OPEN = [0.05, 0.3, 0.56, 0.9];
-    const rec = root.querySelector<HTMLElement>('.rec')!;
-    let shown = -1;
-    function focus(n: number) {
-      if (n === shown) return;
-      const first = shown < 3 && n === 3; shown = n;
-      out('count').textContent = String(n);
-      if (reduceMotion()) { iris.state.open = OPEN[n]; iris.draw(); return; }
-      gsap.to(iris.state, { open: OPEN[n], rot: n * 0.42, duration: 0.9, ease: 'power3.out', onUpdate: iris.draw, overwrite: true });
-      if (first) gsap.fromTo(rec, { filter: 'blur(14px)', opacity: 0 }, { filter: 'blur(0px)', opacity: 1, duration: 0.8, ease: 'power2.out', clearProps: 'filter,opacity' });
-    }
+    // 고른 문항 수(0~3)를 진행 표시에 반영한다.
     const answered = () => ['size', 'pain', 'systems'].filter(n => answers.querySelector(`input[name="${n}"]:checked`)).length;
+    const focus = (n: number) => { root.dataset.n = String(n); out('count').textContent = String(n); };
     focus(0);
 
     const KO: Record<string, string> = { SCAN: '진단', FOCUS: '설계', BUILD: '구축', RUN: '운영' };

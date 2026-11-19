@@ -41,7 +41,9 @@
 - 회사: **옵티코어 (OptiCore)** — SI, AX(AI 전환), ERP 구축, SaaS 제공.
 - 브랜드 규칙: `brand/BRAND.md`
 - 사이트 구조: `docs/SITEMAP.md`
-- **실제 사이트: `web/` (Astro, 시안 B 기반)** — 문구는 `web/src/data/site.ts` 한 곳에서 수정
+- 포지셔닝: **AX(AI 전환) 전문 구축팀**. 고객은 직원 30~200명 회사의 대표·운영 총괄·실무 팀장 (`brand/BRAND.md` 0장)
+- **실제 사이트: `web/` (Astro, 라이트 단일 테마, Pretendard)** — 문구는 `web/src/data/site.ts`, 첫 화면 에이전트 예시는 `web/src/data/agent.ts`
+- 디자인을 바꿀 때는 아티팩트로 먼저 보여 주고, 확인을 받은 뒤 배포한다
 - 배포: GitHub Pages (`.github/workflows/pages.yml`, `main`에 올라가면 자동). 내부 링크는 `web/src/lib/paths.ts`의 `url()` 사용
 - 브랜드 필름(15초): `brand/motion/` — `build.sh`로 다시 렌더
 - 초기 프로토타입·모션 시안(참고용): `site/index.html`, `site/concepts/`
