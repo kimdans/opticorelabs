@@ -1,0 +1,31 @@
+# GitHub Pages 자체 도메인의 HTTPS 상태를 확인하고, 가능하면 "HTTPS 강제"를 켠다.
+# 저장소 설정 화면(Settings → Pages)에서 하는 일을 자동화 권한으로 시도하는 용도다.
+name: pages-https
+on:
+  push:
+    branches: ['claude/tender-davinci-h2e4px']
+    paths: ['.github/workflows/pages-https.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+
+jobs:
+  https:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      DOMAIN: opticorelabs.co.kr
+    steps:
+      - name: Current Pages settings
+        run: gh api "repos/$REPO/pages" --jq '{cname, https_enforced, https_certificate, protected_domain_state, build_type, status}' || true
+      - name: DNS health check
+        run: gh api "repos/$REPO/pages/health" || true
+      - name: Re-save the custom domain (asks GitHub to issue the certificate again)
+        run: gh api -X PUT "repos/$REPO/pages" -f cname="$DOMAIN" -i || true
+      - name: Enforce HTTPS
+        run: gh api -X PUT "repos/$REPO/pages" -F https_enforced=true -i || true
+      - name: Settings after the attempt
+        run: gh api "repos/$REPO/pages" --jq '{cname, https_enforced, https_certificate, protected_domain_state}' || true
