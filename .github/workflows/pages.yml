@@ -33,15 +33,17 @@ jobs:
         uses: actions/configure-pages@v5
       - run: npm ci
       - run: npm test
-      # 사이트 안의 대표 주소(canonical, sitemap, llms.txt)는 항상 https로 적는다.
-      # "Enforce HTTPS"를 켜기 전에는 Pages가 http 주소를 돌려주기 때문에 여기서 바꿔 준다.
-      - run: echo "SITE_URL=${ORIGIN/#http:/https:}" >> "$GITHUB_ENV"
+      # 지금 Pages에 걸려 있는 도메인·인증서 상태를 배포 기록에 남긴다 (문제가 생겼을 때 확인용).
+      - name: Pages domain and certificate state
+        run: gh api "repos/${{ github.repository }}/pages" --jq '{cname, html_url, https_enforced, https_certificate}' || true
         env:
-          ORIGIN: ${{ steps.pages.outputs.origin }}
+          GH_TOKEN: ${{ github.token }}
       - run: npm run build
         env:
-          # 자체 도메인을 연결하면 BASE_PATH가 비어 "/"로 빌드된다.
-          BASE_PATH: ${{ steps.pages.outputs.base_path || '/' }}
+          # 사이트는 항상 자체 도메인 기준으로 만든다. Pages 설정에서 도메인을 잠깐 뺐다 넣어도
+          # (인증서 재발급 등) 그 순간의 설정에 따라 주소와 경로가 바뀌지 않게 하기 위해서다.
+          SITE_URL: https://opticorelabs.co.kr
+          BASE_PATH: /
       - uses: actions/upload-pages-artifact@v3
         with:
           path: web/dist
