@@ -1,75 +1,41 @@
 ---
 import { url } from '../lib/paths';
+import FocusField from './FocusField.astro';
 ---
-<!-- 첫 화면: 누가 무엇을 하는지 먼저 읽히게 한다. 조리개는 옆에 두는 장식이고, 처음 한 번만 열린다(스크롤에 묶지 않음). -->
+<!-- 첫 화면: 왼쪽은 누가 무엇을 하는지, 오른쪽은 그 일을 직접 해 보는 초점 체험.
+     제목 첫 줄("흐릿한 업무를")은 오른쪽 업무가 정리될수록 선명해진다 (--messy: 1 → 0, FocusField가 바꾼다). -->
 <section class="hero gut" aria-labelledby="hero-title">
   <div class="inner wrap">
     <div class="copy">
       <p class="eyebrow">SI · ERP · AX · SaaS</p>
-      <h1 id="hero-title">흐릿한 업무를<br /><em>선명한 시스템</em>으로.</h1>
+      <h1 id="hero-title">
+        <span class="soft"><span class="w" style="--i:0">흐릿한</span> <span class="w" style="--i:1">업무를</span></span><br />
+        <em><span class="w" style="--i:2">선명한</span> <span class="w" style="--i:3">시스템</span></em><span class="w" style="--i:4">으로.</span>
+      </h1>
       <p class="lede">직원 30~200명 규모 회사의 엑셀·메신저 결재·수작업을 하나의 시스템으로 정리합니다. 진단부터 구축, 운영까지 한 팀이 맡습니다.</p>
       <div class="cta">
         <a class="btn" href={url('/diagnose')}>3문항 진단 시작</a>
         <a class="btn ghost" href={url('/lenses')}>서비스 보기</a>
       </div>
     </div>
-    <div class="lens" aria-hidden="true"><canvas id="iris"></canvas></div>
+    <FocusField />
   </div>
 </section>
 
 <style>
-  .hero { padding-block: 128px 88px; }
-  @media (max-width: 760px) { .hero { padding-block: 96px 56px; } }
-  .wrap { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); gap: 48px; align-items: center; }
-  @media (max-width: 860px) { .wrap { grid-template-columns: 1fr; gap: 28px; } }
+  .hero { padding-block: 120px 88px; }
+  @media (max-width: 760px) { .hero { padding-block: 92px 56px; } }
+  .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; align-items: center; }
+  @media (max-width: 860px) { .wrap { grid-template-columns: 1fr; gap: 32px; } }
   .copy { display: grid; gap: 22px; justify-items: start; min-width: 0; }
-  h1 { font-size: clamp(40px, 6.2vw, 84px); line-height: 1.08; letter-spacing: -.04em; font-weight: 700; }
+  h1 { font-size: clamp(40px, 5.6vw, 78px); line-height: 1.08; letter-spacing: -.04em; font-weight: 700; }
   h1 em { font-style: normal; color: var(--core); }
-  .lede { font-size: clamp(16px, 1.6vw, 19px); color: var(--ink-2); max-width: 32em; }
+  /* 단어가 차례로 초점이 맞으며 나타난다 (CSS만 사용: 스크립트가 없어도 제목은 보인다) */
+  .w { display: inline-block; animation: focus-in .9s cubic-bezier(.2, .8, .2, 1) both; animation-delay: calc(var(--i) * 90ms + 80ms); }
+  @keyframes focus-in { from { filter: blur(.22em); opacity: 0; transform: translateY(.12em); } to { filter: blur(0); opacity: 1; transform: none; } }
+  /* 읽을 수 있을 만큼만 흐리다. 업무가 다 정리되면 완전히 선명해진다. */
+  .soft { display: inline-block; filter: blur(calc(var(--messy, 0) * .032em)); opacity: calc(1 - var(--messy, 0) * .3); transition: filter .7s, opacity .7s; }
+  .lede { font-size: clamp(16px, 1.5vw, 19px); color: var(--ink-2); max-width: 30em; }
   .cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
   .cta .btn { min-height: 48px; padding-inline: 22px; }
-  .lens { width: min(420px, 100%); aspect-ratio: 1; justify-self: end; }
-  @media (max-width: 860px) { .lens { width: 180px; justify-self: start; order: -1; } }
-  canvas { width: 100%; height: 100%; display: block; }
 </style>
-
-<script>
-  import { gsap, reduceMotion } from '../scripts/motion';
-
-  const cv = document.getElementById('iris') as HTMLCanvasElement | null;
-  if (cv) {
-    const ctx = cv.getContext('2d')!;
-    const css = (n: string) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-    const C = { body: css('--body'), a: css('--blade-a'), b: css('--blade-b'), edge: css('--edge'), core: css('--core'), deep: css('--core-deep') };
-    const N = 9, OPEN = 0.62;
-    const state = { open: reduceMotion() ? OPEN : 0.06, rot: 0 };
-    let S = 0, dpr = 1;
-
-    function draw() {
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const c = S / 2, R = S * 0.46, r = Math.max(2, R * state.open);
-      ctx.clearRect(0, 0, S, S);
-      // 열린 구멍 안: 코발트 빛과 코어(로고의 사각형)
-      const g = ctx.createRadialGradient(c, c, 0, c, c, R);
-      g.addColorStop(0, C.deep); g.addColorStop(1, C.body);
-      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(c, c, R, 0, Math.PI * 2); ctx.fill();
-      const k = R * 0.22; ctx.fillStyle = C.core; ctx.beginPath(); ctx.roundRect(c - k / 2, c - k / 2, k, k, k * 0.18); ctx.fill();
-      // 날
-      const V = Array.from({ length: N + 2 }, (_, i) => { const a = state.rot + (i * Math.PI * 2) / N; return [c + Math.cos(a) * r, c + Math.sin(a) * r]; });
-      const E = (i: number) => { const dx = V[i + 1][0] - V[i][0], dy = V[i + 1][1] - V[i][1], d = Math.hypot(dx, dy) || 1; return [dx / d, dy / d]; };
-      ctx.save(); ctx.beginPath(); ctx.arc(c, c, R, 0, Math.PI * 2); ctx.clip();
-      for (let i = 0; i < N; i++) {
-        const p1 = V[i + 1], p2 = V[i + 2], e1 = E(i), e2 = E(i + 1), L = R * 3;
-        ctx.beginPath(); ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p1[0] + e1[0] * L, p1[1] + e1[1] * L);
-        ctx.lineTo(p2[0] + e2[0] * L, p2[1] + e2[1] * L); ctx.lineTo(p2[0], p2[1]); ctx.closePath();
-        ctx.fillStyle = i % 2 ? C.b : C.a; ctx.fill();
-        ctx.strokeStyle = C.edge; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p1[0] + e1[0] * L, p1[1] + e1[1] * L); ctx.stroke();
-      }
-      ctx.restore();
-      ctx.strokeStyle = C.edge; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(c, c, R + 6, 0, Math.PI * 2); ctx.stroke();
-    }
-    function size() { dpr = Math.min(2, devicePixelRatio || 1); S = cv!.clientWidth; cv!.width = S * dpr; cv!.height = S * dpr; draw(); }
-    addEventListener('resize', size); size();
-    if (!reduceMotion()) gsap.to(state, { open: OPEN, rot: 0.9, duration: 2.2, delay: 0.3, ease: 'expo.out', onUpdate: draw });
-  }
-</script>
