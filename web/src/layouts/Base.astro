@@ -55,6 +55,7 @@ const org = {
         </details>
       </div>
     </div>
+    <span class="progress" data-progress aria-hidden="true"></span>
   </header>
 
   <main id="main"><slot /></main>
@@ -76,6 +77,7 @@ const org = {
 
 <style>
   .hud { position: fixed; top: 0; left: 0; right: 0; z-index: 40; padding-top: env(safe-area-inset-top, 0px); background: var(--body); border-bottom: 1px solid var(--line); }
+  .progress { position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--core); transform: scaleX(0); transform-origin: left; }
   .bar { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-block: 12px; }
   .logo { display: flex; align-items: center; gap: 10px; font-family: var(--f-display); font-weight: 600; font-size: 19px; letter-spacing: -.02em; text-decoration: none; }
   .logo svg { width: 24px; height: 24px; }

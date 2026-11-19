@@ -31,6 +31,10 @@ p { margin: 0; }
 @media (max-width: 760px) { .section { padding-block: 72px; } }
 .sec-head { display: grid; gap: 14px; max-width: 46em; margin-bottom: 44px; }
 .sec-head h2, .page-title { font-size: clamp(30px, 4.6vw, 58px); letter-spacing: -.03em; font-weight: 700; }
+.sec-head h2 .w { display: inline-block; }
+/* 하위 페이지 제목: 초점이 맞으며 나타난다 */
+.page-title { animation: title-focus .9s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes title-focus { from { filter: blur(.2em); opacity: 0; } to { filter: blur(0); opacity: 1; } }
 .sec-head p, .lede { color: var(--ink-2); font-size: 17px; max-width: 38em; }
 
 .btn { display: inline-flex; align-items: center; gap: 10px; background: var(--core); color: var(--on-core); padding: 12px 20px; border-radius: 999px; font-weight: 500; font-size: 15px; text-decoration: none; border: 0; cursor: pointer; font-family: inherit; }

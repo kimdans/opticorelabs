@@ -32,12 +32,20 @@ const groups = [
     </form>
 
     <div class="result" aria-live="polite">
-      <span class="eyebrow">추천 시작 단계</span>
-      <p class="idle-msg" data-when="idle">왼쪽 세 가지를 고르면 어디서부터 시작하면 좋을지, 어떤 서비스가 맞는지 여기에 나옵니다.</p>
-      <div class="rec" data-when="result contact submitting submitted failed copied">
-        <span class="st"><span data-out="state"></span> <small data-out="code"></small></span>
-        <p class="lens">추천 서비스: <b data-out="lens"></b></p>
-        <p class="why" data-out="reason"></p>
+      <div class="top">
+        <div class="txt">
+          <span class="eyebrow">추천 시작 단계</span>
+          <p class="idle-msg" data-when="idle">세 가지를 고르면 어디서부터 시작하면 좋을지, 어떤 서비스가 맞는지 여기에 나옵니다.</p>
+          <div class="rec" data-when="result contact submitting submitted failed copied">
+            <span class="st"><span data-out="state"></span> <small data-out="code"></small></span>
+            <p class="lens">추천 서비스: <b data-out="lens"></b></p>
+            <p class="why" data-out="reason"></p>
+          </div>
+        </div>
+        <div class="meter">
+          <canvas class="iris" data-iris width="120" height="120" aria-hidden="true"></canvas>
+          <span class="mono"><b data-out="count">0</b> / 3 선택</span>
+        </div>
       </div>
 
       <div class="actions" data-when="result copied">
@@ -77,8 +85,19 @@ const groups = [
   .opts input:checked + label { background: var(--ink); color: var(--body); border-color: var(--ink); }
   .opts input:focus-visible + label { outline: 2px solid var(--core); outline-offset: 2px; }
 
-  .result { border: 1px solid var(--core); border-radius: 16px; padding: 26px; display: grid; gap: 12px; background: var(--body-2); }
-  .st { font-weight: 700; font-size: 44px; line-height: 1.1; letter-spacing: -.03em; color: var(--core); }
+  .result { border: 1px solid var(--edge); border-radius: 16px; padding: 26px; display: grid; gap: 12px; background: var(--body-2); transition: border-color .6s, box-shadow .6s; }
+  .diag:not([data-state="idle"]) .result { border-color: var(--core); box-shadow: 0 0 60px color-mix(in srgb, var(--core) 14%, transparent); }
+  @media (min-width: 901px) { .result { position: sticky; top: 96px; } }
+  /* 답을 하나 고를 때마다 조리개가 3분의 1씩 열린다 */
+  .top { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px; align-items: start; }
+  .txt { display: grid; gap: 12px; }
+  .meter { display: grid; justify-items: center; gap: 8px; font-size: 12px; color: var(--ink-2); letter-spacing: .04em; white-space: nowrap; }
+  .meter b { color: var(--core); font-weight: 500; }
+  .iris { width: 120px; height: 120px; }
+  @media (max-width: 480px) { .top { gap: 14px; } .iris { width: 84px; height: 84px; } }
+  .opts label:hover { border-color: var(--ink-2); }
+  .st { font-weight: 700; font-size: 40px; line-height: 1.1; letter-spacing: -.03em; color: var(--core); }
+  @media (max-width: 480px) { .st { font-size: 34px; } }
   .st small { font: 500 14px var(--f-mono); color: var(--ink-2); letter-spacing: .06em; vertical-align: middle; }
   .rec { display: grid; gap: 12px; }
   .idle-msg { color: var(--ink-2); font-size: 15px; }
@@ -113,6 +132,8 @@ const groups = [
 <script>
   import { recommend, summaryText, next, SUBMIT_TIMEOUT_MS, type Answers, type FlowEvent, type FlowState } from '../lib/diagnose';
   import { track } from '../scripts/track';
+  import { gsap, reduceMotion } from '../scripts/motion';
+  import { createIris } from '../scripts/iris';
 
   const ENDPOINT = import.meta.env.PUBLIC_DIAGNOSE_ENDPOINT as string | undefined;
 
@@ -123,6 +144,22 @@ const groups = [
     const submitBtn = root.querySelector<HTMLButtonElement>('[data-act="submit"]')!;
     let state = root.dataset.state as FlowState;
     let started = false;
+
+    // 조리개: 고른 문항 수(0~3)에 맞춰 열린다. 다 고르면 결과에 초점이 맞는다.
+    const iris = createIris(root.querySelector<HTMLCanvasElement>('[data-iris]')!);
+    const OPEN = [0.05, 0.3, 0.56, 0.9];
+    const rec = root.querySelector<HTMLElement>('.rec')!;
+    let shown = -1;
+    function focus(n: number) {
+      if (n === shown) return;
+      const first = shown < 3 && n === 3; shown = n;
+      out('count').textContent = String(n);
+      if (reduceMotion()) { iris.state.open = OPEN[n]; iris.draw(); return; }
+      gsap.to(iris.state, { open: OPEN[n], rot: n * 0.42, duration: 0.9, ease: 'power3.out', onUpdate: iris.draw, overwrite: true });
+      if (first) gsap.fromTo(rec, { filter: 'blur(14px)', opacity: 0 }, { filter: 'blur(0px)', opacity: 1, duration: 0.8, ease: 'power2.out', clearProps: 'filter,opacity' });
+    }
+    const answered = () => ['size', 'pain', 'systems'].filter(n => answers.querySelector(`input[name="${n}"]:checked`)).length;
+    focus(0);
 
     const KO: Record<string, string> = { SCAN: '진단', FOCUS: '설계', BUILD: '구축', RUN: '운영' };
     const complete = () => ['size', 'pain', 'systems'].every(n => answers.querySelector(`input[name="${n}"]:checked`));
@@ -148,8 +185,8 @@ const groups = [
 
     answers.addEventListener('change', () => {
       if (!started) { started = true; track('diagnose_started', { from: location.pathname }); }
-      if (!complete()) return;                       // 세 문항을 다 고르기 전에는 결과를 보이지 않는다
-      send('ANSWER'); render();
+      if (!complete()) { focus(answered()); return; }   // 세 문항을 다 고르기 전에는 결과를 보이지 않는다
+      send('ANSWER'); render(); focus(3);
     });
     root.querySelector('[data-act="contact"]')?.addEventListener('click', () => {
       send('START_CONTACT');
