@@ -33,10 +33,14 @@ jobs:
         uses: actions/configure-pages@v5
       - run: npm ci
       - run: npm test
+      # 사이트 안의 대표 주소(canonical, sitemap, llms.txt)는 항상 https로 적는다.
+      # "Enforce HTTPS"를 켜기 전에는 Pages가 http 주소를 돌려주기 때문에 여기서 바꿔 준다.
+      - run: echo "SITE_URL=${ORIGIN/#http:/https:}" >> "$GITHUB_ENV"
+        env:
+          ORIGIN: ${{ steps.pages.outputs.origin }}
       - run: npm run build
         env:
-          # 실제 Pages 주소를 그대로 넘긴다. 자체 도메인을 연결하면 BASE_PATH가 비어 "/"로 빌드된다.
-          SITE_URL: ${{ steps.pages.outputs.origin }}
+          # 자체 도메인을 연결하면 BASE_PATH가 비어 "/"로 빌드된다.
           BASE_PATH: ${{ steps.pages.outputs.base_path || '/' }}
       - uses: actions/upload-pages-artifact@v3
         with:
