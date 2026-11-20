@@ -11,8 +11,8 @@ const list = order.map(slug => lenses.find(l => l.slug === slug)!);
   {list.map((l, i) => (
     <article class="item" data-item data-open={i === 0 ? 'true' : 'false'} style={`--row:${i + 1}`}>
       <h3><button type="button" id={`svc-tab-${l.slug}`} aria-controls={`svc-panel-${l.slug}`} aria-expanded={i === 0 ? 'true' : 'false'}>
+        <span class="name">{l.name}</span>
         <span class="when">{l.when}</span>
-        <span class="name">{l.name} <small>{l.code}</small></span>
       </button></h3>
       <div class="panel" id={`svc-panel-${l.slug}`} role="region" aria-labelledby={`svc-tab-${l.slug}`}>
         <div class={`art art-${l.slug}`} aria-hidden="true">
@@ -23,7 +23,6 @@ const list = order.map(slug => lenses.find(l => l.slug === slug)!);
         </div>
         <div class="body">
           <p class="what">{l.what}</p>
-          <ul class="does">{l.does.map(d => <li>{d}</li>)}</ul>
           <a class="more" href={url(`/lenses/${l.slug}`)}>{l.name} 자세히 보기<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
         </div>
       </div>
@@ -35,10 +34,10 @@ const list = order.map(slug => lenses.find(l => l.slug === slug)!);
   .tabs { display: grid; gap: 12px; }
   .item { display: grid; gap: 12px; }
   h3 { font: inherit; letter-spacing: inherit; }
-  button { all: unset; box-sizing: border-box; cursor: pointer; display: grid; gap: 8px; width: 100%; padding: 24px 0; border-top: 1px solid var(--edge); }
+  button { all: unset; box-sizing: border-box; cursor: pointer; display: grid; gap: 6px; width: 100%; padding: 22px 0; border-top: 1px solid var(--edge); }
   button:focus-visible { outline: 2px solid var(--core); outline-offset: 4px; border-radius: 6px; }
-  .when { font-size: clamp(21px, 2.1vw, 28px); font-weight: 700; line-height: 1.35; letter-spacing: -.03em; transition: color .3s; }
-  .name { font-size: 15px; font-weight: 600; color: var(--ink); display: flex; align-items: baseline; gap: 6px; }
+  .name { font-size: clamp(26px, 2.8vw, 38px); font-weight: 700; line-height: 1.2; letter-spacing: -.04em; transition: color .3s; }
+  .when { font-size: 16px; color: var(--ink-2); transition: opacity .3s; }
   .name small { font-size: 13px; font-weight: 500; color: var(--ink-3); }
   .panel { border-radius: 28px; background: var(--surface); overflow: hidden; display: grid; }
   .body { padding: clamp(22px, 2.6vw, 36px); display: grid; gap: 20px; align-content: start; }
@@ -52,8 +51,9 @@ const list = order.map(slug => lenses.find(l => l.slug === slug)!);
 
   /* 스크립트가 켜지면: 넓은 화면은 왼쪽 목록 + 오른쪽 패널, 좁은 화면은 하나씩 펼쳐지는 목록 */
   .tabs.live .item[data-open="false"] .panel { display: none; }
-  .tabs.live .item[data-open="false"] .when { color: var(--ink-3); }
-  .tabs.live .item[data-open="false"] button:hover .when { color: var(--ink-2); }
+  .tabs.live .item[data-open="false"] .name { color: var(--ink-3); }
+  .tabs.live .item[data-open="false"] .when { opacity: .6; }
+  .tabs.live .item[data-open="false"] button:hover .name { color: var(--ink-2); }
   @media (min-width: 901px) {
     .tabs.live { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); column-gap: 72px; row-gap: 0; align-items: start; }
     .tabs.live .item { display: contents; }

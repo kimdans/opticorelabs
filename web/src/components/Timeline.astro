@@ -1,5 +1,8 @@
 ---
 import { states } from '../data/site';
+// brief: 홈에서는 단계 이름과 기간만 보인다 (통과 조건 문장은 진행 방식 페이지에 있다).
+interface Props { brief?: boolean }
+const { brief = false } = Astro.props;
 // 진행 4단계를 실제 기간 비율로 그린 일정표. 진한 부분은 최소 기간, 옅은 부분은 최대 기간까지의 여유다.
 const span: Record<string, [number, number]> = { SCAN: [2, 3], FOCUS: [2, 4], BUILD: [6, 16], RUN: [4, 4] };
 let at = 0;
@@ -7,14 +10,14 @@ const rows = states.map(s => { const [min, max] = span[s.code]; const r = { ...s
 const total = at;                       // 27주 눈금
 const ticks = [0, 4, 8, 12, 16, 20, 24];
 ---
-<div class="tl" data-timeline style={`--total:${total}`}>
+<div class={`tl ${brief ? "brief" : ""}`} data-timeline style={`--total:${total}`}>
   <div class="axis" aria-hidden="true"><span></span><div class="scale">{ticks.map(t => <i style={`--at:${t}`}>{t === 0 ? '시작' : `${t}주`}</i>)}</div></div>
   <ol>
     {rows.map((r, i) => (
       <li class={r.code === 'RUN' ? 'run' : ''} style={`--start:${r.start};--min:${r.min};--max:${r.max};--i:${i}`}>
         <div class="label">
           <p class="name"><span>{i + 1}</span>{r.ko}<em>{r.duration}</em></p>
-          <p class="exit">{r.exit}</p>
+          {!brief && <p class="exit">{r.exit}</p>}
         </div>
         <div class="track" aria-hidden="true"><i class="bar"><b></b></i></div>
       </li>
@@ -29,6 +32,8 @@ const ticks = [0, 4, 8, 12, 16, 20, 24];
   .scale i { position: absolute; left: calc(var(--at) / var(--total) * 100%); font-style: normal; white-space: nowrap; }
   ol { list-style: none; margin: 0; padding: 0; }
   li { padding-block: 28px; border-top: 1px solid var(--edge); align-items: center; }
+  .brief li { padding-block: 18px; }
+  .brief { --label: minmax(200px, 24%); }
   li:last-child { border-bottom: 1px solid var(--edge); }
   .label { display: grid; gap: 8px; }
   .name { display: flex; align-items: center; gap: 12px; font-size: clamp(22px, 2.2vw, 28px); font-weight: 700; letter-spacing: -.03em; }

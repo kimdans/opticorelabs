@@ -1,10 +1,12 @@
 ---
 import { promises } from '../data/site';
-// 어두운 띠 위에 놓이는 세 가지 약속. 색은 바깥 섹션(.night)이 정한다.
+// brief: 홈에서는 제목만 보인다 (설명은 약속 페이지에 있다). 색은 바깥 섹션이 정한다.
+interface Props { brief?: boolean }
+const { brief = false } = Astro.props;
 ---
 <ul class="promises" data-reveal="children">
   {promises.map(p => (
-    <li><h3>{p.title}</h3><p>{p.body}</p></li>
+    <li><h3>{p.title}</h3>{!brief && <p>{p.body}</p>}</li>
   ))}
 </ul>
 
