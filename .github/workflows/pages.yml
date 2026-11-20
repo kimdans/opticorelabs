@@ -44,6 +44,11 @@ jobs:
           # (인증서 재발급 등) 그 순간의 설정에 따라 주소와 경로가 바뀌지 않게 하기 위해서다.
           SITE_URL: https://opticorelabs.co.kr
           BASE_PATH: /
+      # 깨진 내부 링크가 하나라도 있으면 배포하지 않는다
+      - run: node scripts/check-links.mjs
+        env:
+          SITE_URL: https://opticorelabs.co.kr
+          BASE_PATH: /
       - uses: actions/upload-pages-artifact@v3
         with:
           path: web/dist
