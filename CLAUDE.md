@@ -38,7 +38,7 @@
 ---
 
 ## 프로젝트 맥락
-- 회사: **주식회사 옵티코어 (OptiCore)** — 생활·교육·렌탈 분야의 믿을 만한 업체와 고객을 이어 드리는 **마케팅 회사** (2026-11 포지션 변경).
+- 회사: **주식회사 옵티코어 (OptiCore)** — 생활·교육·렌탈 분야의 서비스를 안내하고 업체와 고객을 이어 주는 **마케팅 회사** (2026-11 포지션 변경).
 - 포지셔닝(비즈프로필 소개글과 같음): 이사, 정리·청소, 학습, 렌탈처럼 일상에 필요한 서비스를 비교하고 상담을 신청하도록 안내한다. 상담 신청은 각 제휴 업체로 바로 전달되며, 상담 비용은 받지 않는다.
 - 공개 사이트 문구 규칙 (절대)
   - SI·ERP·AX·AI 전환·SaaS·에이전트 등 IT 개발/컨설팅 내용은 공개 페이지에 쓰지 않는다 (`web/tests/dist.test.ts`가 검사).
@@ -48,7 +48,11 @@
 - 사이트 구조: `docs/SITEMAP.md`
 - **실제 사이트: `web/` (Astro, 라이트 단일 테마, Pretendard)**
   - 문구: `web/src/data/site.ts` · 사업자 정보(푸터·회사 정보): `web/src/data/business.ts`
-  - 제휴 안내 랜딩: `web/src/data/partners.ts` 항목 하나 = `/partners/<slug>` 한 페이지. `draft: true`면 noindex·'초안' 표시·sitemap/llms 제외
+  - 제휴 안내 랜딩: `web/src/data/partners.ts` 항목 하나 = `/partners/<slug>` 한 페이지. `draft: true`면 **빌드에서 완전히 제외**(페이지 미생성·라이브 404, 목록·홈·sitemap·llms 어디에도 제목·요약·이름 없음). 운영사 서면 허락 전에는 이름 공개 금지 → `web/tests/dist.test.ts`가 검사
+  - 공개된 제휴 안내가 없으면 `/partners`·홈 목록은 정직한 빈 상태 문구를 보여 준다 (`site.ts`의 `emptyPartners`)
+  - 페이지: `/`, `/partners`, `/partners/<slug>`(공개 항목만), `/company`(사업 영역 한 줄·광고주 문장), `/terms`(이용약관), `/privacy`, `/404`
+  - 사실만 쓴다: 광고 집행 실적·운영사 서면 허락·공개 제휴 안내 모두 0건(2026-11-20 기준). '실적', '공식 파트너', '검증된', '믿을 만한', 고객 수·만족도·순위·보장·근거 없는 숫자 금지 (테스트가 검사)
+  - IT 관련 표현은 `/company`·홈의 '주요 사업' 한 줄(`site.ts`의 `businessLine`: 소프트웨어 개발·공급, 경영·정보기술 컨설팅)에서만 허용
   - 빌드 후 검사: `node scripts/check-links.mjs` (깨진 내부 링크), `node scripts/check-mobile.mjs` (360px 가로 넘침·채널 태그)
 - 디자인을 바꿀 때는 아티팩트로 먼저 보여 주고, 확인을 받은 뒤 배포한다
 - 배포: GitHub Pages (`.github/workflows/pages.yml`, `main`에 올라가면 자동). 내부 링크는 `web/src/lib/paths.ts`의 `url()` 사용
