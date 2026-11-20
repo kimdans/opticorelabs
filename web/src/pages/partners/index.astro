@@ -4,12 +4,12 @@ import Base from '../../layouts/Base.astro';
 import PartnerList from '../../components/PartnerList.astro';
 import { company } from '../../data/site';
 ---
-<Base title="제휴 서비스 안내" description="옵티코어가 안내하는 생활·교육·렌탈 분야 제휴 서비스 목록입니다. 각 안내 페이지에서 서비스 제공 업체, 진행 방식, 신청 전 확인할 점을 확인하실 수 있습니다.">
+<Base title="제휴 서비스 안내" description="옵티코어의 생활·교육·렌탈 분야 제휴 서비스 안내 목록입니다. 서비스 제공 업체의 확인을 받은 안내 페이지만 이곳에 공개하며, 각 페이지에서 제공 업체와 진행 방식, 신청 전 확인할 점을 보실 수 있습니다.">
   <section class="page-hero gut">
     <div class="inner">
       <p class="eyebrow">제휴 안내</p>
       <h1 class="page-title">제휴 서비스 안내</h1>
-      <p class="lede">옵티코어가 안내하는 서비스 목록입니다. 안내 페이지마다 서비스를 제공하는 업체를 밝히고, 어떤 분께 맞는지와 신청 전에 확인할 점을 정리해 두었습니다.</p>
+      <p class="lede">옵티코어의 제휴 서비스 안내 목록입니다. 서비스 제공 업체의 서면 확인을 받은 안내 페이지만 이곳에 공개합니다. 안내 페이지마다 서비스를 제공하는 업체를 밝히고, 어떤 분께 맞는지와 신청 전에 확인할 점을 정리합니다.</p>
     </div>
   </section>
   <section class="gut" style="padding-bottom:96px">
@@ -29,7 +29,7 @@ import { company } from '../../data/site';
         <li><h3>신청 전 확인할 점</h3><p>요금, 약정, 해지·환불 기준처럼 계약 전에 꼭 확인할 내용을 정리합니다.</p></li>
         <li><h3>자주 묻는 질문과 상담 신청</h3><p>자주 묻는 질문에 답하고, 마지막에 업체 페이지로 이동하는 상담 신청 버튼을 둡니다.</p></li>
       </ol>
-      <p class="note">옵티코어는 제휴에 따른 수수료를 받을 수 있습니다. 상담 신청 정보는 옵티코어가 받지 않고 각 업체가 직접 받습니다. 자세한 내용은 <a href={url('/privacy')}>개인정보 처리방침</a>을 확인해 주세요. 제휴 문의: <a href={`mailto:${company.email}`}>{company.email}</a></p>
+      <p class="note">옵티코어는 제휴에 따른 수수료를 받을 수 있습니다. 상담 신청 정보는 옵티코어가 받지 않고 각 업체가 직접 받습니다. 자세한 내용은 <a href={url('/terms')}>이용약관</a>과 <a href={url('/privacy')}>개인정보 처리방침</a>을 확인해 주세요. 제휴 문의: <a href={`mailto:${company.email}`}>{company.email}</a></p>
     </div>
   </section>
 </Base>

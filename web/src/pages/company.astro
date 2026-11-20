@@ -12,12 +12,14 @@ const rows: [string, string][] = [
   ['이메일', business.email],
 ];
 ---
-<Base title="회사 정보" description="주식회사 옵티코어의 회사 정보입니다. 상호, 대표, 사업자등록번호, 통신판매업 신고번호, 소재지, 이메일과 옵티코어가 하는 일을 안내합니다.">
+<Base title="회사 정보" description="주식회사 옵티코어의 회사 정보입니다. 상호, 대표, 사업자등록번호, 통신판매업 신고번호, 소재지, 이메일, 주요 사업과 광고주 정보, 옵티코어가 하려는 일을 안내합니다.">
   <section class="page-hero gut">
     <div class="inner">
       <p class="eyebrow">회사 정보</p>
-      <h1 class="page-title">믿을 만한 업체와 고객을 이어 드리는 마케팅 회사입니다.</h1>
+      <h1 class="page-title">생활·교육·렌탈 서비스를 안내하는 마케팅 회사입니다.</h1>
       <p class="lede">{company.summary}</p>
+      <p class="facts" data-business-line>{company.businessLine}</p>
+      <p class="facts" data-advertiser>{company.advertiser}</p>
     </div>
   </section>
   <section class="gut" style="padding-bottom:96px">
@@ -30,11 +32,11 @@ const rows: [string, string][] = [
   </section>
   <section class="section tint gut">
     <div class="inner">
-      <h2 class="h2">하는 일</h2>
+      <h2 class="h2">하려는 일과 운영 원칙</h2>
       <div class="does">
         <div>
           <h3>분야별 서비스 안내</h3>
-          <p>{fields.map(f => `${f.name}(${f.items.join('·')})`).join(', ')} 분야에서 믿을 만한 업체의 서비스를 골라, 어떤 분께 맞는지와 신청 전 확인할 점을 정리해 안내합니다.</p>
+          <p>{fields.map(f => `${f.name}(${f.items.join('·')})`).join(', ')} 분야의 서비스를 안내하려고 합니다. 서비스 제공 업체의 서면 확인을 받은 서비스만 골라, 어떤 분께 맞는지와 신청 전 확인할 점을 정리해 공개합니다.</p>
         </div>
         <div>
           <h3>제휴 업체로 연결</h3>
@@ -45,11 +47,13 @@ const rows: [string, string][] = [
           <p>옵티코어는 상담 비용을 받지 않고, 상담 신청 정보(이름·연락처 등)를 받거나 보관하지 않으며, 서비스를 직접 제공하지 않습니다. 제휴에 따른 수수료를 받을 수 있다는 사실은 안내 페이지마다 밝혀 둡니다.</p>
         </div>
       </div>
-      <p class="links"><a class="btn" href={url('/partners')}>제휴 안내 보기</a><a class="btn ghost" href={url('/privacy')}>개인정보 처리방침</a></p>
+      <p class="links"><a class="btn" href={url('/partners')}>제휴 안내 보기</a><a class="btn ghost" href={url('/terms')}>이용약관</a><a class="btn ghost" href={url('/privacy')}>개인정보 처리방침</a></p>
     </div>
   </section>
 </Base>
 <style>
+  .facts { margin-top: 16px; max-width: 46em; font-size: 15px; color: var(--ink-2); }
+  .facts + .facts { margin-top: 6px; }
   .h2 { font-size: clamp(24px, 2.6vw, 32px); margin-bottom: 24px; }
   .info { margin: 0; border-top: 1px solid var(--line); max-width: 52em; }
   .info div { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 16px; padding-block: 16px; border-bottom: 1px solid var(--line); }

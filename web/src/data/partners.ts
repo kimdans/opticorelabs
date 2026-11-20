@@ -1,6 +1,7 @@
 // 제휴 서비스 안내 페이지(/partners/[slug])의 데이터. 항목 하나 = 안내 페이지 하나.
-// - draft: true 인 항목은 noindex, 화면에 '초안' 표시, sitemap·llms 제외, /partners 목록에는 '준비 중'으로만 보인다.
-//   운영사의 서면 확인을 받은 뒤 draft를 false로 바꾸고 provider·operatorUrl을 실제 값으로 채운다.
+// - draft: true 인 항목은 빌드에서 완전히 빠진다: 페이지를 만들지 않고(라이브 404), /partners·홈 목록·sitemap·llms
+//   어디에도 제목·요약·이름이 나오지 않는다 (운영사 서면 허락 전에는 이름 공개 금지).
+//   운영사의 서면 확인을 받은 뒤 draft를 false로 바꾸고 provider·operatorUrl을 실제 값으로 채우면 공개된다.
 // - 내용은 일반적인 서비스 설명만 쓴다. 효과·성적·순위·보장 같은 표현, 근거 없는 숫자, 후기는 넣지 않는다.
 
 export const CATEGORIES = ['생활', '교육', '렌탈'] as const;

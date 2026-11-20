@@ -36,8 +36,12 @@ describe('제휴 안내 데이터', () => {
     drafts.forEach(p => {
       expect(pub).not.toContain(p);
       expect(llmsShort('https://opticorelabs.co.kr/')).not.toContain(`/partners/${p.slug}`);
-      expect(llmsFull('https://opticorelabs.co.kr/')).not.toContain(p.title);
+      for (const s of [p.title, p.summary, p.campaignName, p.slug]) {
+        expect(llmsShort('https://opticorelabs.co.kr/')).not.toContain(s);
+        expect(llmsFull('https://opticorelabs.co.kr/')).not.toContain(s);
+      }
     });
+    expect(llmsFull('https://opticorelabs.co.kr/')).not.toMatch(/밀당|mildang|1등급/i);
   });
 
   it('공개 항목의 운영사 주소는 예시 주소가 아니고, 제공자 이름도 확인 필요 표시가 아니다', () => {

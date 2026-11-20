@@ -6,12 +6,13 @@
 // - 개인정보 입력폼 없음. 문의는 이메일만
 import { url } from '../../lib/paths';
 import Base from '../../layouts/Base.astro';
-import { partners, type Partner } from '../../data/partners';
+import { publishedPartners, type Partner } from '../../data/partners';
 import { company } from '../../data/site';
 import { applyChannel, CHANNELS } from '../../lib/channel';
 
+// 초안(draft) 항목은 페이지를 아예 만들지 않는다 → dist에 없고 라이브에서 404.
 export function getStaticPaths() {
-  return partners.map(p => ({ params: { slug: p.slug }, props: { p } }));
+  return publishedPartners().map(p => ({ params: { slug: p.slug }, props: { p } }));
 }
 const { p } = Astro.props as { p: Partner };
 const param = p.channelParam || 'ch';
@@ -19,12 +20,7 @@ const disclosure = `이 페이지는 주식회사 옵티코어가 제휴 업체�
 const description = `${p.category} 분야 제휴 서비스 안내: ${p.title}. 어떤 분께 맞는지, 진행 방식, 신청 전 확인할 점과 자주 묻는 질문을 정리했습니다.`;
 const channelScript = `(function(){var f=(${applyChannel.toString()});var a=${JSON.stringify(CHANNELS)};document.querySelectorAll('a[data-operator-cta]').forEach(function(el){el.setAttribute('href',f(el.getAttribute('href'),location.search,el.getAttribute('data-channel-param'),a));});})();`;
 ---
-<Base title={p.title} description={description} noindex={p.draft}>
-  {p.draft && (
-    <div class="draft-bar gut" role="note">
-      <div class="inner"><strong>초안 · {p.approvalNote}</strong><span>검색 노출 안 함 · 캠페인: {p.campaignName}</span></div>
-    </div>
-  )}
+<Base title={p.title} description={description}>
   <section class="page-hero gut">
     <div class="inner">
       <p class="eyebrow"><a href={url('/partners')}>제휴 안내</a> · {p.category}</p>
@@ -84,10 +80,6 @@ const channelScript = `(function(){var f=(${applyChannel.toString()});var a=${JS
 </Base>
 
 <style>
-  .draft-bar { position: relative; z-index: 41; margin-top: 68px; background: #FFF4D6; border-bottom: 1px solid #E8C766; color: #5A4300; font-size: 14px; }
-  @media (max-width: 820px) { .draft-bar { margin-top: 60px; } }
-  .draft-bar .inner { display: flex; gap: 6px 16px; flex-wrap: wrap; padding-block: 10px; }
-  .draft-bar + .page-hero { padding-top: 56px; }
   .eyebrow a { color: inherit; }
   .provider { margin-top: 16px; display: inline-block; background: var(--surface); border-radius: 999px; padding: 6px 14px; font-size: 15px; }
   .disclosure { margin-top: 16px; max-width: 46em; font-size: 14px; color: var(--ink-2); background: var(--body-2); border-left: 3px solid var(--ink-3); padding: 12px 16px; border-radius: 0 10px 10px 0; }
