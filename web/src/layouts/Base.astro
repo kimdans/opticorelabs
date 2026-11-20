@@ -78,7 +78,7 @@ const year = new Date().getFullYear();
       </nav>
       <nav class="fcol" aria-label="회사">
         <p>회사</p>
-        <a href={url('/company')}>회사 정보</a><a href={url('/privacy')}>개인정보 처리방침</a><a href={`mailto:${business.email}`}>이메일 문의</a>
+        <a href={url('/company')}>회사 정보</a><a href={url('/terms')}>이용약관</a><a href={url('/privacy')}>개인정보 처리방침</a><a href={`mailto:${business.email}`}>이메일 문의</a>
       </nav>
     </div>
     <div class="inner legal" data-business-info>
@@ -90,7 +90,7 @@ const year = new Date().getFullYear();
         <div><dt>소재지</dt><dd>{business.address}</dd></div>
         <div><dt>이메일</dt><dd><a href={`mailto:${business.email}`}>{business.email}</a></dd></div>
       </dl>
-      <p class="copy"><a href={url('/privacy')}><strong>개인정보 처리방침</strong></a><span>© {year} {business.name}. All rights reserved.</span></p>
+      <p class="copy"><a href={url('/terms')}>이용약관</a><a href={url('/privacy')}><strong>개인정보 처리방침</strong></a><span>© {year} {business.name}. All rights reserved.</span></p>
     </div>
   </footer>
 </body>
