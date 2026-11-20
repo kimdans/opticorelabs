@@ -1,153 +1,148 @@
 ---
 import { url } from '../lib/paths';
 import Base from '../layouts/Base.astro';
-import Hero from '../components/Hero.astro';
-import Compare from '../components/Compare.astro';
-import ServiceTabs from '../components/ServiceTabs.astro';
-import FitMatrix from '../components/FitMatrix.astro';
-import Timeline from '../components/Timeline.astro';
-import Promises from '../components/Promises.astro';
-import BrandFilm from '../components/BrandFilm.astro';
-import Diagnose from '../components/Diagnose.astro';
-import { company } from '../data/site';
-// 홈의 이야기 순서 (AX 전문 구축팀):
-// 에이전트가 일하는 장면 → 찾아오는 분들의 고민 → AI보다 먼저 할 일(업무를 선명하게) → 상황별 서비스 → 우리 방식(점수·승인·측정) → 일정 → 약속 → 필름 → 진단
-const worries = [
-  { who: '대표', say: 'AI를 도입하라는 말은 많은데, 우리 회사는 어디서부터 해야 할지 모르겠습니다.' },
-  { who: '운영 총괄', say: '직원들은 챗봇을 쓰는데 회사 업무는 그대로입니다. 엑셀과 메신저가 줄지 않아요.' },
-  { who: '실무 팀장', say: 'AI가 틀린 내용을 거래처에 보내면 누가 책임지나요? 그게 걱정돼서 못 맡깁니다.' },
-];
-const ways = [
-  { t: '점수로 고릅니다', b: '업무마다 빈도와 효과를 1~10으로 매기고 곱합니다. 점수가 높은 일부터 맡기고, 낮은 일은 기록만 해 둡니다.' },
-  { t: '사람이 승인합니다', b: '거래처에 나가는 문서, 돈이 움직이는 일에는 항상 담당자 승인 단계를 둡니다. 누가 언제 승인했는지 남습니다.' },
-  { t: '효과를 숫자로 잽니다', b: '시범 에이전트를 먼저 돌려 걸리는 시간과 오류를 재고, 그 결과를 보고 넓힐지 정합니다.' },
-];
+import PartnerList from '../components/PartnerList.astro';
+import { company, fields, steps, principles } from '../data/site';
 ---
-<Base>
-  <Hero />
-
-  <section class="section gut" id="worries" aria-labelledby="worries-title">
-    <div class="inner">
-      <div class="sec-head" data-reveal>
-        <p class="eyebrow">찾아오시는 분들</p>
-        <h2 id="worries-title">직원 30~200명 회사에서 이런 고민을 하고 계신다면</h2>
+<Base title={company.nameKo} description="이사·정리·청소, 학습, 렌탈처럼 일상에 필요한 서비스를 비교하고 제휴 업체에 직접 상담을 신청하실 수 있도록 안내하는 마케팅 회사, 주식회사 옵티코어입니다. 옵티코어는 상담 비용을 받지 않습니다.">
+  <section class="hero gut">
+    <div class="inner hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">생활 · 교육 · 렌탈 서비스 안내</p>
+        <h1 class="hero-title">일상에 필요한 서비스,<br>비교해 보고 업체에 직접 신청하세요.</h1>
+        <p class="lede">{company.summary}</p>
+        <p class="cta"><a class="btn core" href={url('/partners')}>제휴 안내 보기</a><a class="btn ghost" href="#how">이용 방법</a></p>
       </div>
-      <ul class="worries" data-reveal="children">
-        {worries.map(w => <li><p class="say">{w.say}</p><p class="who">{w.who}</p></li>)}
+      <aside class="hero-card" aria-label="옵티코어가 하는 일과 하지 않는 일">
+        <p class="card-h">옵티코어가 하는 일</p>
+        <ul>
+          <li>분야별 서비스 내용과 확인할 점을 정리해 안내합니다</li>
+          <li>서비스를 제공하는 제휴 업체를 안내 페이지마다 밝힙니다</li>
+          <li>상담을 신청하실 수 있는 업체 페이지로 이어 드립니다</li>
+        </ul>
+        <p class="card-h no">하지 않는 일</p>
+        <ul class="no">
+          <li>상담 비용을 받지 않습니다</li>
+          <li>이름·연락처 같은 개인정보를 받지 않습니다</li>
+          <li>서비스를 직접 제공하거나 계약하지 않습니다</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section tint gut" id="fields" aria-labelledby="fields-h">
+    <div class="inner">
+      <div class="sec-head">
+        <p class="eyebrow">분야</p>
+        <h2 id="fields-h">옵티코어가 안내하려는 세 가지 분야</h2>
+        <p>집안일부터 아이의 공부, 매달 쓰는 생활용품까지. 직접 알아보기 번거로운 서비스를 분야별로 정리하는 것을 목표로 합니다.</p>
+      </div>
+      <ul class="fields" role="list" data-reveal="children">
+        {fields.map(f => (
+          <li class="field">
+            <h3>{f.name}</h3>
+            <p class="chips">{f.items.map(i => <span class="chip">{i}</span>)}</p>
+            <p class="body">{f.body}</p>
+          </li>
+        ))}
       </ul>
     </div>
   </section>
 
-  <section class="section gut tint" id="clear" aria-labelledby="clear-title">
+  <section class="section gut" id="how" aria-labelledby="how-h">
     <div class="inner">
-      <div class="sec-head" data-reveal>
-        <p class="eyebrow">AI보다 먼저 할 일</p>
-        <h2 id="clear-title">AI는 흐릿한 업무를 대신해 주지 못합니다</h2>
-        <p>데이터가 엑셀과 단체방에 흩어져 있으면 에이전트가 볼 수 있는 것이 없습니다. 그래서 업무를 한 화면으로 정리하는 일부터 합니다.</p>
+      <div class="sec-head">
+        <p class="eyebrow">이용 방법</p>
+        <h2 id="how-h">비교하고, 확인하고, 업체에 직접 신청하세요</h2>
+        <p>옵티코어는 안내까지만 합니다. 상담과 서비스는 각 제휴 업체가 직접 진행합니다.</p>
       </div>
-      <ul class="pairs" data-reveal="children" aria-label="정리 전과 후">
-        <li><s>견적서_최종_진짜최종.xlsx</s><b>견적·수주</b></li>
-        <li><s>단체방으로 받는 결재</s><b>전자결재</b></li>
-        <li><s>김대리만 아는 재고</s><b>실시간 재고</b></li>
-        <li><s>월말 마감 4일</s><b>마감 자동화</b></li>
-      </ul>
-      <div data-reveal><Compare /></div>
+      <ol class="steps" data-reveal="children">
+        {steps.map((s, i) => (
+          <li><span class="num" aria-hidden="true">{i + 1}</span><h3>{s.title}</h3><p>{s.body}</p></li>
+        ))}
+      </ol>
     </div>
   </section>
 
-  <section class="section gut" id="services" aria-labelledby="services-title">
+  <section class="section tint gut" id="principles" aria-labelledby="pr-h">
     <div class="inner">
-      <div class="sec-head" data-reveal>
-        <p class="eyebrow">서비스</p>
-        <h2 id="services-title">지금 상황에서 시작합니다</h2>
-        <p>AI 전환이 중심이고, ERP·시스템 통합·구독형 모듈은 AI가 일할 바탕을 만드는 일입니다. 두 가지 이상이 필요해도 계약 창구와 책임자는 한 명입니다.</p>
+      <div class="sec-head">
+        <p class="eyebrow">운영 원칙</p>
+        <h2 id="pr-h">안내하는 회사로서 지키는 것</h2>
       </div>
-      <div data-reveal><ServiceTabs /></div>
-    </div>
-  </section>
-
-  <section class="section gut tint" id="way" aria-labelledby="way-title">
-    <div class="inner">
-      <div class="sec-head" data-reveal>
-        <p class="eyebrow">옵티코어 방식</p>
-        <h2 id="way-title">어떤 업무부터 AI에 맡길지, 감이 아니라 점수로 정합니다</h2>
-      </div>
-      <div data-reveal><FitMatrix /></div>
-      <ul class="ways" data-reveal="children">
-        {ways.map(w => <li><h3>{w.t}</h3><p>{w.b}</p></li>)}
+      <ul class="prs" role="list" data-reveal="children">
+        {principles.map(p => <li><h3>{p.title}</h3><p>{p.body}</p></li>)}
       </ul>
     </div>
   </section>
 
-  <section class="section gut" id="method" aria-labelledby="method-title">
+  <section class="section gut" id="partners" aria-labelledby="pt-h">
     <div class="inner">
-      <div class="sec-head" data-reveal>
-        <p class="eyebrow">진행 방식</p>
-        <h2 id="method-title">진단부터 운영까지, 단계마다 통과 조건이 있습니다</h2>
-        <p>조건을 통과해야 다음 단계로 넘어갑니다. 아래 일정은 직원 30~200명 규모 회사를 기준으로 한 일반적인 기간입니다.</p>
+      <div class="sec-head">
+        <p class="eyebrow">제휴 안내</p>
+        <h2 id="pt-h">제휴 서비스 안내 페이지</h2>
+        <p>서비스마다 어떤 분께 맞는지, 진행 방식, 신청 전 확인할 점, 자주 묻는 질문을 한 페이지에 정리합니다.</p>
       </div>
-      <div data-reveal><Timeline /></div>
-      <p class="after-link" data-reveal><a class="btn ghost" href={url('/method')}>단계별 산출물 보기</a></p>
+      <PartnerList />
+      <p class="more"><a class="btn ghost" href={url('/partners')}>제휴 안내 전체 보기</a></p>
     </div>
   </section>
 
-  <section class="section gut night" id="promises" aria-labelledby="promises-title">
-    <div class="inner">
-      <div class="sec-head" data-reveal>
-        <p class="eyebrow">약속</p>
-        <h2 id="promises-title">프로젝트 동안 지키는 세 가지</h2>
+  <section class="section tint gut" id="contact" aria-labelledby="ct-h">
+    <div class="inner contact">
+      <div class="sec-head">
+        <p class="eyebrow">문의</p>
+        <h2 id="ct-h">궁금한 점은 이메일로 보내 주세요</h2>
+        <p>안내 내용에 대한 문의, 제휴 문의 모두 이메일로 받습니다. 서비스 이용·계약에 관한 문의는 해당 서비스를 제공하는 업체에 해 주세요.</p>
       </div>
-      <Promises />
-    </div>
-  </section>
-
-  <section class="section gut" aria-labelledby="film-intro" style="padding-bottom:0">
-    <div class="inner">
-      <div class="sec-head" data-reveal style="margin-bottom:0">
-        <p class="eyebrow">브랜드 필름</p>
-        <h2 id="film-intro">흩어진 업무가 하나의 코어로 모이기까지, 15초</h2>
+      <p><a class="btn" href={`mailto:${company.email}`}>{company.email}</a></p>
+      <div class="about" data-company-about>
+        <p><strong>{company.nameKo}</strong> · {company.short}</p>
+        <p data-business-line>{company.businessLine}</p>
+        <p><a href={url('/company')}>회사 정보 보기</a></p>
       </div>
-    </div>
-  </section>
-  <BrandFilm bare />
-
-  <section class="section gut tint" id="diagnose-section" aria-labelledby="diag-title">
-    <div class="inner">
-      <div class="sec-head" data-reveal>
-        <p class="eyebrow">진단 · 약 1분</p>
-        <h2 id="diag-title">세 가지만 고르면 어디서 시작할지 알려드립니다</h2>
-        <p>결과를 보내 주시면 담당자가 같은 내용을 보고 이야기를 시작합니다. 메일({company.email})로 바로 문의하셔도 됩니다.</p>
-      </div>
-      <Diagnose bare />
     </div>
   </section>
 </Base>
 
 <style>
-  .after-link { margin-top: 40px; }
-  /* 찾아오는 분들의 고민: 후기가 아니라 자주 듣는 질문이다 */
-  .worries { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-  @media (max-width: 900px) { .worries { grid-template-columns: 1fr; } }
-  .worries li { background: var(--surface); border-radius: 24px; padding: clamp(24px, 2.6vw, 34px); display: grid; gap: 28px; align-content: space-between; }
-  .say { font-size: clamp(18px, 1.6vw, 21px); font-weight: 600; line-height: 1.55; letter-spacing: -.02em; }
-  .say::before { content: "“"; display: block; font-size: 44px; line-height: .7; color: var(--core); margin-bottom: 10px; font-weight: 700; }
-  .who { font-size: 14px; font-weight: 600; color: var(--ink-2); }
+  .hero { padding-block: 148px 104px; }
+  @media (max-width: 760px) { .hero { padding-block: 108px 72px; } }
+  .hero-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 48px; align-items: center; }
+  @media (max-width: 960px) { .hero-grid { grid-template-columns: minmax(0, 1fr); } }
+  .hero-copy { display: grid; gap: 20px; }
+  .hero-title { font-size: clamp(32px, 5vw, 62px); font-weight: 700; letter-spacing: -.04em; }
+  @media (max-width: 560px) { .hero-title br { display: none; } }
+  .cta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+  .hero-card { background: var(--surface); border-radius: 24px; padding: 32px; display: grid; gap: 12px; }
+  .card-h { font-weight: 700; display: flex; align-items: center; gap: 10px; }
+  .card-h::before { content: ""; width: 9px; height: 9px; border-radius: 2.5px; background: var(--core); }
+  .card-h.no { margin-top: 12px; }
+  .card-h.no::before { background: transparent; box-shadow: inset 0 0 0 1.5px var(--ink-3); }
+  .hero-card ul { margin: 0; padding-left: 19px; display: grid; gap: 6px; color: var(--ink-2); font-size: 15px; }
 
-  /* 브랜드 문법 "취소선 → 코어 칩": 정리 전 이름에 줄을 긋고, 정리된 기능 이름을 붙인다 */
-  .pairs { list-style: none; margin: 0 0 40px; padding: 0; display: flex; flex-wrap: wrap; gap: 12px 28px; }
-  .pairs li { display: flex; align-items: center; gap: 10px; font-size: 15px; }
-  .pairs s { color: var(--ink-3); text-decoration-thickness: 1.5px; }
-  .pairs b { font-weight: 600; background: var(--ink); color: var(--body); padding: 5px 12px; border-radius: 999px; font-size: 14px; }
-  .pairs s::after { content: "→"; display: inline-block; margin-left: 10px; text-decoration: none; color: var(--ink-3); }
+  .fields { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  @media (max-width: 900px) { .fields { grid-template-columns: minmax(0, 1fr); } }
+  .field { background: var(--surface); border-radius: 20px; padding: 32px; display: grid; gap: 14px; align-content: start; }
+  .field h3 { font-size: 26px; }
+  .field .chip { background: var(--body-2); }
+  .field .body { color: var(--ink-2); }
 
-  .ways { list-style: none; margin: 56px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px 48px; }
-  @media (max-width: 900px) { .ways { grid-template-columns: 1fr; margin-top: 40px; } }
-  .ways li { border-top: 1px solid var(--edge); padding-top: 24px; display: grid; gap: 10px; align-content: start; }
-  .ways h3 { font-size: clamp(20px, 1.8vw, 24px); font-weight: 700; }
-  .ways p { color: var(--ink-2); font-size: 16px; }
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; counter-reset: s; }
+  @media (max-width: 900px) { .steps { grid-template-columns: minmax(0, 1fr); gap: 24px; } }
+  .steps li { display: grid; gap: 10px; align-content: start; border-top: 1.5px solid var(--ink); padding-top: 20px; }
+  .num { width: 32px; height: 32px; border-radius: 9px; background: var(--core); color: var(--on-core); display: grid; place-content: center; font-weight: 700; }
+  .steps h3 { font-size: 21px; }
+  .steps p { color: var(--ink-2); }
 
-  /* 어두운 띠: 페이지 흐름에 한 번만 쓴다 */
-  .night { background: var(--night); color: var(--on-night); --muted: var(--on-night-2); }
-  .night :global(.sec-head .eyebrow) { color: var(--on-night); }
-  .night :global(.sec-head .eyebrow::before) { background: #8089FF; }
+  .prs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  @media (max-width: 760px) { .prs { grid-template-columns: minmax(0, 1fr); } }
+  .prs li { background: var(--surface); border-radius: 20px; padding: 28px; display: grid; gap: 8px; }
+  .prs h3 { font-size: 20px; }
+  .prs p { color: var(--ink-2); }
+
+  .more { margin-top: 28px; }
+  .contact .btn { max-width: 100%; overflow-wrap: anywhere; }
+  .about { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--line); display: grid; gap: 6px; font-size: 15px; color: var(--ink-2); max-width: 52em; }
+  .about strong { color: var(--ink); }
 </style>
