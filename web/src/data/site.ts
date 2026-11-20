@@ -1,87 +1,48 @@
-// 사이트의 모든 문구는 여기 한 곳에서 나온다.
-// 사람용 페이지, /llms.txt, /llms-full.txt가 같은 데이터를 읽어서 내용이 어긋나지 않는다 (PRD: 에이전트 인터페이스).
+// 사이트 문구의 단일 출처. 사람용 페이지와 /llms.txt, /llms-full.txt 가 같은 데이터를 읽는다.
+// 포지셔닝: 생활·교육·렌탈 분야의 믿을 만한 업체와 고객을 이어 드리는 마케팅 회사.
+// 연락처는 이메일 하나뿐이다 (전화·메신저·문의폼 없음). 실적·후기·순위·보장 같은 표현은 쓰지 않는다.
+import { business } from './business';
 
 export const company = {
-  nameKo: '주식회사 옵티코어',
-  nameEn: 'OptiCore Inc.',
-  tagline: '흐릿한 업무를, 선명한 시스템으로.',
-  summary: 'AX(AI 전환) 전문 구축팀입니다. 엑셀, 메신저 결재, 담당자 머릿속에 흩어진 일을 하나의 시스템으로 정리하고, 그 위에 사람이 승인하는 업무 에이전트를 올립니다. 시스템 통합, ERP, 구독형 SaaS까지 한 팀이 진단부터 운영까지 맡습니다.',
-  ceo: '김건영',
-  email: 'contact@opticorelabs.co.kr',
-  // 아래 사업자등록번호와 주소는 예시입니다 (placeholder: true인 동안 화면에 "(예시)"로 표시). 실제 값으로 바꾸세요.
-  bizNo: '000-00-00000',
-  address: '서울특별시 (주소 확정 전)',
-  placeholder: true,
+  nameKo: business.name,
+  nameEn: 'OptiCore',
+  tagline: '일상에 필요한 서비스, 믿을 만한 업체와 이어 드립니다.',
+  // 비즈프로필 소개글과 같은 문장
+  summary:
+    '주식회사 옵티코어는 생활·교육·렌탈 분야의 믿을 만한 업체와 고객을 이어 드리는 마케팅 회사입니다. 이사, 정리·청소, 학습, 렌탈처럼 일상에 필요한 서비스를 편하게 비교하고 상담을 신청하실 수 있도록 안내해 드립니다. 상담 신청은 각 제휴 업체로 바로 전달되며, 상담 비용은 받지 않습니다.',
+  short: '생활·교육·렌탈 분야의 믿을 만한 업체와 고객을 이어 드리는 마케팅 회사',
+  email: business.email,
 };
 
-export type ProjectState = 'SCAN' | 'FOCUS' | 'BUILD' | 'RUN';
-
-export const states: { code: ProjectState; ko: string; duration: string; items: string[]; exit: string; next: ProjectState }[] = [
-  { code: 'SCAN', ko: '진단', duration: '2–3주', next: 'FOCUS',
-    items: ['현업 담당자 인터뷰와 실제 업무 관찰', '업무 흐름 지도와 데이터 인벤토리', '자동화·AI 적합도 점수 (빈도 × 효과)', '바로 고칠 것과 기록만 할 것 분류'],
-    exit: '우선순위 과제 3개에 경영진이 합의하면 설계로 넘어갑니다.' },
-  { code: 'FOCUS', ko: '설계', duration: '2–4주', next: 'BUILD',
-    items: ['목표 업무의 상태 전이 표', '오픈소스 · 패키지 · 자체 개발 비교안', '화면 시안과 데이터 모델', '범위와 견적 확정'],
-    exit: '화면과 데이터 모델을 승인하면 구축으로 넘어갑니다.' },
-  { code: 'BUILD', ko: '구축', duration: '6–16주', next: 'RUN',
-    items: ['2주 단위로 실제 동작하는 버전 배포', '매 스프린트 현업 시연', '데이터 이관 리허설', '자동화 테스트와 CI 감사'],
-    exit: '실데이터 병행 운영을 문제 없이 통과하면 운영으로 넘어갑니다.' },
-  { code: 'RUN', ko: '운영', duration: '계속', next: 'SCAN',
-    items: ['장애·성능 모니터링', '월간 운영 리포트', '개선 요청은 빈도 × 심각도로 분류', '사용 데이터 기반 다음 과제 제안'],
-    exit: '다음 개선 과제가 정해지면 다시 진단부터 시작합니다.' },
+export interface NavItem { label: string; href: string; match?: string }
+export const nav: NavItem[] = [
+  { label: '분야', href: '/#fields' },
+  { label: '이용 방법', href: '/#how' },
+  { label: '제휴 안내', href: '/partners', match: '/partners' },
+  { label: '회사 정보', href: '/company', match: '/company' },
 ];
 
-export type LensSlug = 'si' | 'erp' | 'ax' | 'saas';
-
-export interface Lens {
-  slug: LensSlug; code: string; name: string; what: string; when: string;
-  does: string[]; outputs: string[]; tags: string[];
-}
-
-export const lenses: Lens[] = [
-  { slug: 'si', code: 'SI', name: '시스템 통합',
-    what: '따로 노는 프로그램들이 같은 데이터를 보게 만듭니다. 쇼핑몰, 회계, 물류, 그룹웨어 사이의 복사·붙여넣기를 없앱니다.',
-    when: '프로그램은 다섯 개인데 서로 대화를 하지 않을 때.',
-    does: ['시스템 간 API 연동과 데이터 동기화', '기존 데이터 정리와 이관', '오래된 시스템의 단계적 교체'],
-    outputs: ['연동 구성도와 데이터 흐름 문서', '이관 리허설 결과 보고서', '운영 모니터링 대시보드'],
-    tags: ['API 연동', '데이터 이관', '레거시 현대화'] },
-  { slug: 'erp', code: 'ERP', name: 'ERP 구축',
-    what: '회사 업무 순서에 맞춘 ERP를 만듭니다. 검증된 오픈소스와 패키지를 먼저 비교하고, 꼭 필요한 부분만 새로 개발합니다.',
-    when: '월말 마감이 며칠씩 걸리고 숫자가 부서마다 다를 때.',
-    does: ['구축 방식 비교와 선택', '회계·재고·구매·영업 모듈 구성', '맞춤 개발과 기존 시스템 연동'],
-    outputs: ['구축 방식 비교표', '업무별 상태 전이 표', '사용자 교육 자료'],
-    tags: ['Odoo', 'ERPNext', '패키지 커스터마이징', '자체 개발'] },
-  { slug: 'ax', code: 'AX', name: 'AI 전환',
-    what: '사내 문서와 데이터에 연결된 AI 에이전트를 업무 흐름 안에 넣습니다. 중요한 결정에는 항상 사람의 승인 단계를 둡니다.',
-    when: '같은 질문과 같은 서류 작업이 매일 반복될 때.',
-    does: ['AI 적합 업무 선정 (빈도 × 효과 점수)', '사내 데이터에 연결된 업무 에이전트', '사람 승인 단계가 있는 워크플로'],
-    outputs: ['업무별 AI 적합도 점수표', '시범 에이전트와 효과 측정 결과', '데이터 처리·보안 원칙 문서'],
-    tags: ['업무 에이전트', '문서 검색', '승인 워크플로', 'MCP 연동'] },
-  { slug: 'saas', code: 'SaaS', name: '구독형 모듈',
-    what: '구축 프로젝트에서 반복해서 검증된 기능을 바로 쓸 수 있는 서비스로 제공합니다. 구축 없이 시작하고, 필요하면 맞춤으로 확장합니다.',
-    when: '지금 당장 한 가지 문제만 빨리 풀고 싶을 때.',
-    does: ['검증된 기능을 구독형으로 제공', '기존 시스템과 연결', '필요 시 구축 프로젝트로 확장'],
-    outputs: ['바로 쓰는 모듈 (출시 준비 중)', '연동 가이드'],
-    tags: ['예시: 전자결재', '예시: 재고', '예시: 매입 자동 수집'] },
+export interface Field { key: string; name: string; items: string[]; body: string }
+export const fields: Field[] = [
+  { key: 'life', name: '생활', items: ['이사', '정리', '청소'],
+    body: '이사, 정리·수납, 입주·이사 청소처럼 집안일 가운데 전문 업체의 손이 필요한 서비스를 안내합니다. 견적과 진행 방식을 미리 살펴보고 상담을 신청하실 수 있습니다.' },
+  { key: 'edu', name: '교육', items: ['학습'],
+    body: '학생의 학습 계획과 공부 습관을 함께 챙기는 학습 서비스를 안내합니다. 수업 방식과 이용 조건을 먼저 확인하고, 우리 아이에게 맞는지 비교해 보실 수 있습니다.' },
+  { key: 'rental', name: '렌탈', items: ['생활용품 렌탈'],
+    body: '구매 대신 매달 나누어 이용하는 렌탈 서비스를 안내합니다. 약정 기간, 관리 방식, 해지 조건처럼 신청 전에 꼭 봐야 할 내용을 함께 정리해 드립니다.' },
 ];
 
-export const erpOptions = [
-  { name: 'Odoo', fit: '모듈이 많고 화면이 현대적. 빠르게 시작할 때', watch: '커뮤니티판과 유료판 기능 차이' },
-  { name: 'ERPNext', fit: '오픈소스 라이선스로 비용 부담을 줄일 때', watch: '국내 세무·회계 관행 맞춤 필요' },
-  { name: '국내 패키지', fit: '국내 회계·세무 기준이 가장 중요할 때', watch: '업무 흐름을 패키지에 맞춰야 함' },
-  { name: '자체 개발', fit: '업무 방식 자체가 경쟁력일 때', watch: '기간과 비용이 가장 큼' },
+export interface Step { title: string; body: string }
+export const steps: Step[] = [
+  { title: '비교해 보세요', body: '분야별 서비스가 어떤 분께 맞는지, 어떻게 진행되는지, 신청 전에 무엇을 확인해야 하는지 읽어 보세요.' },
+  { title: '제휴 업체 안내 페이지에서 확인하세요', body: '서비스마다 마련된 안내 페이지에서 서비스를 제공하는 업체 이름과 진행 방식, 자주 묻는 질문을 확인하실 수 있습니다.' },
+  { title: '업체에 직접 상담을 신청하세요', body: '안내 페이지의 버튼을 누르면 제휴 업체의 페이지로 이동합니다. 상담 신청은 그 업체에 바로 전달되고, 상담과 서비스도 그 업체가 직접 진행합니다.' },
 ];
 
-// 고객에게 하는 약속. 회사 내부 작업 규칙(CLAUDE.md)이 아니라, 고객이 프로젝트에서 실제로 겪게 될 일만 적는다.
-export const promises = [
-  { title: '2주마다 동작하는 화면을 보여드립니다', body: '문서와 회의록 대신, 2주마다 실제로 눌러 볼 수 있는 버전을 현업 담당자와 함께 확인합니다. 방향이 틀어지면 2주 안에 알 수 있습니다.' },
-  { title: '범위가 바뀌면 견적부터 다시 드립니다', body: '요청이 늘거나 바뀌면 일정과 비용에 미치는 영향을 먼저 알려드리고, 합의한 뒤에 작업합니다. 끝나고 나서 청구서로 알게 되는 일은 없습니다.' },
-  { title: '데이터는 리허설을 마친 뒤에 옮깁니다', body: '실제 데이터로 이관 리허설을 하고, 기존 시스템과 병행 운영으로 숫자가 맞는지 확인한 뒤에 전환합니다.' },
-];
-
-export const nav = [
-  { href: '/lenses', label: '서비스', match: '/lenses' },
-  { href: '/method', label: '진행 방식' },
-  { href: '/principles', label: '약속' },
-  { href: '/company', label: '회사' },
+export interface Principle { title: string; body: string }
+export const principles: Principle[] = [
+  { title: '상담 비용은 받지 않습니다', body: '옵티코어의 안내를 보고 상담을 신청하셔도 옵티코어에 내실 비용은 없습니다.' },
+  { title: '개인정보를 받지 않습니다', body: '이 사이트에는 이름이나 연락처를 적는 칸이 없습니다. 상담 신청 정보는 각 제휴 업체가 직접 받고 관리합니다.' },
+  { title: '실제 서비스는 제휴 업체가 제공합니다', body: '상담, 계약, 서비스 제공과 사후 관리는 각 제휴 업체가 직접 맡습니다. 안내 페이지마다 서비스 제공 업체를 밝혀 둡니다.' },
+  { title: '제휴 관계를 숨기지 않습니다', body: '옵티코어는 제휴에 따른 수수료를 받을 수 있습니다. 모든 안내 페이지 위쪽에 이 사실을 적어 둡니다.' },
 ];

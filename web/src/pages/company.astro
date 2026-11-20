@@ -1,34 +1,65 @@
 ---
+import { url } from '../lib/paths';
 import Base from '../layouts/Base.astro';
-import { company } from '../data/site';
-const rows = [
-  ['법인명', `${company.nameKo} (${company.nameEn})`],
-  ['대표', company.ceo],
-  ['사업 분야', 'SI, ERP 구축, AX(AI 전환), 구독형 SaaS'],
-  // 사업자등록번호·주소는 확정되기 전(placeholder)에는 보이지 않는다
-  ...(company.placeholder ? [] : [['사업자등록번호', company.bizNo], ['주소', company.address]]),
-  ['연락처', company.email],
+import { company, fields } from '../data/site';
+import { business, ftcBizInfoUrl } from '../data/business';
+const rows: [string, string][] = [
+  ['상호', business.name],
+  ['대표', business.ceo],
+  ['사업자등록번호', business.bizNo],
+  ['통신판매업 신고번호', business.mailOrderNo],
+  ['소재지', business.address],
+  ['이메일', business.email],
 ];
 ---
-<Base title="회사" description="주식회사 옵티코어 회사 정보.">
+<Base title="회사 정보" description="주식회사 옵티코어의 회사 정보입니다. 상호, 대표, 사업자등록번호, 통신판매업 신고번호, 소재지, 이메일과 옵티코어가 하는 일을 안내합니다.">
   <section class="page-hero gut">
     <div class="inner">
-      <p class="eyebrow">회사</p>
-      <h1 class="page-title">흩어진 업무를 하나의 시스템으로 정리하는 회사입니다.</h1>
+      <p class="eyebrow">회사 정보</p>
+      <h1 class="page-title">믿을 만한 업체와 고객을 이어 드리는 마케팅 회사입니다.</h1>
       <p class="lede">{company.summary}</p>
     </div>
   </section>
-  <section class="gut" style="padding-bottom:112px">
+  <section class="gut" style="padding-bottom:96px">
     <div class="inner">
-      <dl class="info">{rows.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
+      <h2 class="h2">사업자 정보</h2>
+      <dl class="info">
+        {rows.map(([k, v]) => <div><dt>{k}</dt><dd>{k === '이메일' ? <a href={`mailto:${v}`}>{v}</a> : v}{k === '사업자등록번호' && <> · <a href={ftcBizInfoUrl} target="_blank" rel="noopener">사업자정보 확인</a></>}</dd></div>)}
+      </dl>
+    </div>
+  </section>
+  <section class="section tint gut">
+    <div class="inner">
+      <h2 class="h2">하는 일</h2>
+      <div class="does">
+        <div>
+          <h3>분야별 서비스 안내</h3>
+          <p>{fields.map(f => `${f.name}(${f.items.join('·')})`).join(', ')} 분야에서 믿을 만한 업체의 서비스를 골라, 어떤 분께 맞는지와 신청 전 확인할 점을 정리해 안내합니다.</p>
+        </div>
+        <div>
+          <h3>제휴 업체로 연결</h3>
+          <p>안내 페이지에서 상담 신청 버튼을 누르면 서비스를 제공하는 제휴 업체의 페이지로 이동합니다. 상담과 계약, 서비스 제공은 그 업체가 직접 합니다.</p>
+        </div>
+        <div>
+          <h3>하지 않는 일</h3>
+          <p>옵티코어는 상담 비용을 받지 않고, 상담 신청 정보(이름·연락처 등)를 받거나 보관하지 않으며, 서비스를 직접 제공하지 않습니다. 제휴에 따른 수수료를 받을 수 있다는 사실은 안내 페이지마다 밝혀 둡니다.</p>
+        </div>
+      </div>
+      <p class="links"><a class="btn" href={url('/partners')}>제휴 안내 보기</a><a class="btn ghost" href={url('/privacy')}>개인정보 처리방침</a></p>
     </div>
   </section>
 </Base>
 <style>
+  .h2 { font-size: clamp(24px, 2.6vw, 32px); margin-bottom: 24px; }
   .info { margin: 0; border-top: 1px solid var(--line); max-width: 52em; }
-  .info div { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 16px; padding-block: 16px; border-bottom: 1px solid var(--line); }
-  @media (max-width: 560px) { .info div { grid-template-columns: 1fr; gap: 4px; } }
+  .info div { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 16px; padding-block: 16px; border-bottom: 1px solid var(--line); }
+  @media (max-width: 560px) { .info div { grid-template-columns: minmax(0, 1fr); gap: 4px; } }
   dt { font: 500 15px var(--f-body); color: var(--ink-2); }
   dd { margin: 0; }
-  .note { margin-top: 24px; color: var(--ink-2); font-size: 14px; }
+  .does { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  @media (max-width: 900px) { .does { grid-template-columns: minmax(0, 1fr); } }
+  .does > div { background: var(--surface); border-radius: 20px; padding: 28px; display: grid; gap: 8px; align-content: start; }
+  .does h3 { font-size: 19px; }
+  .does p { color: var(--ink-2); }
+  .links { margin-top: 32px; display: flex; gap: 10px; flex-wrap: wrap; }
 </style>
