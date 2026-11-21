@@ -14,46 +14,56 @@ import Diagnose from '../components/Diagnose.astro';
 const ways = ['점수가 높은 일부터 맡깁니다', '돈과 문서는 사람이 승인합니다', '효과를 숫자로 먼저 잽니다'];
 ---
 <Base>
+  <!-- 첫 방문(세션당 한 번)에는 이름표를 단 커서 여섯이 날아와 이 화면을 눈앞에서 그린다 ("스웜").
+       오픈소스 cursor-swarm(MIT)을 쓴다. 동작 줄이기 설정이거나 이미 본 방문자에게는 완성된 화면을 바로 보여 준다. -->
+  <script is:inline>
+    (function () {
+      try { if (matchMedia('(prefers-reduced-motion: reduce)').matches || sessionStorage.getItem('oc-built')) return; } catch (e) {}
+      document.documentElement.classList.add('swarm-on');
+    })();
+  </script>
+  <cursor-swarm id="builders" cursors="6" speed="1.5" trigger="load" scope="viewport" linger="1600"
+    names="기획,디자인,카피,개발,데이터,검수" colors="#2430E8,#121519,#00A9BD,#D9246F,#4C555B,#2430E8">
   <Hero />
 
   <section class="section gut tint" id="agent" aria-labelledby="agent-title">
     <div class="inner">
-      <div class="sec-head" data-reveal>
+      <div class="sec-head">
         <p class="eyebrow">AI 전환</p>
         <h2 id="agent-title">AI가 일하고, <em>사람이 승인합니다</em></h2>
       </div>
-      <div data-reveal><AgentRun /></div>
+      <div data-swarm="block"><AgentRun /></div>
     </div>
   </section>
 
   <section class="section gut" id="clear" aria-labelledby="clear-title">
     <div class="inner">
-      <div class="sec-head" data-reveal>
+      <div class="sec-head">
         <p class="eyebrow">AI보다 먼저 할 일</p>
         <h2 id="clear-title">흩어진 업무를 <em>한 화면으로</em></h2>
       </div>
-      <div data-reveal><Compare /></div>
+      <div data-swarm="block"><Compare /></div>
     </div>
   </section>
 
   <section class="section gut tint" id="services" aria-labelledby="services-title">
     <div class="inner">
-      <div class="sec-head" data-reveal>
+      <div class="sec-head">
         <p class="eyebrow">서비스</p>
         <h2 id="services-title">네 가지 서비스, <em>책임자는 한 명</em></h2>
       </div>
-      <div data-reveal><ServiceTabs /></div>
+      <div><ServiceTabs /></div>
     </div>
   </section>
 
   <section class="section gut" id="way" aria-labelledby="way-title">
     <div class="inner">
-      <div class="sec-head" data-reveal>
+      <div class="sec-head">
         <p class="eyebrow">옵티코어 방식</p>
         <h2 id="way-title">무엇부터 맡길지, <em>점수로 정합니다</em></h2>
       </div>
-      <div data-reveal><FitMatrix /></div>
-      <ul class="ways" data-reveal="children">
+      <div><FitMatrix /></div>
+      <ul class="ways">
         {ways.map(w => <li>{w}</li>)}
       </ul>
     </div>
@@ -61,26 +71,56 @@ const ways = ['점수가 높은 일부터 맡깁니다', '돈과 문서는 사�
 
   <section class="section gut night" id="method" aria-labelledby="method-title">
     <div class="inner">
-      <div class="sec-head" data-reveal>
+      <div class="sec-head">
         <p class="eyebrow">진행 방식</p>
         <h2 id="method-title">진단부터 가동까지 <em>10~23주</em></h2>
       </div>
-      <div data-reveal><Timeline brief /></div>
-      <div class="pledge" data-reveal><Promises brief /></div>
-      <p class="after-link" data-reveal><a class="btn" href={url('/method')}>단계별로 보기</a></p>
+      <div><Timeline brief /></div>
+      <div class="pledge"><Promises brief /></div>
+      <p class="after-link"><a class="btn" href={url('/method')}>단계별로 보기</a></p>
     </div>
   </section>
 
   <section class="section gut tint" id="diagnose-section" aria-labelledby="diag-title">
     <div class="inner">
-      <div class="sec-head" data-reveal>
+      <div class="sec-head">
         <p class="eyebrow">진단 · 약 1분</p>
         <h2 id="diag-title">세 가지만 고르면 <em>시작점</em>이 나옵니다</h2>
       </div>
       <Diagnose bare />
     </div>
   </section>
+  </cursor-swarm>
+  <button type="button" class="skip-build" data-skip-build hidden>건너뛰기</button>
 </Base>
+
+<script>
+  // 커서 스웜은 이번 방문에서 처음일 때만 불러온다 (html.swarm-on은 위의 인라인 스크립트가 정한다).
+  if (document.documentElement.classList.contains('swarm-on')) {
+    const skip = document.querySelector<HTMLButtonElement>('[data-skip-build]')!;
+    const remember = () => { try { sessionStorage.setItem('oc-built', '1'); } catch { /* 저장이 막혀 있으면 매번 재생된다 */ } };
+    const done = () => { skip.hidden = true; remember(); };
+    const visible = (sel: string) => (document.querySelector(sel) as (Element & { checkVisibility?: (o: object) => boolean }) | null)?.checkVisibility?.({ visibilityProperty: true }) ?? true;
+    import('cursor-swarm').then(() => {
+      const el = document.querySelector('cursor-swarm')!;
+      skip.hidden = false;
+      skip.addEventListener('click', () => { el.finish(); done(); });
+      el.addEventListener('swarmend', done);
+      // 첫 화면이 다 그려지면: 이번 방문에서는 다시 재생하지 않고, 아래 섹션은 더 빠르게 그린다
+      const iv = setInterval(() => {
+        if (!visible('.hero .more')) return;   // 제목·설명·버튼까지 그려졌다 (휴대폰에서는 그 아래가 화면 밖이라 여기까지만 본다)
+        clearInterval(iv); remember(); el.speed = 2.4;
+      }, 250);
+    }).catch(() => document.documentElement.classList.remove('swarm-on'));   // 불러오지 못하면 완성된 화면을 그대로 보여 준다
+  }
+</script>
+
+<style is:global>
+  cursor-swarm { display: block; }
+  /* 스크립트가 커서들을 부르기 전에 완성된 화면이 잠깐 비치지 않게 한다 (첫 방문일 때만) */
+  html.swarm-on cursor-swarm:not(:defined) { visibility: hidden; }
+  .skip-build { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); translate: -50% 0; z-index: 60; font: 600 14px var(--f-body); color: var(--body); background: var(--ink); border: 0; border-radius: 999px; padding: 0 18px; min-height: 44px; cursor: pointer; box-shadow: 0 10px 30px -10px rgba(18, 21, 25, .5); }
+</style>
 
 <style>
   /* 제목에서 가장 중요한 말 한 군데만 코어색으로 짚는다 */
