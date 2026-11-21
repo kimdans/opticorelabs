@@ -33,9 +33,7 @@ for (const rel of files) {
       // 아티팩트 본문은 게시할 때 문서 뼈대로 감싸지므로 head와 body의 안쪽만 남긴다.
       const head = s.match(/<head[^>]*>([\s\S]*?)<\/head>/)[1].replace(/<meta charset[^>]*>|<meta name="viewport"[^>]*>|<link rel="canonical"[^>]*>/g, '');
       const body = s.match(/<body[^>]*>([\s\S]*?)<\/body>/)[1];
-      // Astro는 레이아웃·페이지의 모듈 스크립트를 </body> 뒤에 붙인다. 이것까지 가져와야 스크립트가 빠지지 않는다.
-      const tail = (s.split('</body>')[1] ?? '').replace('</html>', '');
-      s = head.replace(/<title>[\s\S]*?<\/title>/, '<title>OptiCore 웹사이트</title>\n<meta name="claude:viewport-fit-sides" content="cover">') + body + tail;
+      s = head.replace(/<title>[\s\S]*?<\/title>/, '<title>OptiCore 웹사이트</title>\n<meta name="claude:viewport-fit-sides" content="cover">') + body;
     }
     fs.writeFileSync(to, s);
   } else fs.copyFileSync(path.join(src, rel), to);
