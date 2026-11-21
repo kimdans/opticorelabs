@@ -39,10 +39,10 @@
 
 ## 프로젝트 맥락
 - 회사: **옵티코어 (OptiCore)** — SI, AX(AI 전환), ERP 구축, SaaS 제공.
-- 이 저장소(`opticorelabs`, opticorelabs.co.kr)는 **AX 전문 구축팀 사이트**다. 생활·교육·렌탈 서비스를 안내하는 마케팅 회사 사이트는 2026-11에 별도 저장소로 분리한다 (문구 규칙이 달라 서로 섞지 않는다).
+- 이 저장소(`opticorelabs`, opticorelabs.co.kr)는 **AX 전환 컨설팅·구축 사이트**다. 광고·마케팅 회사 사이트(생활·교육·렌탈 서비스 안내)는 2026-11-21에 별도 저장소 `kimdans/opticore-marketer`(opticore-ads.co.kr)로 분리했다. 문구 규칙이 달라 서로 섞지 않는다.
 - 브랜드 규칙: `brand/BRAND.md`
 - 사이트 구조: `docs/SITEMAP.md`
-- 포지셔닝: **AX(AI 전환) 전문 구축팀**. 고객은 직원 30~200명 회사의 대표·운영 총괄·실무 팀장 (`brand/BRAND.md` 0장)
+- 포지셔닝: **AX(AI 전환) 컨설팅·구축**. 고객은 직원 30~200명 회사의 대표·운영 총괄·실무 팀장 (`brand/BRAND.md` 0장)
 - **실제 사이트: `web/` (Astro, 라이트 단일 테마, Pretendard)** — 문구는 `web/src/data/site.ts`, 첫 화면 에이전트 예시는 `web/src/data/agent.ts`
 - 디자인을 바꿀 때는 아티팩트로 먼저 보여 주고, 확인을 받은 뒤 배포한다
 - 배포: GitHub Pages (`.github/workflows/pages.yml`, `main`에 올라가면 자동). 내부 링크는 `web/src/lib/paths.ts`의 `url()` 사용
