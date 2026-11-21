@@ -1,0 +1,19 @@
+---
+import { promises } from '../data/site';
+// brief: 홈에서는 제목만 보인다 (설명은 약속 페이지에 있다). 색은 바깥 섹션이 정한다.
+interface Props { brief?: boolean }
+const { brief = false } = Astro.props;
+---
+<ul class="promises" data-reveal="children">
+  {promises.map(p => (
+    <li><h3>{p.title}</h3>{!brief && <p>{p.body}</p>}</li>
+  ))}
+</ul>
+
+<style>
+  .promises { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px 48px; }
+  @media (max-width: 900px) { .promises { grid-template-columns: 1fr; } }
+  li { padding-top: 28px; border-top: 1px solid color-mix(in srgb, currentColor 22%, transparent); display: grid; gap: 14px; align-content: start; }
+  h3 { font-size: clamp(21px, 1.9vw, 26px); font-weight: 700; line-height: 1.4; }
+  p { color: var(--muted, var(--ink-2)); font-size: 16px; }
+</style>

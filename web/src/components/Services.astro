@@ -1,0 +1,32 @@
+---
+import { url } from '../lib/paths';
+import { lenses } from '../data/site';
+// 증상 문장("이럴 때")이 곧 서비스 카드의 제목이다. 고객은 자기 상황으로 서비스를 고른다.
+---
+<ul class="cards" data-reveal="children">
+  {lenses.map(l => (
+    <li class="card">
+      <a href={url(`/lenses/${l.slug}`)}>
+        <p class="when">{l.when}</p>
+        <div class="who"><span class="code">{l.code}</span><span class="name">{l.name}</span></div>
+        <ul class="does">{l.does.map(d => <li>{d}</li>)}</ul>
+        <span class="more">자세히 보기 →</span>
+      </a>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+  @media (max-width: 760px) { .cards { grid-template-columns: 1fr; } }
+  .card a { height: 100%; display: grid; grid-template-rows: auto auto 1fr auto; gap: 18px; padding: clamp(24px, 3vw, 40px); border-radius: 28px; background: var(--surface); text-decoration: none; transition: box-shadow .35s, transform .35s var(--ease); }
+  .card a:hover, .card a:focus-visible { transform: translateY(-4px); box-shadow: 0 24px 40px -28px rgba(18, 21, 25, .35); }
+  .when { font-size: clamp(21px, 2vw, 27px); font-weight: 700; line-height: 1.4; letter-spacing: -.03em; }
+  .who { display: flex; align-items: baseline; gap: 8px; }
+  .code { font-size: 13px; font-weight: 500; color: var(--ink-3); order: 2; }
+  .name { font-weight: 600; font-size: 15px; color: var(--core); }
+  .does { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; color: var(--ink-2); font-size: 16px; align-content: start; }
+  .does li { padding-left: 24px; position: relative; }
+  .does li::before { content: ""; position: absolute; left: 2px; top: .42em; width: 11px; height: 6px; border-left: 2px solid var(--core); border-bottom: 2px solid var(--core); rotate: -45deg; }
+  .more { font-size: 16px; font-weight: 600; }
+</style>

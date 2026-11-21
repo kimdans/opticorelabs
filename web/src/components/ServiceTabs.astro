@@ -1,0 +1,116 @@
+---
+import { url } from '../lib/paths';
+import { lenses } from '../data/site';
+// 홈의 서비스 영역. 왼쪽에서 "지금 겪는 상황"을 고르면 오른쪽에 맞는 서비스가 나온다.
+// 스크립트가 없으면 네 서비스가 모두 펼쳐진 목록으로 보인다 (.tabs.live일 때만 하나씩 보인다).
+// 홈에서는 AX를 맨 앞에 둔다: 나머지 세 서비스는 AI가 일할 바탕을 만드는 일이다.
+const order = ['ax', 'erp', 'si', 'saas'];
+const list = order.map(slug => lenses.find(l => l.slug === slug)!);
+---
+<div class="tabs" data-tabs>
+  {list.map((l, i) => (
+    <article class="item" data-item data-open={i === 0 ? 'true' : 'false'} style={`--row:${i + 1}`}>
+      <h3><button type="button" id={`svc-tab-${l.slug}`} aria-controls={`svc-panel-${l.slug}`} aria-expanded={i === 0 ? 'true' : 'false'}>
+        <span class="name">{l.name}</span>
+        <span class="when">{l.when}</span>
+      </button></h3>
+      <div class="panel" id={`svc-panel-${l.slug}`} role="region" aria-labelledby={`svc-tab-${l.slug}`}>
+        <div class={`art art-${l.slug}`} aria-hidden="true">
+          {l.slug === 'si' && <><span class="n a">쇼핑몰</span><span class="n b">회계</span><span class="n c">물류</span><span class="n d">그룹웨어</span><span class="hub"><i></i></span><i class="ln l1"></i><i class="ln l2"></i><i class="ln l3"></i><i class="ln l4"></i></>}
+          {l.slug === 'erp' && <><ul class="mods"><li><b>회계</b><em>마감 완료</em></li><li><b>재고</b><em>실시간</em></li><li><b>구매</b><em>발주 3건</em></li><li><b>영업</b><em>수주 12.4억</em></li></ul><p class="close">월 마감 <b>4일 → 반나절</b></p></>}
+          {l.slug === 'ax' && <><p class="q">지난달 대성기계 납품 단가 알려줘</p><p class="a"><b>AI 업무비서</b>베어링 6204 기준 1,850원입니다. 견적서 초안을 만들까요?</p><p class="ok"><span>초안 작성</span><em>담당자 승인 필요</em></p></>}
+          {l.slug === 'saas' && <ul class="plans"><li class="on"><b>전자결재</b><i></i></li><li class="on"><b>재고 알림</b><i></i></li><li><b>매입 자동 수집</b><i></i></li></ul>}
+        </div>
+        <div class="body">
+          <p class="what">{l.what}</p>
+          <a class="more" href={url(`/lenses/${l.slug}`)}>{l.name} 자세히 보기<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </div>
+    </article>
+  ))}
+</div>
+
+<style>
+  .tabs { display: grid; gap: 12px; }
+  .item { display: grid; gap: 12px; }
+  h3 { font: inherit; letter-spacing: inherit; }
+  button { all: unset; box-sizing: border-box; cursor: pointer; display: grid; gap: 6px; width: 100%; padding: 22px 0; border-top: 1px solid var(--edge); }
+  button:focus-visible { outline: 2px solid var(--core); outline-offset: 4px; border-radius: 6px; }
+  .name { font-size: clamp(26px, 2.8vw, 38px); font-weight: 700; line-height: 1.2; letter-spacing: -.04em; transition: color .3s; }
+  .when { font-size: 16px; color: var(--ink-2); transition: opacity .3s; }
+  .name small { font-size: 13px; font-weight: 500; color: var(--ink-3); }
+  .panel { border-radius: 28px; background: var(--surface); overflow: hidden; display: grid; }
+  .body { padding: clamp(22px, 2.6vw, 36px); display: grid; gap: 20px; align-content: start; }
+  .what { font-size: clamp(17px, 1.5vw, 20px); font-weight: 500; line-height: 1.6; }
+  .does { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; color: var(--ink-2); font-size: 16px; }
+  .does li { padding-left: 26px; position: relative; }
+  .does li::before { content: ""; position: absolute; left: 2px; top: .42em; width: 12px; height: 7px; border-left: 2px solid var(--core); border-bottom: 2px solid var(--core); rotate: -45deg; }
+  .more { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 16px; text-decoration: none; justify-self: start; padding-block: 8px; }
+  .more svg { width: 18px; height: 18px; transition: translate .25s var(--ease); }
+  .more:hover svg { translate: 4px 0; }
+
+  /* 스크립트가 켜지면: 넓은 화면은 왼쪽 목록 + 오른쪽 패널, 좁은 화면은 하나씩 펼쳐지는 목록 */
+  .tabs.live .item[data-open="false"] .panel { display: none; }
+  .tabs.live .item[data-open="false"] .name { color: var(--ink-3); }
+  .tabs.live .item[data-open="false"] .when { opacity: .6; }
+  .tabs.live .item[data-open="false"] button:hover .name { color: var(--ink-2); }
+  @media (min-width: 901px) {
+    .tabs.live { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); column-gap: 72px; row-gap: 0; align-items: start; }
+    .tabs.live .item { display: contents; }
+    .tabs.live h3 { grid-column: 1; grid-row: var(--row); }
+    .tabs.live .item:last-child button { border-bottom: 1px solid var(--edge); }
+    .tabs.live .panel { grid-column: 2; grid-row: 1 / span 4; align-self: stretch; animation: swap .5s var(--ease); }
+  }
+  @keyframes swap { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+  /* 서비스별 작은 그림 */
+  .art { position: relative; height: clamp(190px, 21vw, 250px); background: var(--body-2); font-size: 14px; font-weight: 600; display: grid; place-items: center; overflow: hidden; }
+  /* 여백만 지운다. 여기서 padding까지 지우면 말풍선의 안쪽 여백이 사라진다 (선택자 우선순위가 더 높다). */
+  .art :global(p) { margin: 0; }
+  .art :global(ul) { margin: 0; padding: 0; list-style: none; }
+  .n { position: absolute; background: #fff; border-radius: 12px; padding: 9px 14px; box-shadow: 0 8px 18px -12px rgba(18, 21, 25, .3); z-index: 1; }
+  .n.a { left: 9%; top: 18%; } .n.b { right: 9%; top: 18%; } .n.c { left: 9%; bottom: 18%; } .n.d { right: 9%; bottom: 18%; }
+  .hub { width: 56px; height: 56px; border-radius: 50%; border: 7px solid var(--ink); background: #fff; display: grid; place-items: center; z-index: 1; }
+  .hub i { width: 15px; height: 15px; border-radius: 4px; background: var(--core); }
+  .ln { position: absolute; left: 50%; top: 50%; width: 34%; height: 2px; background: repeating-linear-gradient(90deg, var(--core) 0 6px, transparent 6px 12px); background-size: 12px 2px; transform-origin: left; animation: flow 1s linear infinite; }
+  .l1 { rotate: 18deg; } .l2 { rotate: 162deg; } .l3 { rotate: -18deg; } .l4 { rotate: -162deg; }
+  @keyframes flow { to { background-position: -12px 0; } }
+  .mods { display: grid !important; grid-template-columns: repeat(2, 150px); gap: 10px; }
+  .mods li { background: #fff; border-radius: 12px; padding: 10px 14px; display: grid; gap: 2px; box-shadow: 0 8px 18px -12px rgba(18, 21, 25, .3); }
+  .mods em { font-style: normal; font-size: 12.5px; font-weight: 500; color: var(--ok); }
+  .art-erp { align-content: center; gap: 14px; }
+  .close { font-size: 13.5px; font-weight: 500; color: var(--ink-2); }
+  .close b { color: var(--core); }
+  .art-ax { align-content: center; justify-items: stretch; gap: 10px; padding-inline: clamp(20px, 10%, 64px); font-weight: 500; }
+  .q { justify-self: end; background: var(--ink); color: #fff; padding: 9px 14px; border-radius: 16px 16px 4px 16px; }
+  .a { justify-self: start; background: #fff; padding: 10px 14px; border-radius: 4px 16px 16px 16px; max-width: 86%; box-shadow: 0 8px 18px -12px rgba(18, 21, 25, .3); }
+  .a b { display: block; font-size: 12.5px; color: var(--core); }
+  .ok { justify-self: start; display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  .ok span { background: var(--core); color: #fff; padding: 6px 13px; border-radius: 999px; font-weight: 600; }
+  .ok em { font-style: normal; color: var(--ink-2); }
+  .plans { display: grid !important; gap: 8px; width: min(300px, 80%); }
+  .plans li { display: flex; justify-content: space-between; align-items: center; background: #fff; border-radius: 12px; padding: 11px 14px; box-shadow: 0 8px 18px -12px rgba(18, 21, 25, .3); }
+  .plans i { width: 38px; height: 22px; border-radius: 999px; background: #D4D8E0; position: relative; }
+  .plans i::after { content: ""; position: absolute; left: 3px; top: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; }
+  .plans .on i { background: var(--core); }
+  .plans .on i::after { left: 19px; }
+</style>
+
+<script>
+  // 열려 있는 서비스는 항상 하나다. 넓은 화면에서는 포인터를 올리기만 해도 바뀐다.
+  document.querySelectorAll<HTMLElement>('[data-tabs]').forEach(root => {
+    const items = Array.from(root.querySelectorAll<HTMLElement>('[data-item]'));
+    const open = (it: HTMLElement) => items.forEach(x => {
+      const on = x === it; x.dataset.open = String(on);
+      x.querySelector('button')!.setAttribute('aria-expanded', String(on));
+    });
+    root.classList.add('live');
+    const wide = matchMedia('(min-width: 901px) and (hover: hover)');
+    items.forEach(it => {
+      const btn = it.querySelector('button')!;
+      btn.addEventListener('click', () => open(it));
+      btn.addEventListener('pointerenter', () => { if (wide.matches) open(it); });
+      btn.addEventListener('focus', () => { if (wide.matches) open(it); });
+    });
+  });
+</script>

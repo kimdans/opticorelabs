@@ -1,130 +1,95 @@
 ---
 import { url } from '../lib/paths';
 import Base from '../layouts/Base.astro';
-import PartnerList from '../components/PartnerList.astro';
-import Swarm from '../components/Swarm.astro';
-import { company, fields, steps, principles } from '../data/site';
+import Hero from '../components/Hero.astro';
+import AgentRun from '../components/AgentRun.astro';
+import Compare from '../components/Compare.astro';
+import ServiceTabs from '../components/ServiceTabs.astro';
+import FitMatrix from '../components/FitMatrix.astro';
+import Timeline from '../components/Timeline.astro';
+import Promises from '../components/Promises.astro';
+import Diagnose from '../components/Diagnose.astro';
+// 홈은 "한 화면에 한 가지"만 말한다. 제목 한 줄 + 그림 하나, 설명은 하위 페이지로 넘긴다.
+// 스웜(무엇을 하는 회사인가) → 에이전트 장면 → 정리 전/후 → 서비스 → 점수판 → 일정·약속 → 진단
+const ways = ['점수가 높은 일부터 맡깁니다', '돈과 문서는 사람이 승인합니다', '효과를 숫자로 먼저 잽니다'];
 ---
-<Base title={company.nameKo} description="이사·정리·청소, 학습, 렌탈처럼 일상에 필요한 서비스를 비교하고 제휴 업체에 직접 상담을 신청하실 수 있도록 안내하는 마케팅 회사, 주식회사 옵티코어입니다. 옵티코어는 상담 비용을 받지 않습니다.">
-  <!-- 커서 스웜: 홈에 처음 들어오면 이름표를 단 커서들이 날아와 이 화면을 눈앞에서 그린다 (오픈소스 cursor-swarm, MIT).
-       문구는 바꾸지 않고 나타나는 방식만 바꾼다. 저장소(쿠키·세션 저장)는 쓰지 않는다: 사이트 안에서 홈으로 돌아왔거나
-       뒤로 가기로 온 경우, '동작 줄이기' 설정인 경우에는 완성된 화면을 바로 보여 준다. -->
+<Base>
+  <!-- 첫 방문(세션당 한 번)에는 이름표를 단 커서 여섯이 날아와 이 화면을 눈앞에서 그린다 ("스웜").
+       오픈소스 cursor-swarm(MIT)을 쓴다. 동작 줄이기 설정이거나 이미 본 방문자에게는 완성된 화면을 바로 보여 준다. -->
   <script is:inline>
     (function () {
-      try {
-        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        var nav = performance.getEntriesByType('navigation')[0];
-        if (nav && nav.type === 'back_forward') return;
-        if (document.referrer && new URL(document.referrer).origin === location.origin) return;
-      } catch (e) {}
+      try { if (matchMedia('(prefers-reduced-motion: reduce)').matches || sessionStorage.getItem('oc-built')) return; } catch (e) {}
       document.documentElement.classList.add('swarm-on');
       // 안전장치: 커서 스웜 스크립트가 2.5초 안에 준비되지 않으면 완성된 화면을 그대로 보여 준다
       setTimeout(function () { if (!customElements.get('cursor-swarm')) document.documentElement.classList.remove('swarm-on'); }, 2500);
     })();
   </script>
   <cursor-swarm id="builders" cursors="6" speed="1.5" trigger="load" scope="viewport" linger="1600"
-    names="기획,디자인,카피,편집,검수,안내" colors="#2430E8,#121519,#00A9BD,#D9246F,#4C555B,#2430E8">
-  <section class="hero gut">
-    <div class="inner hero-grid">
-      <div class="hero-copy">
-        <p class="eyebrow">생활 · 교육 · 렌탈 서비스 안내</p>
-        <h1 class="hero-title">일상에 필요한 서비스,<br>비교해 보고 업체에 직접 신청하세요.</h1>
-        <p class="lede">{company.summary}</p>
-        <p class="cta"><a class="btn core" href={url('/partners')}>제휴 안내 보기</a><a class="btn ghost" href="#how">이용 방법</a></p>
+    names="기획,디자인,카피,개발,데이터,검수" colors="#2430E8,#121519,#00A9BD,#D9246F,#4C555B,#2430E8">
+  <Hero />
+
+  <section class="section gut tint" id="agent" aria-labelledby="agent-title">
+    <div class="inner">
+      <div class="sec-head">
+        <p class="eyebrow">AI 전환</p>
+        <h2 id="agent-title">AI가 일하고, <em>사람이 승인합니다</em></h2>
       </div>
-      <aside class="hero-card" aria-label="옵티코어가 하는 일과 하지 않는 일">
-        <p class="card-h">옵티코어가 하는 일</p>
-        <ul>
-          <li>분야별 서비스 내용과 확인할 점을 정리해 안내합니다</li>
-          <li>서비스를 제공하는 제휴 업체를 안내 페이지마다 밝힙니다</li>
-          <li>상담을 신청하실 수 있는 업체 페이지로 이어 드립니다</li>
-        </ul>
-        <p class="card-h no">하지 않는 일</p>
-        <ul class="no">
-          <li>상담 비용을 받지 않습니다</li>
-          <li>이름·연락처 같은 개인정보를 받지 않습니다</li>
-          <li>서비스를 직접 제공하거나 계약하지 않습니다</li>
-        </ul>
-      </aside>
+      <div data-swarm="block"><AgentRun /></div>
     </div>
   </section>
 
-  <!-- 점 무리: 흩어진 정보 → 세 분야 → 세 단계 → 로고. 커서들이 무대를 그린 뒤에 시작한다. -->
-  <section class="story gut" aria-label="옵티코어가 하는 일을 그림으로 보기">
-    <div class="inner"><Swarm /></div>
-  </section>
-
-  <section class="section tint gut" id="fields" aria-labelledby="fields-h">
+  <section class="section gut" id="clear" aria-labelledby="clear-title">
     <div class="inner">
       <div class="sec-head">
-        <p class="eyebrow">분야</p>
-        <h2 id="fields-h">옵티코어가 안내하려는 세 가지 분야</h2>
-        <p>집안일부터 아이의 공부, 매달 쓰는 생활용품까지. 직접 알아보기 번거로운 서비스를 분야별로 정리하는 것을 목표로 합니다.</p>
+        <p class="eyebrow">AI보다 먼저 할 일</p>
+        <h2 id="clear-title">흩어진 업무를 <em>한 화면으로</em></h2>
       </div>
-      <ul class="fields" role="list" data-reveal="children">
-        {fields.map(f => (
-          <li class="field">
-            <h3>{f.name}</h3>
-            <p class="chips">{f.items.map(i => <span class="chip">{i}</span>)}</p>
-            <p class="body">{f.body}</p>
-          </li>
-        ))}
+      <div data-swarm="block"><Compare /></div>
+    </div>
+  </section>
+
+  <section class="section gut tint" id="services" aria-labelledby="services-title">
+    <div class="inner">
+      <div class="sec-head">
+        <p class="eyebrow">서비스</p>
+        <h2 id="services-title">네 가지 서비스, <em>책임자는 한 명</em></h2>
+      </div>
+      <div><ServiceTabs /></div>
+    </div>
+  </section>
+
+  <section class="section gut" id="way" aria-labelledby="way-title">
+    <div class="inner">
+      <div class="sec-head">
+        <p class="eyebrow">옵티코어 방식</p>
+        <h2 id="way-title">무엇부터 맡길지, <em>점수로 정합니다</em></h2>
+      </div>
+      <div><FitMatrix /></div>
+      <ul class="ways">
+        {ways.map(w => <li>{w}</li>)}
       </ul>
     </div>
   </section>
 
-  <section class="section gut" id="how" aria-labelledby="how-h">
+  <section class="section gut night" id="method" aria-labelledby="method-title">
     <div class="inner">
       <div class="sec-head">
-        <p class="eyebrow">이용 방법</p>
-        <h2 id="how-h">비교하고, 확인하고, 업체에 직접 신청하세요</h2>
-        <p>옵티코어는 안내까지만 합니다. 상담과 서비스는 각 제휴 업체가 직접 진행합니다.</p>
+        <p class="eyebrow">진행 방식</p>
+        <h2 id="method-title">진단부터 가동까지 <em>10~23주</em></h2>
       </div>
-      <ol class="steps" data-reveal="children">
-        {steps.map((s, i) => (
-          <li><span class="num" aria-hidden="true">{i + 1}</span><h3>{s.title}</h3><p>{s.body}</p></li>
-        ))}
-      </ol>
+      <div><Timeline brief /></div>
+      <div class="pledge"><Promises brief /></div>
+      <p class="after-link"><a class="btn" href={url('/method')}>단계별로 보기</a></p>
     </div>
   </section>
 
-  <section class="section tint gut" id="principles" aria-labelledby="pr-h">
+  <section class="section gut tint" id="diagnose-section" aria-labelledby="diag-title">
     <div class="inner">
       <div class="sec-head">
-        <p class="eyebrow">운영 원칙</p>
-        <h2 id="pr-h">안내하는 회사로서 지키는 것</h2>
+        <p class="eyebrow">진단 · 약 1분</p>
+        <h2 id="diag-title">세 가지만 고르면 <em>시작점</em>이 나옵니다</h2>
       </div>
-      <ul class="prs" role="list" data-reveal="children">
-        {principles.map(p => <li><h3>{p.title}</h3><p>{p.body}</p></li>)}
-      </ul>
-    </div>
-  </section>
-
-  <section class="section gut" id="partners" aria-labelledby="pt-h">
-    <div class="inner">
-      <div class="sec-head">
-        <p class="eyebrow">제휴 안내</p>
-        <h2 id="pt-h">제휴 서비스 안내 페이지</h2>
-        <p>서비스마다 어떤 분께 맞는지, 진행 방식, 신청 전 확인할 점, 자주 묻는 질문을 한 페이지에 정리합니다.</p>
-      </div>
-      <PartnerList />
-      <p class="more"><a class="btn ghost" href={url('/partners')}>제휴 안내 전체 보기</a></p>
-    </div>
-  </section>
-
-  <section class="section tint gut" id="contact" aria-labelledby="ct-h">
-    <div class="inner contact">
-      <div class="sec-head">
-        <p class="eyebrow">문의</p>
-        <h2 id="ct-h">궁금한 점은 이메일로 보내 주세요</h2>
-        <p>안내 내용에 대한 문의, 제휴 문의 모두 이메일로 받습니다. 서비스 이용·계약에 관한 문의는 해당 서비스를 제공하는 업체에 해 주세요.</p>
-      </div>
-      <p><a class="btn" href={`mailto:${company.email}`}>{company.email}</a></p>
-      <div class="about" data-company-about>
-        <p><strong>{company.nameKo}</strong> · {company.short}</p>
-        <p data-business-line>{company.businessLine}</p>
-        <p><a href={url('/company')}>회사 정보 보기</a></p>
-      </div>
+      <Diagnose bare />
     </div>
   </section>
   </cursor-swarm>
@@ -132,70 +97,46 @@ import { company, fields, steps, principles } from '../data/site';
 </Base>
 
 <script>
-  // 커서 스웜은 필요할 때만 불러온다 (html.swarm-on은 위의 인라인 스크립트가 정한다).
+  // 커서 스웜은 이번 방문에서 처음일 때만 불러온다 (html.swarm-on은 위의 인라인 스크립트가 정한다).
   if (document.documentElement.classList.contains('swarm-on')) {
     const skip = document.querySelector<HTMLButtonElement>('[data-skip-build]')!;
+    const remember = () => { try { sessionStorage.setItem('oc-built', '1'); } catch { /* 저장이 막혀 있으면 매번 재생된다 */ } };
+    const done = () => { skip.hidden = true; remember(); };
     const visible = (sel: string) => (document.querySelector(sel) as (Element & { checkVisibility?: (o: object) => boolean }) | null)?.checkVisibility?.({ visibilityProperty: true }) ?? true;
     import('cursor-swarm').then(() => {
       const el = document.querySelector('cursor-swarm')!;
       skip.hidden = false;
-      skip.addEventListener('click', () => { el.finish(); skip.hidden = true; });
-      el.addEventListener('swarmend', () => { skip.hidden = true; });
-      // 첫 화면(제목·설명·버튼)이 그려지면 아래 섹션은 더 빠르게 그린다
-      const iv = setInterval(() => { if (!visible('.hero .cta .btn')) return; clearInterval(iv); el.speed = 2.4; }, 250);
+      skip.addEventListener('click', () => { el.finish(); done(); });
+      el.addEventListener('swarmend', done);
+      // 첫 화면이 다 그려지면: 이번 방문에서는 다시 재생하지 않고, 아래 섹션은 더 빠르게 그린다
+      const iv = setInterval(() => {
+        if (!visible('.hero .more')) return;   // 제목·설명·버튼까지 그려졌다 (휴대폰에서는 그 아래가 화면 밖이라 여기까지만 본다)
+        clearInterval(iv); remember(); el.speed = 2.4;
+      }, 250);
     }).catch(() => document.documentElement.classList.remove('swarm-on'));   // 불러오지 못하면 완성된 화면을 그대로 보여 준다
   }
 </script>
 
 <style is:global>
   cursor-swarm { display: block; }
-  /* 스크립트가 커서들을 부르기 전에 완성된 화면이 잠깐 비치지 않게 한다 (커서 스웜을 재생할 때만) */
+  /* 스크립트가 커서들을 부르기 전에 완성된 화면이 잠깐 비치지 않게 한다 (첫 방문일 때만) */
   html.swarm-on cursor-swarm:not(:defined) { visibility: hidden; }
-  /* 커서들이 그리는 동안에는 스크롤 등장 효과를 겹치지 않는다 */
-  html.swarm-on .rv { opacity: 1; transform: none; }
   .skip-build { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); translate: -50% 0; z-index: 60; font: 600 14px var(--f-body); color: var(--body); background: var(--ink); border: 0; border-radius: 999px; padding: 0 18px; min-height: 44px; cursor: pointer; box-shadow: 0 10px 30px -10px rgba(18, 21, 25, .5); }
 </style>
 
 <style>
-  .story { padding-block: 8px 96px; overflow-x: clip; }   /* 점 무리 캔버스가 무대보다 넓어 좁은 화면에서 옆으로 넘치지 않게 자른다 */
-  @media (max-width: 760px) { .story { padding-block: 0 64px; } }
-  .hero { padding-block: 148px 104px; }
-  @media (max-width: 760px) { .hero { padding-block: 108px 72px; } }
-  .hero-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 48px; align-items: center; }
-  @media (max-width: 960px) { .hero-grid { grid-template-columns: minmax(0, 1fr); } }
-  .hero-copy { display: grid; gap: 20px; }
-  .hero-title { font-size: clamp(32px, 5vw, 62px); font-weight: 700; letter-spacing: -.04em; }
-  @media (max-width: 560px) { .hero-title br { display: none; } }
-  .cta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
-  .hero-card { background: var(--surface); border-radius: 24px; padding: 32px; display: grid; gap: 12px; }
-  .card-h { font-weight: 700; display: flex; align-items: center; gap: 10px; }
-  .card-h::before { content: ""; width: 9px; height: 9px; border-radius: 2.5px; background: var(--core); }
-  .card-h.no { margin-top: 12px; }
-  .card-h.no::before { background: transparent; box-shadow: inset 0 0 0 1.5px var(--ink-3); }
-  .hero-card ul { margin: 0; padding-left: 19px; display: grid; gap: 6px; color: var(--ink-2); font-size: 15px; }
+  /* 제목에서 가장 중요한 말 한 군데만 코어색으로 짚는다 */
+  .sec-head :global(h2 em), .sec-head h2 em { font-style: normal; color: var(--core); }
+  .sec-head h2 { font-size: clamp(32px, 4.6vw, 64px); letter-spacing: -.04em; }
+  .sec-head { margin-bottom: clamp(32px, 4vw, 56px); }
 
-  .fields { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-  @media (max-width: 900px) { .fields { grid-template-columns: minmax(0, 1fr); } }
-  .field { background: var(--surface); border-radius: 20px; padding: 32px; display: grid; gap: 14px; align-content: start; }
-  .field h3 { font-size: 26px; }
-  .field .chip { background: var(--body-2); }
-  .field .body { color: var(--ink-2); }
+  .ways { list-style: none; margin: 48px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 40px; }
+  @media (max-width: 900px) { .ways { grid-template-columns: 1fr; margin-top: 32px; } }
+  .ways li { border-top: 2px solid var(--ink); padding-top: 18px; font-size: clamp(19px, 1.8vw, 24px); font-weight: 700; letter-spacing: -.03em; line-height: 1.4; }
 
-  .steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; counter-reset: s; }
-  @media (max-width: 900px) { .steps { grid-template-columns: minmax(0, 1fr); gap: 24px; } }
-  .steps li { display: grid; gap: 10px; align-content: start; border-top: 1.5px solid var(--ink); padding-top: 20px; }
-  .num { width: 32px; height: 32px; border-radius: 9px; background: var(--core); color: var(--on-core); display: grid; place-content: center; font-weight: 700; }
-  .steps h3 { font-size: 21px; }
-  .steps p { color: var(--ink-2); }
-
-  .prs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-  @media (max-width: 760px) { .prs { grid-template-columns: minmax(0, 1fr); } }
-  .prs li { background: var(--surface); border-radius: 20px; padding: 28px; display: grid; gap: 8px; }
-  .prs h3 { font-size: 20px; }
-  .prs p { color: var(--ink-2); }
-
-  .more { margin-top: 28px; }
-  .contact .btn { max-width: 100%; overflow-wrap: anywhere; }
-  .about { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--line); display: grid; gap: 6px; font-size: 15px; color: var(--ink-2); max-width: 52em; }
-  .about strong { color: var(--ink); }
+  /* 어두운 띠 (일정과 약속): 페이지에 한 번만 쓴다 */
+  .night { background: var(--night); color: var(--on-night); --muted: var(--on-night-2); --ink: var(--on-night); --ink-2: var(--on-night-2); --ink-3: #6E777C; --edge: #333A3F; --line: #272D31; --body: var(--night); --core: #8089FF; }
+  .night :global(.btn) { background: var(--on-night); color: var(--night); }
+  .pledge { margin-top: 64px; }
+  .after-link { margin-top: 48px; }
 </style>
