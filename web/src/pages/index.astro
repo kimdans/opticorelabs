@@ -2,9 +2,28 @@
 import { url } from '../lib/paths';
 import Base from '../layouts/Base.astro';
 import PartnerList from '../components/PartnerList.astro';
+import Swarm from '../components/Swarm.astro';
 import { company, fields, steps, principles } from '../data/site';
 ---
 <Base title={company.nameKo} description="이사·정리·청소, 학습, 렌탈처럼 일상에 필요한 서비스를 비교하고 제휴 업체에 직접 상담을 신청하실 수 있도록 안내하는 마케팅 회사, 주식회사 옵티코어입니다. 옵티코어는 상담 비용을 받지 않습니다.">
+  <!-- 커서 스웜: 홈에 처음 들어오면 이름표를 단 커서들이 날아와 이 화면을 눈앞에서 그린다 (오픈소스 cursor-swarm, MIT).
+       문구는 바꾸지 않고 나타나는 방식만 바꾼다. 저장소(쿠키·세션 저장)는 쓰지 않는다: 사이트 안에서 홈으로 돌아왔거나
+       뒤로 가기로 온 경우, '동작 줄이기' 설정인 경우에는 완성된 화면을 바로 보여 준다. -->
+  <script is:inline>
+    (function () {
+      try {
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        var nav = performance.getEntriesByType('navigation')[0];
+        if (nav && nav.type === 'back_forward') return;
+        if (document.referrer && new URL(document.referrer).origin === location.origin) return;
+      } catch (e) {}
+      document.documentElement.classList.add('swarm-on');
+      // 안전장치: 커서 스웜 스크립트가 2.5초 안에 준비되지 않으면 완성된 화면을 그대로 보여 준다
+      setTimeout(function () { if (!customElements.get('cursor-swarm')) document.documentElement.classList.remove('swarm-on'); }, 2500);
+    })();
+  </script>
+  <cursor-swarm id="builders" cursors="6" speed="1.5" trigger="load" scope="viewport" linger="1600"
+    names="기획,디자인,카피,편집,검수,안내" colors="#2430E8,#121519,#00A9BD,#D9246F,#4C555B,#2430E8">
   <section class="hero gut">
     <div class="inner hero-grid">
       <div class="hero-copy">
@@ -28,6 +47,11 @@ import { company, fields, steps, principles } from '../data/site';
         </ul>
       </aside>
     </div>
+  </section>
+
+  <!-- 점 무리: 흩어진 정보 → 세 분야 → 세 단계 → 로고. 커서들이 무대를 그린 뒤에 시작한다. -->
+  <section class="story gut" aria-label="옵티코어가 하는 일을 그림으로 보기">
+    <div class="inner"><Swarm /></div>
   </section>
 
   <section class="section tint gut" id="fields" aria-labelledby="fields-h">
@@ -103,9 +127,38 @@ import { company, fields, steps, principles } from '../data/site';
       </div>
     </div>
   </section>
+  </cursor-swarm>
+  <button type="button" class="skip-build" data-skip-build hidden>건너뛰기</button>
 </Base>
 
+<script>
+  // 커서 스웜은 필요할 때만 불러온다 (html.swarm-on은 위의 인라인 스크립트가 정한다).
+  if (document.documentElement.classList.contains('swarm-on')) {
+    const skip = document.querySelector<HTMLButtonElement>('[data-skip-build]')!;
+    const visible = (sel: string) => (document.querySelector(sel) as (Element & { checkVisibility?: (o: object) => boolean }) | null)?.checkVisibility?.({ visibilityProperty: true }) ?? true;
+    import('cursor-swarm').then(() => {
+      const el = document.querySelector('cursor-swarm')!;
+      skip.hidden = false;
+      skip.addEventListener('click', () => { el.finish(); skip.hidden = true; });
+      el.addEventListener('swarmend', () => { skip.hidden = true; });
+      // 첫 화면(제목·설명·버튼)이 그려지면 아래 섹션은 더 빠르게 그린다
+      const iv = setInterval(() => { if (!visible('.hero .cta .btn')) return; clearInterval(iv); el.speed = 2.4; }, 250);
+    }).catch(() => document.documentElement.classList.remove('swarm-on'));   // 불러오지 못하면 완성된 화면을 그대로 보여 준다
+  }
+</script>
+
+<style is:global>
+  cursor-swarm { display: block; }
+  /* 스크립트가 커서들을 부르기 전에 완성된 화면이 잠깐 비치지 않게 한다 (커서 스웜을 재생할 때만) */
+  html.swarm-on cursor-swarm:not(:defined) { visibility: hidden; }
+  /* 커서들이 그리는 동안에는 스크롤 등장 효과를 겹치지 않는다 */
+  html.swarm-on .rv { opacity: 1; transform: none; }
+  .skip-build { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); translate: -50% 0; z-index: 60; font: 600 14px var(--f-body); color: var(--body); background: var(--ink); border: 0; border-radius: 999px; padding: 0 18px; min-height: 44px; cursor: pointer; box-shadow: 0 10px 30px -10px rgba(18, 21, 25, .5); }
+</style>
+
 <style>
+  .story { padding-block: 8px 96px; overflow-x: clip; }   /* 점 무리 캔버스가 무대보다 넓어 좁은 화면에서 옆으로 넘치지 않게 자른다 */
+  @media (max-width: 760px) { .story { padding-block: 0 64px; } }
   .hero { padding-block: 148px 104px; }
   @media (max-width: 760px) { .hero { padding-block: 108px 72px; } }
   .hero-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 48px; align-items: center; }
