@@ -20,6 +20,8 @@ const ways = ['점수가 높은 일부터 맡깁니다', '돈과 문서는 사�
     (function () {
       try { if (matchMedia('(prefers-reduced-motion: reduce)').matches || sessionStorage.getItem('oc-built')) return; } catch (e) {}
       document.documentElement.classList.add('swarm-on');
+      // 안전장치: 커서 스웜 스크립트가 2.5초 안에 준비되지 않으면 완성된 화면을 그대로 보여 준다
+      setTimeout(function () { if (!customElements.get('cursor-swarm')) document.documentElement.classList.remove('swarm-on'); }, 2500);
     })();
   </script>
   <cursor-swarm id="builders" cursors="6" speed="1.5" trigger="load" scope="viewport" linger="1600"
