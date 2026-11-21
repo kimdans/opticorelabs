@@ -1,0 +1,14 @@
+---
+import Base from '../layouts/Base.astro';
+import Diagnose from '../components/Diagnose.astro';
+---
+<Base title="진단 시작" description="세 가지만 고르면 어디서 시작할지 추천 시작 상태와 서비스가 나옵니다.">
+  <section class="page-hero gut">
+    <div class="inner">
+      <p class="eyebrow">진단 · 약 1분</p>
+      <h1 class="page-title">세 가지만 고르면 시작 지점이 나옵니다.</h1>
+      <p class="lede">문의 양식 대신 진단부터 합니다. 결과를 보내 주시면 담당자가 같은 화면을 보고 이야기를 시작합니다.</p>
+    </div>
+  </section>
+  <section class="gut" style="padding-bottom:112px"><div class="inner"><Diagnose /></div></section>
+</Base>

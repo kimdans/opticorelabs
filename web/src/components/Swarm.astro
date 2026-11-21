@@ -1,0 +1,159 @@
+---
+// 첫 화면의 스웜: 수많은 점이 무리 지어 움직이며 회사가 하는 일을 네 장면으로 보여 준다.
+// 흩어진 업무(흐릿한 점 무리) → 네 가지 서비스 → 네 단계 → 하나의 코어(로고). 브랜드 필름이 하던 이야기를 대신한다.
+// 직접 만든 Canvas 2D 구현이다. tsParticles(범용·무거움), Three.js/React Three Fiber(3D·수백 KB)와 비교해
+// 정해진 모양으로 모이는 연출에 필요한 것만 담았다 (스크립트 약 3KB).
+const phases = [
+  { id: 'scatter', tab: '흩어진 업무', cap: '일이 엑셀·메신저·메모에 흩어져 있습니다' },
+  { id: 'services', tab: '네 서비스', cap: '네 가지 서비스로 정리하고' },
+  { id: 'steps', tab: '네 단계', cap: '네 단계를 거쳐' },
+  { id: 'core', tab: '하나의 코어', cap: '하나의 코어로 모읍니다' },
+];
+// 점 무리의 좌표계는 가운데가 (0,0), 한 변이 2인 정사각형이다. 아래 위치는 스크립트의 모양 정의와 같아야 한다.
+const svc = [['AI 전환', -0.47, -0.45], ['ERP', 0.47, -0.45], ['시스템 통합', -0.47, 0.45], ['구독형', 0.47, 0.45]];
+const stp = [['진단', -0.72], ['설계', -0.24], ['구축', 0.24], ['운영', 0.72]];
+const pct = (v: number) => `${(v * 0.5 + 0.5) * 100}%`;
+---
+<div class="swarm" data-dots data-phase="core">
+  <div class="stage">
+    <svg class="fallback" viewBox="0 0 24 24" aria-hidden="true" data-swarm-ignore><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="2.4"/><rect x="9" y="9" width="6" height="6" rx="1" fill="var(--core)"/></svg>
+    <canvas aria-hidden="true" data-swarm="media"></canvas>
+    <div class="labels" aria-hidden="true" data-swarm-ignore>
+      {svc.map(([t, x, y]) => <span class="lb svc" style={`left:${pct(x as number)};top:${pct(y as number)}`}>{t}</span>)}
+      {stp.map(([t, x]) => <span class="lb stp" style={`left:${pct(x as number)};top:${pct(0.36)}`}>{t}</span>)}
+    </div>
+  </div>
+  <div class="ctrl">
+    <p class="cap" data-cap aria-live="polite">{phases[3].cap}</p>
+    <div class="tabs" role="group" aria-label="장면 고르기">
+      {phases.map((p, i) => <button type="button" data-go={p.id} data-cap-text={p.cap} aria-pressed={i === 3 ? 'true' : 'false'}><i></i>{p.tab}</button>)}
+    </div>
+  </div>
+  <p class="sr-only">움직이는 그림: 흩어져 있던 점들이 네 가지 서비스(AI 전환, ERP, 시스템 통합, 구독형)와 네 단계(진단, 설계, 구축, 운영)를 거쳐 옵티코어 로고 모양의 코어 하나로 모입니다.</p>
+</div>
+
+<style>
+  .swarm { display: grid; gap: 20px; justify-items: center; min-width: 0; }
+  .stage { position: relative; width: min(100%, 560px); aspect-ratio: 1; }
+  /* 점들이 무대 밖으로도 흘러 다닐 수 있게 캔버스를 무대보다 넓게 둔다 */
+  canvas { position: absolute; inset: -14%; width: 128%; height: 128%; touch-action: pan-y; }
+  .fallback { position: absolute; inset: 14%; width: 72%; height: 72%; color: var(--ink); }
+  .swarm.live .fallback { display: none; }
+  .lb { position: absolute; translate: -50% -50%; font-size: clamp(13px, 1.25vw, 17px); font-weight: 700; letter-spacing: -.02em; white-space: nowrap; opacity: 0; scale: .9; transition: opacity .5s, scale .5s var(--ease); pointer-events: none; }
+  .swarm[data-phase="services"] .svc, .swarm[data-phase="steps"] .stp { opacity: 1; scale: 1; transition-delay: .7s; }
+
+  .ctrl { display: grid; gap: 14px; justify-items: center; }
+  .cap { font-size: clamp(16px, 1.5vw, 19px); font-weight: 600; text-align: center; min-height: 1.6em; }
+  .tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+  .tabs button { all: unset; box-sizing: border-box; cursor: pointer; position: relative; overflow: hidden; font-size: 13.5px; font-weight: 600; color: var(--ink-2); padding: 9px 14px; border-radius: 999px; background: var(--surface); white-space: nowrap; transition: color .2s; }
+  .tabs button:focus-visible { outline: 2px solid var(--core); outline-offset: 2px; }
+  .tabs button[aria-pressed="true"] { color: var(--ink); }
+  /* 지금 장면의 버튼 아래에 진행 막대가 찬다 (--dur은 스크립트가 넣는다) */
+  .tabs i { position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; background: var(--core); transform: scaleX(0); transform-origin: left; }
+  .swarm.auto .tabs button[aria-pressed="true"] i { animation: fill var(--dur, 4s) linear forwards; }
+  .swarm:not(.auto) .tabs button[aria-pressed="true"] i { transform: scaleX(1); }
+  @keyframes fill { to { transform: scaleX(1); } }
+</style>
+
+<script>
+  // 장면은 넷뿐이다: scatter(흩어짐) → services → steps → core → 다시 scatter. 버튼을 누르면 그 장면에 잠시 머문다.
+  type Phase = 'scatter' | 'services' | 'steps' | 'core';
+  const ORDER: Phase[] = ['scatter', 'services', 'steps', 'core'];
+  const HOLD: Record<Phase, number> = { scatter: 3400, services: 4200, steps: 4200, core: 5200 };
+  const TAU = Math.PI * 2;
+
+  // ── 모양 정의: 점 i가 각 장면에서 갈 자리 ──
+  const ring = (cx: number, cy: number, r0: number, r1: number, u: number, v: number) => { const a = u * TAU, r = Math.sqrt(r0 * r0 + v * (r1 * r1 - r0 * r0)); return [cx + Math.cos(a) * r, cy + Math.sin(a) * r]; };
+  const SVC = [[-0.47, -0.45], [0.47, -0.45], [-0.47, 0.45], [0.47, 0.45]], STP = [-0.72, -0.24, 0.24, 0.72];
+  function target(phase: Phase, i: number, n: number, u: number, v: number): [number, number] | null {
+    if (phase === 'scatter') return null;
+    if (phase === 'services') { const c = SVC[i % 4]; return ring(c[0], c[1], 0.31, 0.37, u, v) as [number, number]; }
+    if (phase === 'steps') {
+      if (i % 10 < 8) return ring(STP[i % 4], 0, 0.125, 0.165, u, v) as [number, number];
+      const k = i % 3; return [STP[k] + 0.2 + u * 0.08, (v - 0.5) * 0.012];        // 단계 사이를 잇는 짧은 선
+    }
+    if (i < n * 0.22) return [(u - 0.5) * 0.4, (v - 0.5) * 0.4];                     // 코어 사각형
+    return ring(0, 0, 0.64, 0.78, u, v) as [number, number];                         // 렌즈 링
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-dots]').forEach(root => {
+    const cv = root.querySelector('canvas')!, ctx = cv.getContext('2d')!;
+    const cap = root.querySelector<HTMLElement>('[data-cap]')!, tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-go]'));
+    const css = (k: string) => getComputedStyle(document.documentElement).getPropertyValue(k).trim();
+    const INK = css('--ink') || '#121519', CORE = css('--core') || '#2430E8';
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const N = matchMedia('(max-width: 760px)').matches ? 1100 : 2400;
+    // 모양 안의 자리는 난수 대신 고르게 퍼지는 수열(Halton)로 정한다: 링과 사각형이 얼룩 없이 또렷해진다
+    const halton = (i: number, b: number) => { let f = 1, r = 0; while (i > 0) { f /= b; r += f * (i % b); i = Math.floor(i / b); } return r; };
+
+    // 점 하나: 위치, 속도, 고유 난수 둘(모양 안의 자리), 초점(0 흐림 ~ 1 선명), 코어색 정도, 출발 지연
+    const P = Array.from({ length: N }, (_, i) => ({ x: (Math.random() - 0.5) * 2.2, y: (Math.random() - 0.5) * 2.2, vx: 0, vy: 0, u: halton(i + 1, 3), v: halton(i + 1, 7), f: 0, c: 0, wait: 0, s: Math.random() * TAU, i }));
+    let W = 0, H = 0, S = 1, dpr = 1, phase: Phase = 'scatter', since = 0, raf = 0, visible = false, last = 0, hold = 0, px = 9, py = 9;
+
+    function size() { dpr = Math.min(2, devicePixelRatio || 1); W = cv.clientWidth; H = cv.clientHeight; cv.width = W * dpr; cv.height = H * dpr; S = (W / 1.28 / 2) * 0.94; if (reduce) draw(); }
+    function go(p: Phase, byUser = false) {
+      phase = p; since = performance.now(); root.dataset.phase = p;
+      hold = HOLD[p] + (byUser ? 6000 : 0);
+      root.classList.toggle('auto', !byUser && !reduce); root.style.setProperty('--dur', hold + 'ms');
+      tabs.forEach(t => { const on = t.dataset.go === p; t.setAttribute('aria-pressed', String(on)); if (on) cap.textContent = t.dataset.capText!; });
+      // 한꺼번에 움직이지 않고 물결처럼 출발한다
+      P.forEach(q => { q.wait = Math.random() * 520; });
+      if (reduce) { P.forEach(q => { const t = target(p, q.i, N, q.u, q.v); if (t) { q.x = t[0]; q.y = t[1]; } q.f = p === 'scatter' ? 0.25 : 1; q.c = p === 'core' && q.i < N * 0.2 ? 1 : 0; }); draw(); }
+    }
+    function step(now: number) {
+      const dt = Math.min(2.2, (now - last) / 16.7); last = now;
+      const t = now / 1000, el = now - since;
+      for (const q of P) {
+        const tg = el > q.wait ? target(phase, q.i, N, q.u, q.v) : null;
+        if (tg) {                                                    // 자리를 찾아 모인다
+          q.vx += (tg[0] + Math.sin(t * 1.3 + q.s) * 0.008 - q.x) * 0.05 * dt; q.vy += (tg[1] + Math.cos(t * 1.1 + q.s) * 0.008 - q.y) * 0.05 * dt;
+          q.vx *= 0.84; q.vy *= 0.84; q.f += (1 - q.f) * 0.06 * dt;
+        } else {                                                     // 흐름을 타고 무리 지어 떠돈다
+          const a = Math.sin(q.x * 1.9 + t * 0.35) * 1.7 + Math.cos(q.y * 2.3 - t * 0.28) * 1.7 + q.s * 0.25;
+          // 각자 제 구역(hx, hy) 근처에서 떠돌게 해서 한쪽으로 쏠리지 않는다
+          const hx = Math.cos(q.s) * (0.25 + q.u * 0.85), hy = Math.sin(q.s) * (0.25 + q.v * 0.85);
+          q.vx += Math.cos(a) * 0.0012 * dt + (hx - q.x) * 0.0016 * dt; q.vy += Math.sin(a) * 0.0012 * dt + (hy - q.y) * 0.0016 * dt;
+          q.vx *= 0.965; q.vy *= 0.965; q.f += ((phase === 'scatter' ? 0 : 0.4) - q.f) * 0.05 * dt;
+        }
+        const dx = q.x - px, dy = q.y - py, d2 = dx * dx + dy * dy;   // 포인터를 피해 흩어진다
+        if (d2 < 0.09) { const k = (0.09 - d2) * 0.5 * dt; q.vx += dx * k; q.vy += dy * k; }
+        q.x += q.vx * dt; q.y += q.vy * dt;
+        q.c += ((phase === 'core' && tg && q.i < N * 0.2 ? 1 : 0) - q.c) * 0.08 * dt;
+      }
+    }
+    function draw() {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+      const cx = W / 2, cy = H / 2;
+      for (const q of P) {
+        // 흐릴 때는 크고 옅게, 초점이 맞으면 작고 진하게
+        const r = (0.021 - q.f * 0.0142) * S, a = 0.09 + q.f * 0.81;
+        ctx.globalAlpha = a; ctx.fillStyle = q.c > 0.5 ? CORE : INK;
+        ctx.beginPath(); ctx.arc(cx + q.x * S, cy + q.y * S, r, 0, TAU); ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+    // 커서들이 이 무대를 아직 그리지 않았으면(visibility: hidden) 첫 장면에서 기다린다
+    const shown = () => (cv as HTMLElement & { checkVisibility?: (o: object) => boolean }).checkVisibility?.({ visibilityProperty: true }) ?? true;
+    let wasShown = false;
+    function frame(now: number) {
+      raf = 0;
+      if (!shown()) { since = now; wasShown = false; } else if (!wasShown) { wasShown = true; go('scatter'); }
+      step(now); draw();
+      if (now - since > hold) go(ORDER[(ORDER.indexOf(phase) + 1) % ORDER.length]);
+      if (visible) raf = requestAnimationFrame(frame);
+    }
+    const kick = () => { if (!raf && visible && !reduce) { last = performance.now(); raf = requestAnimationFrame(frame); } };
+
+    root.classList.add('live'); size(); addEventListener('resize', size);
+    tabs.forEach(t => t.addEventListener('click', () => { go(t.dataset.go as Phase, true); kick(); }));
+    const stage = cv.parentElement!;
+    const move = (e: PointerEvent) => { const b = cv.getBoundingClientRect(); px = (e.clientX - b.left - W / 2) / S; py = (e.clientY - b.top - H / 2) / S; };
+    stage.addEventListener('pointermove', move); stage.addEventListener('pointerdown', move);
+    stage.addEventListener('pointerleave', () => { px = py = 9; });
+
+    if (reduce) { go('core', true); return; }
+    go('scatter');
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible) since = performance.now() - Math.min(performance.now() - since, hold * 0.5); kick(); }, { threshold: 0.2 }).observe(root);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) { last = performance.now(); since = last; } });
+  });
+</script>

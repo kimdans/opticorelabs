@@ -6,12 +6,11 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "test": "vitest run",
-    "check:links": "node scripts/check-links.mjs",
-    "check:mobile": "node scripts/check-mobile.mjs"
+    "test": "vitest run"
   },
   "dependencies": {
-    "astro": "^7.4.12"
+    "astro": "^7.4.12",
+    "cursor-swarm": "^0.1.0"
   },
   "devDependencies": {
     "typescript": "^7.0.2",
